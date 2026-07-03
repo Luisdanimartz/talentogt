@@ -1,0 +1,267 @@
+/* ================= RESET ================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f5f7fb;
+  color: #333;
+}
+
+.container {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* ================= NAVBAR ================= */
+
+.navbar {
+  background: #0a4d8c;
+  color: white;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 50px;
+}
+
+.logo {
+  color: white;
+}
+
+.navbar nav {
+  display: flex;
+  gap: 30px;
+}
+
+.navbar nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.login {
+  background: #14ae5c;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ================= HERO ================= */
+
+.hero {
+  text-align: center;
+  margin-top: 80px;
+  padding: 20px;
+}
+
+.hero h1 {
+  font-size: 58px;
+  color: #0a4d8c;
+}
+
+.hero p {
+  max-width: 750px;
+  margin: 25px auto;
+  font-size: 22px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.hero-buttons {
+  margin-top: 35px;
+}
+
+.primary,
+.secondary {
+  border: none;
+  border-radius: 8px;
+  padding: 15px 30px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.primary {
+  background: #0a4d8c;
+  color: white;
+  margin-right: 20px;
+}
+
+.secondary {
+  background: #14ae5c;
+  color: white;
+}
+
+/* ================= BUSCADOR ================= */
+
+.search {
+  width: 90%;
+  max-width: 1100px;
+  margin: 90px auto;
+  text-align: center;
+}
+
+.search h2 {
+  color: #0a4d8c;
+  margin-bottom: 30px;
+}
+
+.search-box {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.search-box input {
+  width: 280px;
+  padding: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.search-box button {
+  background: #0a4d8c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 30px;
+  cursor: pointer;
+}
+
+/* ================= ESTADISTICAS ================= */
+
+.stats {
+  width: 90%;
+  max-width: 1100px;
+  margin: 80px auto;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: white;
+  width: 300px;
+  padding: 35px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+  color: #0a4d8c;
+  font-size: 42px;
+}
+
+.card p {
+  margin-top: 15px;
+  color: #666;
+}
+
+/* ================= EMPRESAS ================= */
+
+.companies {
+  width: 90%;
+  max-width: 1100px;
+  margin: 80px auto;
+}
+
+.companies h2 {
+  text-align: center;
+  color: #0a4d8c;
+  margin-bottom: 40px;
+}
+
+.companies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+}
+
+.company {
+  background: white;
+  padding: 35px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: bold;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  transition: 0.3s;
+}
+
+.company:hover {
+  transform: translateY(-5px);
+}
+/* ================= VACANTES ================= */
+
+.jobs{
+
+    width:90%;
+
+    max-width:1100px;
+
+    margin:80px auto;
+
+}
+
+.jobs h2{
+
+    text-align:center;
+
+    color:#0A4D8C;
+
+    margin-bottom:40px;
+
+}
+
+.job{
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:12px;
+
+    margin-bottom:20px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+.job h3{
+
+    color:#0A4D8C;
+
+}
+
+.job p{
+
+    margin:12px 0;
+
+    color:#666;
+
+}
+
+.job button{
+
+    background:#14AE5C;
+
+    color:white;
+
+    border:none;
+
+    padding:10px 18px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
