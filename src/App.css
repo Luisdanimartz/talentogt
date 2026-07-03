@@ -265,3 +265,332 @@ body {
     cursor:pointer;
 
 }
+/* ================= DASHBOARD ================= */
+
+.dashboard{
+
+    width:90%;
+
+    max-width:1200px;
+
+    margin:60px auto;
+
+}
+
+.subtitle{
+
+    color:#666;
+
+    margin-top:10px;
+
+    margin-bottom:40px;
+
+}
+
+.dashboard-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+    gap:25px;
+
+}
+
+.stat-card{
+
+    background:white;
+
+    padding:35px;
+
+    border-radius:14px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+    transition:.3s;
+
+}
+
+.stat-card:hover{
+
+    transform:translateY(-6px);
+
+}
+
+.stat-card h2{
+
+    color:#0A4D8C;
+
+    font-size:42px;
+
+}
+
+.stat-card p{
+
+    margin-top:12px;
+
+    color:#666;
+
+}
+/* ================= DASHBOARD V2 ================= */
+
+.welcome{
+    margin-bottom:35px;
+}
+
+.welcome h1{
+    color:#0A4D8C;
+    margin-bottom:10px;
+}
+
+.welcome p{
+    color:#666;
+}
+
+.profile-progress{
+    background:white;
+    padding:25px;
+    border-radius:14px;
+    margin-bottom:35px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.progress-header{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:12px;
+    font-weight:bold;
+}
+
+.progress-bar{
+    height:14px;
+    background:#E5E7EB;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.progress-fill{
+    width:18%;
+    height:100%;
+    background:#14AE5C;
+}
+
+.activity{
+    margin-top:50px;
+    background:white;
+    padding:30px;
+    border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.activity h2{
+    color:#0A4D8C;
+    margin-bottom:20px;
+}
+
+.activity ul{
+    list-style:none;
+}
+
+.activity li{
+    padding:12px 0;
+    border-bottom:1px solid #EEEEEE;
+}
+
+.activity li:last-child{
+    border-bottom:none;
+}
+/* ================= PROCESOS ================= */
+
+.processes{
+
+    margin-top:50px;
+
+}
+
+.processes h2{
+
+    color:#0A4D8C;
+
+    margin-bottom:25px;
+
+}
+
+.process-card{
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:14px;
+
+    margin-bottom:20px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+}
+
+.process-card h3{
+
+    color:#0A4D8C;
+
+}
+
+.process-card p{
+
+    color:#777;
+
+    margin:8px 0 20px;
+
+}
+
+.status{
+
+    display:inline-block;
+
+    padding:8px 15px;
+
+    border-radius:30px;
+
+    color:white;
+
+    font-size:14px;
+
+    margin-bottom:20px;
+
+}
+
+.review{
+
+    background:#2563EB;
+
+}
+
+.interview{
+
+    background:#14AE5C;
+
+}
+
+.send{
+
+    background:#F59E0B;
+
+}
+
+.process-card button{
+
+    display:block;
+
+    margin-top:20px;
+
+    background:#0A4D8C;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 22px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+/* ================= DASHBOARD PRO ================= */
+
+.dashboard-header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:35px;
+
+}
+
+.profile-btn{
+
+background:white;
+
+border:2px solid #0A4D8C;
+
+color:#0A4D8C;
+
+padding:12px 20px;
+
+border-radius:10px;
+
+cursor:pointer;
+
+font-weight:bold;
+
+}
+
+.dashboard-columns{
+
+display:grid;
+
+grid-template-columns:1fr 1.4fr;
+
+gap:30px;
+
+margin-top:40px;
+
+}
+
+.process-card{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+background:white;
+
+padding:20px;
+
+border-radius:14px;
+
+margin-bottom:18px;
+
+box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+}
+
+.process-card h3{
+
+color:#0A4D8C;
+
+margin-bottom:6px;
+
+}
+
+.process-card p{
+
+color:#666;
+
+}
+
+@media(max-width:900px){
+
+.dashboard-columns{
+
+grid-template-columns:1fr;
+
+}
+
+.dashboard-header{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+gap:20px;
+
+}
+
+}
