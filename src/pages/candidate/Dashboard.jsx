@@ -1,6 +1,35 @@
+import { useState } from "react";
+
 import StatCard from "../../components/ui/StatCard";
+import ProcessCard from "../../components/process/ProcessCard";
+import ProcessTimeline from "../../components/timeline/ProcessTimeline";
+
+import { dashboardStats } from "../../data/dashboard";
+import { timeline } from "../../data/timeline";
+import applications from "../../mock/applications";
+import user from "../../session/user";
+
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
 
 function Dashboard() {
+
+  const [open, setOpen] = useState(false);
+  const [selectedProcess, setSelectedProcess] = useState(null);
+
+  const handleOpen = (application) => {
+    setSelectedProcess(application);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedProcess(null);
+  };
+
   return (
     <div className="dashboard">
 
@@ -10,10 +39,14 @@ function Dashboard() {
 
         <div>
 
-          <h1>Bienvenido, Luis 👋</h1>
+          <h1>
+            Bienvenido, {user.name} 👋
+          </h1>
 
           <p>
-            Completa tu perfil para aumentar tus posibilidades de conseguir empleo.
+
+            {user.accountType} • Completa tu perfil para aumentar tus posibilidades de conseguir empleo.
+
           </p>
 
         </div>
@@ -23,7 +56,6 @@ function Dashboard() {
         </button>
 
       </div>
-
 
       {/* PERFIL */}
 
@@ -45,35 +77,24 @@ function Dashboard() {
 
       </div>
 
-
-      {/* TARJETAS */}
+      {/* ESTADÍSTICAS */}
 
       <div className="dashboard-grid">
 
-        <StatCard
-          number="15"
-          title="Postulaciones"
-        />
+        {dashboardStats.map((stat) => (
 
-        <StatCard
-          number="4"
-          title="Procesos activos"
-        />
+          <StatCard
+            key={stat.id}
+            number={stat.number}
+            title={stat.title}
+            icon={stat.icon}
+          />
 
-        <StatCard
-          number="2"
-          title="Entrevistas"
-        />
-
-        <StatCard
-          number="80%"
-          title="Empresas que respondieron"
-        />
+        ))}
 
       </div>
 
-
-      {/* DOS COLUMNAS */}
+      {/* CONTENIDO */}
 
       <div className="dashboard-columns">
 
@@ -85,72 +106,71 @@ function Dashboard() {
 
             <li>✅ Banco Industrial revisó tu CV.</li>
 
-            <li>✅ Tigo descargó tu CV.</li>
+            <li>📅 Entrevista programada para mañana.</li>
 
-            <li>📅 Entrevista mañana 10:00 AM.</li>
+            <li>📩 Tienes un mensaje nuevo del reclutador.</li>
 
-            <li>📩 Farmacias Batres envió un mensaje.</li>
+            <li>🎉 Has enviado {applications.length} postulaciones.</li>
 
           </ul>
 
         </div>
 
-
         <div className="processes">
 
           <h2>Mis procesos activos</h2>
 
-          <div className="process-card">
+          {applications.map((application) => (
 
-            <div>
+            <ProcessCard
+              key={application.id}
+              job={application.job}
+              company={application.company}
+              status={application.status}
+              progress={application.progress}
+              nextStep={application.nextStep}
+              updated={application.updated}
+              onView={() => handleOpen(application)}
+            />
 
-              <h3>Asesor Comercial</h3>
-
-              <p>Banco Industrial</p>
-
-            </div>
-
-            <span className="status review">
-              CV Revisado
-            </span>
-
-          </div>
-
-          <div className="process-card">
-
-            <div>
-
-              <h3>Supervisor de Ventas</h3>
-
-              <p>Tigo Guatemala</p>
-
-            </div>
-
-            <span className="status interview">
-              Entrevista
-            </span>
-
-          </div>
-
-          <div className="process-card">
-
-            <div>
-
-              <h3>Analista Financiero</h3>
-
-              <p>Cementos Progreso</p>
-
-            </div>
-
-            <span className="status send">
-              CV Enviado
-            </span>
-
-          </div>
+          ))}
 
         </div>
 
       </div>
+
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="md"
+        fullWidth
+      >
+
+        <DialogTitle>
+
+          {selectedProcess?.job}
+
+          <br />
+
+          <small>{selectedProcess?.company}</small>
+
+        </DialogTitle>
+
+        <DialogContent>
+
+          <ProcessTimeline steps={timeline} />
+
+        </DialogContent>
+
+        <DialogActions>
+
+          <Button onClick={handleClose}>
+            Cerrar
+          </Button>
+
+        </DialogActions>
+
+      </Dialog>
 
     </div>
   );
