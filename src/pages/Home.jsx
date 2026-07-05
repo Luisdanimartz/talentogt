@@ -1,3 +1,4 @@
+import "../styles/Home.css";
 import { useNavigate } from "react-router-dom";
 
 function Home() {
@@ -6,37 +7,91 @@ function Home() {
 
   return (
     <>
-      {/* HERO */}
+     {/* HERO */}
 
-      <section className="hero">
+<section className="hero">
 
-        <h1>Tu talento merece una respuesta.</h1>
+  <div className="hero-overlay">
 
-        <p>
-          La primera plataforma de empleo en Guatemala donde las empresas mantienen
-          informados a los candidatos durante todo el proceso de selección.
-        </p>
+    <div className="hero-content">
 
-        <div className="hero-buttons">
+      <span className="hero-badge">
+        🇬🇹 La plataforma de empleo de Guatemala
+      </span>
 
-          <button
-            className="primary"
-            onClick={() => navigate("/empleos")}
-          >
-            Buscar empleo
-          </button>
+      <h1>
+        Tu talento merece
+        <br />
+        una respuesta.
+      </h1>
 
-          <button
-            className="secondary"
-            onClick={() => navigate("/empresa/dashboard")}
-          >
-            Publicar vacante
-          </button>
+      <p>
+        Conectamos empresas con talento guatemalteco mediante procesos
+        transparentes donde cada candidato conoce el estado de su postulación.
+      </p>
 
+      <div className="hero-search">
+
+        <input
+          type="text"
+          placeholder="¿Qué empleo buscas?"
+        />
+
+        <input
+          type="text"
+          placeholder="Departamento"
+        />
+
+        <button
+          onClick={() => navigate("/empleos")}
+        >
+          Buscar
+        </button>
+
+      </div>
+
+      <div className="hero-buttons">
+
+        <button
+          className="primary"
+          onClick={() => navigate("/empleos")}
+        >
+          Buscar empleo
+        </button>
+
+        <button
+          className="secondary"
+          onClick={() => navigate("/empresa/dashboard")}
+        >
+          Publicar vacante
+        </button>
+
+      </div>
+
+      <div className="hero-stats">
+
+        <div>
+          <strong>2,500+</strong>
+          <span>Vacantes</span>
         </div>
 
-      </section>
+        <div>
+          <strong>350+</strong>
+          <span>Empresas</span>
+        </div>
 
+        <div>
+          <strong>98%</strong>
+          <span>Responden a candidatos</span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
       {/* BUSCADOR */}
 
       <section className="search">
