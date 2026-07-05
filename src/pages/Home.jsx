@@ -20,15 +20,18 @@ function Home() {
       </span>
 
       <h1>
-        Tu talento merece
-        <br />
-        una respuesta.
-      </h1>
-
+  El único portal de empleo
+  <br />
+  donde cada candidato
+  <br />
+  recibe una respuesta.
+</h1>
       <p>
-        Conectamos empresas con talento guatemalteco mediante procesos
-        transparentes donde cada candidato conoce el estado de su postulación.
-      </p>
+  TalentoGT conecta empresas y profesionales mediante procesos
+  transparentes. Las empresas que publican vacantes se comprometen
+  a mantener informados a los candidatos durante cada etapa del
+  proceso de selección.
+</p>
 
       <div className="hero-search">
 
