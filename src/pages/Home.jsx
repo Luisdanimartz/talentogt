@@ -1,5 +1,6 @@
 import "../styles/Home.css";
 import { useNavigate } from "react-router-dom";
+import Hero from "../components/Hero";
 
 function Home() {
 
@@ -7,119 +8,31 @@ function Home() {
 
   return (
     <>
-     {/* HERO */}
 
-<section className="hero">
+      <Hero />
 
-  <div className="hero-overlay">
+      {/* NUESTRA PROMESA */}
 
-    <div className="hero-content">
+      <section className="mission">
 
-      <span className="hero-badge">
-        🇬🇹 La plataforma de empleo de Guatemala
-      </span>
+        <h2>
+          El problema no es encontrar empleo.
+        </h2>
 
-      <h1>
-  El único portal de empleo
-  <br />
-  donde cada candidato
-  <br />
-  recibe una respuesta.
-</h1>
-      <p>
-  TalentoGT conecta empresas y profesionales mediante procesos
-  transparentes. Las empresas que publican vacantes se comprometen
-  a mantener informados a los candidatos durante cada etapa del
-  proceso de selección.
-</p>
+        <h3>
+          Es nunca volver a recibir una respuesta.
+        </h3>
 
-      <div className="hero-search">
+        <p>
+          Miles de profesionales en Guatemala envían su currículum cada día
+          y nunca saben si fue visto, revisado o descartado.
+        </p>
 
-        <input
-          type="text"
-          placeholder="¿Qué empleo buscas?"
-        />
-
-        <input
-          type="text"
-          placeholder="Departamento"
-        />
-
-        <button
-          onClick={() => navigate("/empleos")}
-        >
-          Buscar
-        </button>
-
-      </div>
-
-      <div className="hero-buttons">
-
-        <button
-          className="primary"
-          onClick={() => navigate("/empleos")}
-        >
-          Buscar empleo
-        </button>
-
-        <button
-          className="secondary"
-          onClick={() => navigate("/empresa/dashboard")}
-        >
-          Publicar vacante
-        </button>
-
-      </div>
-
-      <div className="hero-stats">
-
-        <div>
-          <strong>2,500+</strong>
-          <span>Vacantes</span>
-        </div>
-
-        <div>
-          <strong>350+</strong>
-          <span>Empresas</span>
-        </div>
-
-        <div>
-          <strong>98%</strong>
-          <span>Responden a candidatos</span>
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</section>
-      {/* BUSCADOR */}
-
-      <section className="search">
-
-        <h2>Buscar empleo</h2>
-
-        <div className="search-box">
-
-          <input
-            type="text"
-            placeholder="Puesto o palabra clave"
-          />
-
-          <input
-            type="text"
-            placeholder="Departamento"
-          />
-
-          <button
-            onClick={() => navigate("/empleos")}
-          >
-            Buscar
-          </button>
-
-        </div>
+        <p>
+          En <strong>TalentoGT</strong>, las empresas se comprometen
+          a mantener informado al candidato durante cada etapa del proceso
+          de selección.
+        </p>
 
       </section>
 
@@ -128,27 +41,18 @@ function Home() {
       <section className="stats">
 
         <div className="card">
-
-          <h2>+2,500</h2>
-
+          <h2>2,500+</h2>
           <p>Vacantes activas</p>
-
         </div>
 
         <div className="card">
-
-          <h2>350</h2>
-
+          <h2>350+</h2>
           <p>Empresas registradas</p>
-
         </div>
 
         <div className="card">
-
           <h2>98%</h2>
-
-          <p>Empresas que responden</p>
-
+          <p>Empresas responden a sus candidatos</p>
         </div>
 
       </section>
@@ -162,35 +66,23 @@ function Home() {
         <div className="companies-grid">
 
           <div className="company">
-
             <h3>Banco Industrial</h3>
-
             <p>Sector Financiero</p>
-
           </div>
 
           <div className="company">
-
             <h3>Tigo Guatemala</h3>
-
             <p>Telecomunicaciones</p>
-
           </div>
 
           <div className="company">
-
             <h3>Cementos Progreso</h3>
-
             <p>Construcción</p>
-
           </div>
 
           <div className="company">
-
             <h3>Farmacias Batres</h3>
-
             <p>Salud</p>
-
           </div>
 
         </div>
