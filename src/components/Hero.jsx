@@ -23,9 +23,8 @@ function Hero() {
           </h1>
 
           <p>
-            La plataforma donde las empresas se comprometen
-            a responder a cada candidato durante todo el
-            proceso de selección.
+            La plataforma donde las empresas se comprometen a responder
+            a cada candidato durante todo el proceso de selección.
           </p>
 
           {/* ================= BUSCADOR ================= */}
@@ -47,7 +46,6 @@ function Hero() {
               <option>Tecnología</option>
               <option>Marketing</option>
               <option>Contabilidad</option>
-
             </select>
 
             <button>
@@ -79,12 +77,12 @@ function Hero() {
 
             <div className="stat-box">
               <h3>2,500+</h3>
-              <p>Empresas confían</p>
+              <p>Empresas registradas</p>
             </div>
 
             <div className="stat-box">
               <h3>12,000+</h3>
-              <p>Candidatos inscritos</p>
+              <p>Candidatos activos</p>
             </div>
 
             <div className="stat-box">
@@ -100,11 +98,15 @@ function Hero() {
 
         <div className="hero-right">
 
-          <img
-            className="hero-people"
-            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80"
-            alt="Equipo de trabajo"
-          />
+          <div className="hero-photo">
+
+            <img
+              className="hero-people"
+              src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80"
+              alt="Equipo de trabajo"
+            />
+
+          </div>
 
         </div>
 

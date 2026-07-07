@@ -1,0 +1,133 @@
+/* =======================================================
+   EMPRESAS QUE CONFÍAN EN CHANCEGT
+======================================================= */
+
+.company-logos{
+
+    width:100%;
+
+    background:#FFFFFF;
+
+    padding:70px 0;
+
+    overflow:hidden;
+
+}
+
+.logos-container{
+
+    width:100%;
+
+    max-width:1280px;
+
+    margin:0 auto;
+
+    padding:0 24px;
+
+}
+
+.logos-container h2{
+
+    text-align:center;
+
+    font-size:34px;
+
+    color:#0B2F6B;
+
+    font-weight:800;
+
+    margin-bottom:45px;
+
+}
+
+.logos-slider{
+
+    width:100%;
+
+    overflow:hidden;
+
+    position:relative;
+
+}
+
+.logos-track{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:70px;
+
+    width:max-content;
+
+    animation:scrollLogos 30s linear infinite;
+
+}
+
+.logos-track img{
+
+    height:46px;
+
+    width:auto;
+
+    object-fit:contain;
+
+    filter:grayscale(100%);
+
+    opacity:.70;
+
+    transition:.30s;
+
+}
+
+.logos-track img:hover{
+
+    filter:none;
+
+    opacity:1;
+
+    transform:scale(1.08);
+
+}
+
+@keyframes scrollLogos{
+
+    from{
+
+        transform:translateX(0);
+
+    }
+
+    to{
+
+        transform:translateX(-50%);
+
+    }
+
+}
+
+/* =======================================================
+   RESPONSIVE
+======================================================= */
+
+@media(max-width:768px){
+
+.logos-container h2{
+
+    font-size:28px;
+
+}
+
+.logos-track{
+
+    gap:40px;
+
+}
+
+.logos-track img{
+
+    height:34px;
+
+}
+
+}

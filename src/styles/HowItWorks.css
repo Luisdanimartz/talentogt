@@ -1,0 +1,321 @@
+/* =======================================================
+   HOW IT WORKS
+======================================================= */
+
+.how{
+
+    width:100%;
+
+    padding:70px 0;
+
+    background:#F8FAFC;
+
+}
+
+.how-container{
+
+    max-width:1280px;
+
+    margin:0 auto;
+
+    padding:0 24px;
+
+}
+
+.how-container h2{
+
+    text-align:center;
+
+    font-size:42px;
+
+    color:#0B2F6B;
+
+    font-weight:800;
+
+    margin-bottom:12px;
+
+}
+
+.how-subtitle{
+
+    text-align:center;
+
+    color:#64748B;
+
+    font-size:18px;
+
+    margin-bottom:50px;
+
+}
+
+/* =======================================================
+   GRID
+======================================================= */
+
+.how-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:28px;
+
+}
+
+/* =======================================================
+   CARD
+======================================================= */
+
+.how-card{
+
+    background:#FFFFFF;
+
+    border-radius:24px;
+
+    padding:32px;
+
+    box-shadow:0 15px 40px rgba(15,23,42,.08);
+
+    transition:.25s;
+
+}
+
+.how-card:hover{
+
+    transform:translateY(-6px);
+
+}
+
+.how-header{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:18px;
+
+    margin-bottom:34px;
+
+}
+
+.how-icon{
+
+    width:62px;
+
+    height:62px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:white;
+
+    font-size:28px;
+
+    flex-shrink:0;
+
+}
+
+.candidate{
+
+    background:#2563EB;
+
+}
+
+.company{
+
+    background:#16A34A;
+
+}
+
+.how-header h3{
+
+    color:#0B2F6B;
+
+    font-size:28px;
+
+    margin-bottom:10px;
+
+}
+
+.how-description{
+
+    color:#64748B;
+
+    line-height:1.6;
+
+}
+
+/* =======================================================
+   PASOS HORIZONTALES
+======================================================= */
+
+.steps-horizontal{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    justify-content:space-between;
+
+    gap:10px;
+
+    margin-bottom:34px;
+
+}
+
+.step-item{
+
+    flex:1;
+
+    text-align:center;
+
+}
+
+.step-circle{
+
+    width:44px;
+
+    height:44px;
+
+    border-radius:50%;
+
+    background:#E8F0FF;
+
+    color:#2563EB;
+
+    font-weight:700;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    margin:0 auto 14px;
+
+}
+
+.step-item h4{
+
+    color:#0B2F6B;
+
+    font-size:17px;
+
+    margin-bottom:8px;
+
+}
+
+.step-item p{
+
+    color:#64748B;
+
+    font-size:14px;
+
+    line-height:1.5;
+
+}
+
+.step-arrow{
+
+    font-size:32px;
+
+    color:#CBD5E1;
+
+    margin-top:8px;
+
+}
+
+/* =======================================================
+   BOTÓN
+======================================================= */
+
+.how-card button{
+
+    display:block;
+
+    margin:0 auto;
+
+    padding:14px 34px;
+
+    border:none;
+
+    border-radius:10px;
+
+    color:white;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.how-card:first-child button{
+
+    background:#2563EB;
+
+}
+
+.how-card:last-child button{
+
+    background:#16A34A;
+
+}
+
+.how-card button:hover{
+
+    transform:translateY(-2px);
+
+}
+
+/* =======================================================
+   RESPONSIVE
+======================================================= */
+
+@media(max-width:1100px){
+
+.how-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+}
+
+@media(max-width:768px){
+
+.steps-horizontal{
+
+    flex-direction:column;
+
+    align-items:center;
+
+}
+
+.step-arrow{
+
+    transform:rotate(90deg);
+
+    margin:6px 0;
+
+}
+
+.how-card{
+
+    padding:26px;
+
+}
+
+.how-container h2{
+
+    font-size:34px;
+
+}
+
+}
