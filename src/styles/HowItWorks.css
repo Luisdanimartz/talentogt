@@ -6,7 +6,7 @@
 
     width:100%;
 
-    padding:70px 0;
+    padding:30px 0 15px;
 
     background:#F8FAFC;
 
@@ -32,7 +32,7 @@
 
     font-weight:800;
 
-    margin-bottom:12px;
+    margin-bottom:8px;
 
 }
 
@@ -44,7 +44,7 @@
 
     font-size:18px;
 
-    margin-bottom:50px;
+    margin-bottom:30px;
 
 }
 
@@ -58,7 +58,7 @@
 
     grid-template-columns:repeat(2,1fr);
 
-    gap:28px;
+    gap:24px;
 
 }
 
@@ -72,9 +72,9 @@
 
     border-radius:24px;
 
-    padding:32px;
+    padding:26px;
 
-    box-shadow:0 15px 40px rgba(15,23,42,.08);
+    box-shadow:0 12px 30px rgba(15,23,42,.08);
 
     transition:.25s;
 
@@ -82,7 +82,7 @@
 
 .how-card:hover{
 
-    transform:translateY(-6px);
+    transform:translateY(-4px);
 
 }
 
@@ -94,15 +94,15 @@
 
     gap:18px;
 
-    margin-bottom:34px;
+    margin-bottom:22px;
 
 }
 
 .how-icon{
 
-    width:62px;
+    width:60px;
 
-    height:62px;
+    height:60px;
 
     border-radius:50%;
 
@@ -136,9 +136,9 @@
 
     color:#0B2F6B;
 
-    font-size:28px;
+    font-size:26px;
 
-    margin-bottom:10px;
+    margin-bottom:8px;
 
 }
 
@@ -146,7 +146,7 @@
 
     color:#64748B;
 
-    line-height:1.6;
+    line-height:1.5;
 
 }
 
@@ -162,9 +162,9 @@
 
     justify-content:space-between;
 
-    gap:10px;
+    gap:8px;
 
-    margin-bottom:34px;
+    margin-bottom:22px;
 
 }
 
@@ -178,9 +178,9 @@
 
 .step-circle{
 
-    width:44px;
+    width:42px;
 
-    height:44px;
+    height:42px;
 
     border-radius:50%;
 
@@ -196,7 +196,7 @@
 
     align-items:center;
 
-    margin:0 auto 14px;
+    margin:0 auto 10px;
 
 }
 
@@ -204,9 +204,9 @@
 
     color:#0B2F6B;
 
-    font-size:17px;
+    font-size:16px;
 
-    margin-bottom:8px;
+    margin-bottom:6px;
 
 }
 
@@ -216,17 +216,17 @@
 
     font-size:14px;
 
-    line-height:1.5;
+    line-height:1.45;
 
 }
 
 .step-arrow{
 
-    font-size:32px;
+    font-size:28px;
 
     color:#CBD5E1;
 
-    margin-top:8px;
+    margin-top:6px;
 
 }
 
@@ -240,7 +240,7 @@
 
     margin:0 auto;
 
-    padding:14px 34px;
+    padding:12px 30px;
 
     border:none;
 
@@ -308,7 +308,7 @@
 
 .how-card{
 
-    padding:26px;
+    padding:22px;
 
 }
 
