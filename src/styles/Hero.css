@@ -1,0 +1,453 @@
+/* =======================================================
+   HERO
+======================================================= */
+
+.hero{
+
+    width:100%;
+    min-height:calc(100vh - 82px);
+     padding-top:82px;
+
+    display:flex;
+    align-items:center;
+
+    background:
+    linear-gradient(rgba(8,38,84,.82),rgba(8,38,84,.82)),
+    url("https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1800&q=80");
+
+    background-size:cover;
+    background-position:center;
+    overflow:hidden;
+
+}
+
+.hero-container{
+
+    width:100%;
+
+    max-width:1280px;
+
+    margin:0 auto;
+
+    padding:24px 20px;
+
+    display:grid;
+
+    grid-template-columns:1.1fr .480fr;
+
+    align-items:center;
+
+    gap:32px;
+
+}
+
+/* =======================================================
+   IZQUIERDA
+======================================================= */
+
+.hero-left{
+
+    color:#fff;
+
+}
+
+.hero-badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    padding:12px 22px;
+
+    border-radius:999px;
+
+    background:rgba(255,255,255,.12);
+
+    backdrop-filter:blur(10px);
+
+    margin-bottom:10px;
+
+    font-weight:600;
+
+}
+
+.hero-left h1{
+
+    font-size:54px;
+
+    line-height:1.02;
+
+    margin:0 0 8px;
+
+    font-weight:800;
+
+    color:white;
+}
+
+.hero-left h1 span{
+
+    color:#60A5FA;
+
+}
+
+.hero-left p{
+
+    font-size:17px;
+
+    line-height:1.5;
+
+    color:#E5EDF8;
+
+    max-width:540px;
+
+    margin-bottom:16px;
+
+}
+
+/* =======================================================
+   BUSCADOR
+======================================================= */
+
+.hero-search{
+
+    display:flex;
+
+    background:#fff;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    box-shadow:0 20px 50px rgba(0,0,0,.18);
+
+}
+
+.hero-search input{
+
+    flex:2;
+
+    border:none;
+
+    outline:none;
+
+    padding:22px;
+
+    font-size:16px;
+
+}
+
+.hero-search select{
+
+    flex:1;
+
+    border:none;
+
+    outline:none;
+
+    padding:22px;
+
+    font-size:16px;
+
+}
+
+.hero-search button{
+
+    width:210px;
+
+    border:none;
+
+    background:#2563EB;
+
+    color:#fff;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+}
+
+.hero-search button:hover{
+
+    background:#1D4ED8;
+
+}
+
+/* =======================================================
+   ETIQUETAS
+======================================================= */
+
+.hero-tags{
+
+    display:flex;
+
+    flex-wrap:nowrap;
+
+    justify-content:space-between;
+
+    gap:8px;
+
+    margin-bottom:18px;
+
+}
+
+.hero-tags span{
+
+    padding:8px 14px;
+
+    border-radius:999px;
+
+    background:rgba(255,255,255,.15);
+
+    backdrop-filter:blur(8px);
+
+    border:1px solid rgba(255,255,255,.18);
+
+    color:white;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    white-space:nowrap;
+
+}
+
+/* =======================================================
+   ESTADISTICAS
+======================================================= */
+
+.stat-box{
+
+    background:rgba(255,255,255,.12);
+
+    backdrop-filter:blur(12px);
+
+    border:1px solid rgba(255,255,255,.18);
+
+    border-radius:16px;
+    width:100%;
+
+    padding:8px 10px;
+
+    text-align:center;
+
+    transition:.30s;
+
+}
+
+.stat-box p{
+
+    margin-top:6px;
+
+    color:#E4ECF9;
+
+    font-size:13px;
+
+    line-height:1.3;
+
+}
+
+.stat-box h3{
+
+    margin:0;
+
+    color:white;
+
+    font-size:22px;
+
+    font-weight:800;
+
+    line-height:1.1;
+
+}
+.stat-box p{
+
+    color:#E5EAF6;
+
+    font-size:14px;
+
+}
+
+/* =======================================================
+   DERECHA
+======================================================= */
+
+.hero-right{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.hero-people{
+
+    width:480px;
+
+    height:480px;
+
+    object-fit:cover;
+
+    border-radius:24px;
+
+    display:block;
+
+    margin:auto;
+
+    box-shadow:0 30px 70px rgba(0,0,0,.28);
+
+}
+/* =======================================================
+   RESPONSIVE
+======================================================= */
+
+@media (max-width:1200px){
+
+.hero-container{
+
+    grid-template-columns:1fr;
+
+    gap:50px;
+
+    text-align:center;
+
+}
+
+.hero-left{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+}
+
+.hero-left p{
+
+    max-width:720px;
+
+}
+
+.hero-search{
+
+    width:100%;
+
+    max-width:720px;
+
+}
+
+.hero-tags{
+
+    justify-content:center;
+
+}
+
+.hero-stats{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,minmax(0,1fr));
+
+    gap:26px;
+
+    margin-top:52px;
+
+    align-items:start;
+
+}
+
+.hero-right{
+
+    order:-1;
+
+}
+
+.hero-people{
+
+    max-width:520px;
+
+}
+
+}
+
+@media (max-width:768px){
+
+.hero{
+
+    min-height:auto;
+
+    padding:40px 0;
+
+}
+
+.hero-container{
+
+    padding:20px;
+
+    gap:35px;
+
+}
+
+.hero-left h1{
+
+    font-size:46px;
+
+}
+
+.hero-left p{
+
+    font-size:18px;
+
+}
+
+.hero-search{
+
+    flex-direction:column;
+
+}
+
+.hero-search input,
+.hero-search select,
+.hero-search button{
+
+    width:100%;
+
+}
+
+.hero-search button{
+
+    height:64px;
+
+}
+
+.hero-tags{
+
+    justify-content:center;
+
+}
+
+.hero-stats{
+
+    grid-template-columns:1fr;
+
+}
+
+.hero-people{
+
+    width:100%;
+
+    max-width:400px;
+
+}
+
+}
+
+html,
+body{
+
+    overflow-x:hidden;
+
+}

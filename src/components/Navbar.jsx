@@ -1,158 +1,71 @@
-import { Link, useNavigate } from "react-router-dom";
-
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-
-import { supabase } from "../lib/supabase";
-import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
+import "../styles/Navbar.css";
 
 function Navbar() {
 
-  const navigate = useNavigate();
-
-  const { user } = useAuth();
-
-  const handleLogout = async () => {
-
-    await supabase.auth.signOut();
-
-    navigate("/");
-
-  };
-
   return (
 
-    <AppBar
-      position="sticky"
-      color="inherit"
-      elevation={1}
-    >
+    <header className="navbar">
 
-      <Toolbar
-        sx={{
-          maxWidth: "1400px",
-          width: "100%",
-          margin: "0 auto",
-        }}
-      >
+      <div className="navbar-container">
 
-        {/* LOGO */}
+        <Link to="/" className="logo">
 
-        <Typography
-          component={Link}
-          to="/"
-          variant="h5"
-          sx={{
-            flexGrow: 1,
-            fontWeight: "bold",
-            color: "#0A4D8C",
-            textDecoration: "none",
-          }}
-        >
-          TalentoGT
-        </Typography>
+          <img
+            src="/guatemala.png"
+            alt="Guatemala"
+            className="flag"
+          />
 
-        {/* MENÚ */}
+          <div className="logo-text">
 
-        <Box
-          sx={{
-            display: "flex",
-            gap: 2,
-            mr: 3,
-          }}
-        >
+            <h2>
+              Chance<span>GT</span>
+            </h2>
 
-          <Button component={Link} to="/">
-            Inicio
-          </Button>
+            <small>
+              Conectamos talento, creamos oportunidades
+            </small>
 
-          <Button component={Link} to="/empleos">
-            Empleos
-          </Button>
+          </div>
 
-          <Button component={Link} to="/empresas">
-            Empresas
-          </Button>
+        </Link>
 
-          <Button component={Link} to="/crear-cv">
-            Crear CV
-          </Button>
+        <nav className="nav-links">
 
-        </Box>
+          <Link to="/empleos">
+            Buscar empleo
+          </Link>
 
-        {/* SESIÓN */}
+          <Link to="/empresas">
+            Explorar empresas
+          </Link>
 
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 2,
-          }}
-        >
+          <Link to="/consejos">
+            Consejos profesionales
+          </Link>
 
-          {!user ? (
+        </nav>
 
-            <>
+        <div className="nav-actions">
 
-              <Button
-                component={Link}
-                to="/login"
-                variant="outlined"
-              >
-                Iniciar sesión
-              </Button>
+          <button className="publish">
+            Publicar vacante
+          </button>
 
-              <Button
-                component={Link}
-                to="/empresa/dashboard"
-                variant="contained"
-              >
-                Empresas
-              </Button>
+          <button className="login">
+            Ingresar
+          </button>
 
-            </>
+          <button className="register">
+            Registrarse
+          </button>
 
-          ) : (
+        </div>
 
-            <>
+      </div>
 
-              <Typography
-                sx={{
-                  fontWeight: "bold",
-                  color: "#0A4D8C",
-                }}
-              >
-                Hola, {user.email}
-              </Typography>
-
-              <Button
-                component={Link}
-                to="/candidato/dashboard"
-                variant="outlined"
-              >
-                Mi Panel
-              </Button>
-
-              <Button
-                color="error"
-                variant="contained"
-                onClick={handleLogout}
-              >
-                Cerrar sesión
-              </Button>
-
-            </>
-
-          )}
-
-        </Box>
-
-      </Toolbar>
-
-    </AppBar>
+    </header>
 
   );
 

@@ -23,12 +23,9 @@ function Hero() {
           </h1>
 
           <p>
-            La plataforma donde las empresas se comprometen
-            a responder a cada candidato durante todo el
-            proceso de selección.
+            La plataforma donde las empresas se comprometen a responder
+            a cada candidato durante todo el proceso de selección.
           </p>
-
-          {/* ================= BUSCADOR ================= */}
 
           <div className="hero-search">
 
@@ -47,7 +44,6 @@ function Hero() {
               <option>Tecnología</option>
               <option>Marketing</option>
               <option>Contabilidad</option>
-
             </select>
 
             <button>
@@ -55,8 +51,6 @@ function Hero() {
             </button>
 
           </div>
-
-          {/* ================= ETIQUETAS ================= */}
 
           <div className="hero-tags">
 
@@ -68,8 +62,6 @@ function Hero() {
 
           </div>
 
-          {/* ================= ESTADÍSTICAS ================= */}
-
           <div className="hero-stats">
 
             <div className="stat-box">
@@ -79,12 +71,12 @@ function Hero() {
 
             <div className="stat-box">
               <h3>2,500+</h3>
-              <p>Empresas confían</p>
+              <p>Empresas registradas</p>
             </div>
 
             <div className="stat-box">
               <h3>12,000+</h3>
-              <p>Candidatos inscritos</p>
+              <p>Candidatos activos</p>
             </div>
 
             <div className="stat-box">
@@ -100,11 +92,34 @@ function Hero() {
 
         <div className="hero-right">
 
-          <img
-            className="hero-people"
-            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80"
-            alt="Equipo de trabajo"
-          />
+          <div className="hero-photo">
+
+            <img
+              className="hero-people"
+              src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80"
+              alt="Equipo de trabajo"
+            />
+
+          </div>
+
+          <div className="hero-cards">
+
+            <div className="hero-card">
+              <h3>5,000+</h3>
+              <p>Vacantes activas</p>
+            </div>
+
+            <div className="hero-card">
+              <h3>12,000+</h3>
+              <p>Candidatos activos</p>
+            </div>
+
+            <div className="hero-card">
+              <h3>350+</h3>
+              <p>Empresas verificadas</p>
+            </div>
+
+          </div>
 
         </div>
 
