@@ -244,6 +244,23 @@
 
 }
 
+/* ==========================
+   STATS MOBILE
+========================== */
+
+@media (max-width:768px){
+
+.hero-stats{
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:14px;
+
+    margin-top:20px;
+
+}
+
+}
 .stat-box{
 
     background:rgba(255,255,255,.12);
@@ -254,11 +271,47 @@
 
     border-radius:16px;
 
-    padding:12px;
+    padding:14px 10px;
 
     text-align:center;
 
     transition:.30s;
+
+}
+
+.stat-box:hover{
+
+    transform:translateY(-4px);
+
+    background:rgba(255,255,255,.18);
+
+}
+
+/* ==========================
+   STATS MOBILE
+========================== */
+
+@media (max-width:768px){
+
+.stat-box{
+
+    padding:16px 10px;
+
+}
+
+.stat-box h2{
+
+    font-size:28px;
+
+}
+
+.stat-box p{
+
+    font-size:13px;
+
+    line-height:1.4;
+
+}
 
 }
 
@@ -330,6 +383,32 @@
     border-radius:24px;
 
     box-shadow:0 30px 70px rgba(0,0,0,.28);
+
+    transition:.30s;
+
+}
+
+/* ==========================
+   HERO MOBILE
+========================== */
+
+@media (max-width:768px){
+
+.hero-photo{
+
+    margin-top:10px;
+
+}
+
+.hero-people{
+
+    max-width:310px;
+
+    height:310px;
+
+    border-radius:20px;
+
+}
 
 }
 

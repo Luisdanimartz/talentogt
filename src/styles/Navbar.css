@@ -277,38 +277,58 @@
 
 .navbar{
 
-    height:72px;
+    height:64px;
 
 }
 
 .navbar-container{
 
-    height:72px;
+    height:64px;
 
-    padding:0 16px;
+    padding:0 14px;
 
 }
 
-.logo-text h2{
+.logo{
 
-    font-size:24px;
+    gap:10px;
 
 }
 
 .flag{
 
-    width:42px;
+    width:36px;
 
-    height:42px;
+    height:36px;
+
+}
+
+.logo-text h2{
+
+    font-size:20px;
+
+    line-height:1;
+
+}
+
+.logo-text small{
+
+    display:none;
+
+}
+
+.auth{
+
+    gap:8px;
 
 }
 
 .login,
 .register{
 
-    padding:12px 16px;
+    padding:10px 14px;
 
-    font-size:14px;
+    font-size:13px;
 
 }
 
