@@ -31,7 +31,7 @@ fue visto, revisado o si el proceso finalizó.
 
           <button
             className="company-btn"
-            onClick={() => navigate("/register-company")}
+            onClick={() => navigate("/login")}
           >
             Publicar una vacante
           </button>

@@ -4,6 +4,7 @@ const COMPANY_PROFILE_COLUMNS = `
   id,
   user_id,
   company_name,
+  legal_name,
   nit,
   phone,
   email,
@@ -66,6 +67,7 @@ export async function createCompanyProfile(userId, form) {
     .insert({
       user_id: userId,
       company_name: form.commercialName,
+      legal_name: form.legalName,
       nit: form.nit,
       phone: form.phone,
       website: form.website,
@@ -83,6 +85,7 @@ export async function updateCompanyProfile(profileId, form) {
     .from("company_profiles")
     .update({
       company_name: form.commercialName,
+      legal_name: form.legalName,
       nit: form.nit,
       phone: form.phone,
       website: form.website,

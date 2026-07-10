@@ -1,8 +1,7 @@
 import { Navigate } from "react-router-dom";
-
 import { useAuth } from "../context/AuthContext";
 
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children, allowedRoles }) {
 
   const { user, loading } = useAuth();
 
@@ -12,6 +11,14 @@ function ProtectedRoute({ children }) {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  const role = user?.user_metadata?.role;
+
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    // El usuario está logueado pero no tiene permiso para esta ruta.
+    // Lo mandamos a la home en vez de dejarlo entrar.
+    return <Navigate to="/" replace />;
   }
 
   return children;

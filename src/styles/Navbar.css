@@ -165,6 +165,14 @@
 
 .publish{
 
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-decoration:none;
+
     background:#16A34A;
 
     color:#FFFFFF;
@@ -193,6 +201,14 @@
 
 .login{
 
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-decoration:none;
+
     background:transparent;
 
     color:#FFFFFF;
@@ -220,6 +236,14 @@
 }
 
 .register{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-decoration:none;
 
     background:#2563EB;
 

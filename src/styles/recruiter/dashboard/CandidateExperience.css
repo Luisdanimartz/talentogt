@@ -1,0 +1,75 @@
+.candidate-experience{
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:24px;
+
+    box-shadow:0 12px 30px rgba(15,23,42,.06);
+
+}
+
+.candidate-experience h3{
+
+    margin-top:0;
+
+    color:#0B2F6B;
+
+    margin-bottom:22px;
+
+}
+
+.ia-score{
+
+    background:#EEF6FF;
+
+    border-radius:16px;
+
+    padding:20px;
+
+    text-align:center;
+
+    margin-bottom:24px;
+
+    color:#2563EB;
+
+    font-weight:700;
+
+}
+
+.ia-score span{
+
+    display:block;
+
+    font-size:42px;
+
+    margin-bottom:8px;
+
+}
+
+.candidate-experience ul{
+
+    list-style:none;
+
+    padding:0;
+
+    margin:0;
+
+}
+
+.candidate-experience li{
+
+    padding:12px 0;
+
+    border-bottom:1px solid #EEF2F7;
+
+    color:#475569;
+
+}
+
+.candidate-experience li:last-child{
+
+    border-bottom:none;
+
+}

@@ -3,12 +3,15 @@ import {
   Button,
   Divider,
   Grid,
+  MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
 
 function CompanyProfileForm({
   form,
+  departments = [],
+  municipalities = [],
   errors = {},
   loading = false,
   onChange,
@@ -16,7 +19,6 @@ function CompanyProfileForm({
 }) {
   return (
     <Box>
-
       <Typography
         variant="h4"
         fontWeight="bold"
@@ -29,118 +31,131 @@ function CompanyProfileForm({
         color="text.secondary"
         mb={4}
       >
-        Completa la informacion de tu empresa para continuar.
+        Completa la información de tu empresa para continuar.
       </Typography>
 
       <Grid container spacing={3}>
 
         <Grid item xs={12} md={6}>
           <TextField
+            fullWidth
             label="Nombre comercial"
             name="commercialName"
             value={form.commercialName}
             onChange={onChange}
             error={!!errors.commercialName}
             helperText={errors.commercialName}
-            fullWidth
           />
         </Grid>
 
         <Grid item xs={12} md={6}>
           <TextField
-            label="Razon social"
+            fullWidth
+            label="Razón social"
             name="legalName"
             value={form.legalName}
             onChange={onChange}
             error={!!errors.legalName}
             helperText={errors.legalName}
-            fullWidth
           />
         </Grid>
 
         <Grid item xs={12} md={4}>
           <TextField
+            fullWidth
             label="NIT"
             name="nit"
             value={form.nit}
             onChange={onChange}
             error={!!errors.nit}
             helperText={errors.nit}
-            fullWidth
           />
         </Grid>
 
         <Grid item xs={12} md={4}>
           <TextField
-            label="Telefono"
+            fullWidth
+            label="Teléfono"
             name="phone"
             value={form.phone}
             onChange={onChange}
-            error={!!errors.phone}
-            helperText={errors.phone}
-            fullWidth
           />
         </Grid>
 
         <Grid item xs={12} md={4}>
           <TextField
+            fullWidth
             label="Sitio web"
             name="website"
             value={form.website}
             onChange={onChange}
-            error={!!errors.website}
-            helperText={errors.website}
-            fullWidth
           />
         </Grid>
 
         <Grid item xs={12} md={6}>
           <TextField
+            select
+            fullWidth
             label="Departamento"
             name="department"
             value={form.department}
             onChange={onChange}
             error={!!errors.department}
             helperText={errors.department}
-            fullWidth
-          />
+          >
+            {departments.map((department) => (
+              <MenuItem
+                key={department.id}
+                value={department.id}
+              >
+                {department.name}
+              </MenuItem>
+            ))}
+          </TextField>
         </Grid>
 
         <Grid item xs={12} md={6}>
           <TextField
+            select
+            fullWidth
             label="Municipio"
             name="municipality"
             value={form.municipality}
             onChange={onChange}
             error={!!errors.municipality}
             helperText={errors.municipality}
-            fullWidth
-          />
+            disabled={!form.department}
+          >
+            {municipalities.map((municipality) => (
+              <MenuItem
+                key={municipality.id}
+                value={municipality.id}
+              >
+                {municipality.name}
+              </MenuItem>
+            ))}
+          </TextField>
         </Grid>
 
         <Grid item xs={12}>
           <TextField
-            label="Direccion"
+            fullWidth
+            label="Dirección"
             name="address"
             value={form.address}
             onChange={onChange}
-            error={!!errors.address}
-            helperText={errors.address}
-            fullWidth
           />
         </Grid>
 
         <Grid item xs={12}>
           <TextField
-            label="Descripcion"
+            fullWidth
+            multiline
+            rows={5}
+            label="Descripción de la empresa"
             name="description"
             value={form.description}
             onChange={onChange}
-            error={!!errors.description}
-            helperText={errors.description}
-            multiline
-            rows={5}
-            fullWidth
           />
         </Grid>
 
@@ -166,13 +181,12 @@ function CompanyProfileForm({
         <Button
           variant="contained"
           size="large"
-          onClick={onSubmit}
           disabled={loading}
+          onClick={onSubmit}
         >
           Guardar Perfil
         </Button>
       </Box>
-
     </Box>
   );
 }

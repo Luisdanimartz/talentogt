@@ -1,0 +1,101 @@
+.featured-candidates{
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:24px;
+
+    box-shadow:0 12px 30px rgba(15,23,42,.06);
+
+}
+
+.featured-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.featured-header h2{
+
+    margin:0;
+
+    color:#0B2F6B;
+
+}
+
+.featured-header button{
+
+    border:none;
+
+    background:#EEF4FF;
+
+    color:#2563EB;
+
+    padding:10px 16px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-weight:700;
+
+}
+
+.candidate-card{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:18px 0;
+
+    border-bottom:1px solid #EEF2F7;
+
+}
+
+.candidate-card:last-child{
+
+    border-bottom:none;
+
+}
+
+.candidate-card h3{
+
+    margin:0;
+
+    font-size:16px;
+
+}
+
+.candidate-card p{
+
+    margin-top:6px;
+
+    color:#64748B;
+
+    font-size:14px;
+
+}
+
+.candidate-card span{
+
+    background:#DCFCE7;
+
+    color:#15803D;
+
+    padding:8px 14px;
+
+    border-radius:999px;
+
+    font-weight:700;
+
+}

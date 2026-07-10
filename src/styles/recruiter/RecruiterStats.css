@@ -1,0 +1,71 @@
+.recruiter-stats{
+
+    width:min(1200px,92%);
+
+    margin:35px auto;
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:22px;
+
+}
+
+.stat-card{
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:28px;
+
+    box-shadow:0 10px 30px rgba(15,23,42,.08);
+
+    transition:.25s;
+
+}
+
+.stat-card:hover{
+
+    transform:translateY(-4px);
+
+}
+
+.stat-card h2{
+
+    color:#2563EB;
+
+    font-size:38px;
+
+    margin-bottom:8px;
+
+}
+
+.stat-card p{
+
+    color:#64748B;
+
+    font-size:15px;
+
+}
+
+@media(max-width:900px){
+
+.recruiter-stats{
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:600px){
+
+.recruiter-stats{
+
+    grid-template-columns:1fr;
+
+}
+
+}

@@ -1,0 +1,49 @@
+.tasks-panel{
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:24px;
+
+    box-shadow:0 12px 30px rgba(15,23,42,.06);
+
+}
+
+.tasks-panel h3{
+
+    margin-top:0;
+
+    color:#0B2F6B;
+
+    font-size:22px;
+
+    margin-bottom:18px;
+
+}
+
+.tasks-panel ul{
+
+    margin:0;
+
+    padding:0;
+
+    list-style:none;
+
+}
+
+.tasks-panel li{
+
+    padding:14px 0;
+
+    border-bottom:1px solid #EEF2F7;
+
+    font-size:15px;
+
+}
+
+.tasks-panel li:last-child{
+
+    border-bottom:none;
+
+}

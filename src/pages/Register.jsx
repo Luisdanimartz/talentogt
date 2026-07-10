@@ -13,6 +13,10 @@ import {
   Divider,
 } from "@mui/material";
 
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+
 function Register() {
 
   const navigate = useNavigate();
@@ -29,12 +33,10 @@ function Register() {
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
-
     setForm({
       ...form,
       [e.target.name]: e.target.value,
     });
-
   };
 
   const validate = () => {
@@ -62,19 +64,29 @@ function Register() {
     }
 
     if (!form.password) {
+
       newErrors.password = "Ingrese una contraseña.";
+
     } else if (form.password.length < 6) {
+
       newErrors.password = "Debe tener al menos 6 caracteres.";
+
     }
 
     if (!form.confirmPassword) {
+
       newErrors.confirmPassword = "Confirme la contraseña.";
+
     } else if (form.password !== form.confirmPassword) {
+
       newErrors.confirmPassword = "Las contraseñas no coinciden.";
+
     }
 
     if (!form.accountType) {
+
       newErrors.accountType = "Seleccione un tipo de cuenta.";
+
     }
 
     setErrors(newErrors);
@@ -83,23 +95,27 @@ function Register() {
 
   };
 
- const handleRegister = async () => {
+  const handleRegister = async () => {
 
-  if (!validate()) return;
+    if (!validate()) return;
 
-  const { error } = await registerUser(form);
+    const { error } = await registerUser(form);
 
-  if (error) {
-    setErrors({
-      general: error.message,
-    });
-    return;
-  }
+    if (error) {
 
-  navigate("/login");
+      setErrors({
+        general: error.message,
+      });
 
-};
-  return (
+      return;
+
+    }
+
+    navigate("/login");
+
+  };
+
+   return (
 
     <Box
       sx={{
@@ -158,8 +174,8 @@ function Register() {
               </Typography>
 
               <Typography>
-                Regístrate gratuitamente y encuentra oportunidades
-                laborales con seguimiento durante todo el proceso de selección.
+                Regístrate gratuitamente y encuentra oportunidades laborales
+                con seguimiento durante todo el proceso de selección.
               </Typography>
 
             </Box>
@@ -256,25 +272,43 @@ function Register() {
                 </Grid>
 
                 <Grid item xs={12}>
-                  <TextField
-                    select
-                    label="Tipo de cuenta"
-                    name="accountType"
-                    value={form.accountType}
-                    onChange={handleChange}
-                    error={!!errors.accountType}
-                    helperText={errors.accountType}
-                    fullWidth
-                  >
-                    <MenuItem value="candidato">
-                      Candidato
-                    </MenuItem>
+                  <FormControl fullWidth error={!!errors.accountType}>
 
-                    <MenuItem value="empresa">
-                      Empresa
-                    </MenuItem>
+                    <InputLabel id="account-type-label">
+                      Tipo de cuenta
+                    </InputLabel>
 
-                  </TextField>
+                    <Select
+                      labelId="account-type-label"
+                      id="accountType"
+                      name="accountType"
+                      value={form.accountType}
+                      label="Tipo de cuenta"
+                      onChange={handleChange}
+                    >
+
+                      <MenuItem value="candidato">
+                        Candidato
+                      </MenuItem>
+
+                      <MenuItem value="empresa">
+                        Empresa
+                      </MenuItem>
+
+                    </Select>
+
+                  </FormControl>
+
+                  {errors.accountType && (
+                    <Typography
+                      variant="caption"
+                      color="error"
+                      sx={{ ml: 1 }}
+                    >
+                      {errors.accountType}
+                    </Typography>
+                  )}
+
                 </Grid>
 
               </Grid>

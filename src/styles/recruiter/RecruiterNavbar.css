@@ -1,0 +1,101 @@
+.recruiter-navbar{
+
+    background:#0B2F6B;
+
+    height:78px;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1000;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+}
+
+.recruiter-navbar-container{
+
+    width:min(1280px,94%);
+
+    height:100%;
+
+    margin:auto;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.recruiter-logo h2{
+
+    color:white;
+
+    font-size:30px;
+
+    margin:0;
+
+}
+
+.recruiter-logo span{
+
+    color:#C7D2FE;
+
+    font-size:13px;
+
+}
+
+.recruiter-navbar nav{
+
+    display:flex;
+
+    gap:28px;
+
+}
+
+.recruiter-navbar nav a{
+
+    color:white;
+
+    text-decoration:none;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.recruiter-navbar nav a:hover{
+
+    color:#60A5FA;
+
+}
+
+.recruiter-navbar button{
+
+    background:#2563EB;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 22px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+}
+
+@media(max-width:900px){
+
+.recruiter-navbar nav{
+
+    display:none;
+
+}
+
+}

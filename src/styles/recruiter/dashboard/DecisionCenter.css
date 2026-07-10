@@ -1,0 +1,71 @@
+.decision-center{
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:24px;
+
+    box-shadow:0 12px 30px rgba(15,23,42,.06);
+
+}
+
+.decision-center h2{
+
+    margin-top:0;
+
+    margin-bottom:24px;
+
+    color:#0B2F6B;
+
+}
+
+.decision{
+
+    border-radius:14px;
+
+    padding:16px;
+
+    margin-bottom:16px;
+
+}
+
+.decision strong{
+
+    display:block;
+
+    margin-bottom:6px;
+
+}
+
+.decision p{
+
+    margin:0;
+
+    color:#475569;
+
+}
+
+.warning{
+
+    background:#FFF7D6;
+
+}
+
+.success{
+
+    background:#DCFCE7;
+
+}
+
+.info{
+
+    background:#DBEAFE;
+
+}
+
+.alert{
+
+    background:#FEE2E2;
+
+}

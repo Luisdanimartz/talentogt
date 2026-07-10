@@ -1,0 +1,29 @@
+.dashboard-footer{
+
+    margin-top:40px;
+
+    padding:30px 0;
+
+    text-align:center;
+
+    color:#64748B;
+
+}
+
+.dashboard-footer p{
+
+    margin:0;
+
+    font-weight:700;
+
+}
+
+.dashboard-footer span{
+
+    display:block;
+
+    margin-top:8px;
+
+    font-size:14px;
+
+}

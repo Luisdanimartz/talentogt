@@ -49,17 +49,26 @@ function Navbar() {
 
         <div className="nav-actions">
 
-          <button className="publish">
+          <Link
+            to="/login"
+            className="publish"
+          >
             Publicar vacante
-          </button>
+          </Link>
 
-          <button className="login">
+          <Link
+            to="/login"
+            className="login"
+          >
             Ingresar
-          </button>
+          </Link>
 
-          <button className="register">
+          <Link
+            to="/register"
+            className="register"
+          >
             Registrarse
-          </button>
+          </Link>
 
         </div>
 

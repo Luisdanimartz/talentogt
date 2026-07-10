@@ -1,0 +1,59 @@
+.activity-feed{
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:24px;
+
+    box-shadow:0 12px 30px rgba(15,23,42,.06);
+
+}
+
+.activity-feed h2{
+
+    margin-top:0;
+
+    color:#0B2F6B;
+
+    margin-bottom:22px;
+
+}
+
+.activity-item{
+
+    display:flex;
+
+    gap:18px;
+
+    padding:18px 0;
+
+    border-bottom:1px solid #EEF2F7;
+
+}
+
+.activity-item:last-child{
+
+    border-bottom:none;
+
+}
+
+.activity-time{
+
+    min-width:65px;
+
+    font-weight:700;
+
+    color:#2563EB;
+
+}
+
+.activity-item p{
+
+    margin:0;
+
+    color:#475569;
+
+    line-height:1.5;
+
+}
