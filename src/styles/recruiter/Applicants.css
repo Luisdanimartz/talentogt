@@ -166,3 +166,176 @@
     color: var(--cgt-red);
     border-color: transparent;
 }
+
+/* --- Afinidad candidato-vacante --- */
+
+.applicant-match {
+    margin-top: 10px;
+}
+
+.applicant-match summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    list-style: none;
+}
+
+.applicant-match summary::-webkit-details-marker {
+    display: none;
+}
+
+.applicant-match summary em {
+    font-style: normal;
+    color: var(--cgt-slate);
+    font-size: 12.5px;
+    text-decoration: underline;
+}
+
+.match-chip {
+    display: inline-block;
+    background: var(--cgt-slate-soft);
+    color: var(--cgt-slate);
+    border-radius: 999px;
+    padding: 5px 13px;
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.match-chip.match-good {
+    background: var(--cgt-teal-soft);
+    color: var(--cgt-teal);
+}
+
+.applicant-match ul {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 12px 14px;
+    background: var(--cgt-bg);
+    border-radius: 10px;
+}
+
+.applicant-match li {
+    font-size: 13.5px;
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+.applicant-match li:last-child {
+    margin-bottom: 0;
+}
+
+.match-ok {
+    color: var(--cgt-teal);
+}
+
+.match-no {
+    color: var(--cgt-slate);
+}
+
+.match-chip.match-bad {
+    background: var(--cgt-red-soft);
+    color: var(--cgt-red);
+}
+
+/* --- Responsabilidad de respuesta --- */
+
+.applicants-pending-banner {
+    background: var(--cgt-amber-soft);
+    border: 1px solid rgba(201, 138, 44, 0.35);
+    border-radius: var(--cgt-radius);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+}
+
+.applicants-pending-banner strong {
+    color: var(--cgt-amber);
+    font-size: 15px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.applicants-pending-banner p {
+    margin: 0;
+    color: var(--cgt-ink);
+    font-size: 13.5px;
+    line-height: 1.55;
+}
+
+.waiting-chip {
+    display: inline-block;
+    margin-left: 8px;
+    background: var(--cgt-slate-soft);
+    color: var(--cgt-slate);
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.waiting-chip.waiting-late {
+    background: var(--cgt-red-soft);
+    color: var(--cgt-red);
+}
+
+/* --- Perfil completo del candidato --- */
+
+.applicant-profile {
+    margin-top: 10px;
+}
+
+.applicant-profile summary {
+    cursor: pointer;
+    color: var(--cgt-navy);
+    font-size: 13.5px;
+    font-weight: 700;
+    text-decoration: underline;
+    list-style: none;
+}
+
+.applicant-profile summary::-webkit-details-marker {
+    display: none;
+}
+
+.profile-full {
+    margin-top: 10px;
+    background: var(--cgt-bg);
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+
+.profile-full p {
+    margin: 0 0 8px;
+    font-size: 13.5px;
+    color: var(--cgt-ink);
+}
+
+.profile-block {
+    margin-bottom: 10px;
+}
+
+.profile-block strong {
+    display: block;
+    color: var(--cgt-navy);
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.profile-block ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.profile-block li {
+    font-size: 13.5px;
+    color: var(--cgt-ink);
+    margin-bottom: 3px;
+    line-height: 1.45;
+}
+
+.profile-empty {
+    color: var(--cgt-slate);
+    font-size: 13px;
+    margin: 0;
+}

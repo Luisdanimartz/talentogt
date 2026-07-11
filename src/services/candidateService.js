@@ -19,8 +19,16 @@ const CANDIDATE_COLUMNS = `
   municipality,
   address,
   birth_date,
+  education_level,
+  education_institution,
+  education_year,
+  experience,
+  skills,
+  expected_salary,
   created_at,
-  updated_at
+  updated_at,
+  candidate_education ( id, level, institution, graduation_year ),
+  candidate_experience ( id, job_title, company, years )
 `;
 
 export async function getCurrentCandidateProfile() {
@@ -49,7 +57,7 @@ export async function getCurrentCandidateProfile() {
   Guarda el perfil: si ya existe lo actualiza,
   si no existe lo crea.
 */
-export async function saveCandidateProfile(form) {
+export async function saveCandidateProfile(form, educationList = [], experienceList = []) {
 
   const {
     data: { user },
@@ -75,6 +83,29 @@ export async function saveCandidateProfile(form) {
     municipality: form.municipality || null,
     address: form.address || null,
     birth_date: form.birth_date || null,
+    skills: form.skills || null,
+    expected_salary: form.expected_salary || null,
+
+    /*
+      Columnas "resumen" (compatibilidad con el motor de
+      coincidencias y la vista de la empresa): se generan
+      automaticamente de las listas estructuradas.
+    */
+    education_level: educationList[0]?.level || null,
+    education_institution: educationList[0]?.institution || null,
+    education_year: educationList[0]?.graduation_year || null,
+    experience: experienceList
+      .filter((exp) => exp.job_title || exp.company)
+      .map((exp) =>
+        [
+          exp.job_title,
+          exp.company,
+          exp.years ? `${exp.years} años` : null,
+        ]
+          .filter(Boolean)
+          .join(" — ")
+      )
+      .join("\n") || null,
   };
 
   const { data: existing } = await supabase
@@ -83,22 +114,72 @@ export async function saveCandidateProfile(form) {
     .eq("user_id", user.id)
     .maybeSingle();
 
+  let result;
+
   if (existing) {
 
-    return await supabase
+    result = await supabase
       .from("candidate_profiles")
       .update(profile)
       .eq("id", existing.id)
       .select(CANDIDATE_COLUMNS)
       .single();
 
+  } else {
+
+    result = await supabase
+      .from("candidate_profiles")
+      .insert({ user_id: user.id, ...profile })
+      .select(CANDIDATE_COLUMNS)
+      .single();
+
   }
 
-  return await supabase
-    .from("candidate_profiles")
-    .insert({ user_id: user.id, ...profile })
-    .select(CANDIDATE_COLUMNS)
-    .single();
+  if (result.error || !result.data) {
+    return result;
+  }
+
+  const profileId = result.data.id;
+
+  /* Reemplazar formacion: borrar las filas viejas e insertar las nuevas */
+  await supabase
+    .from("candidate_education")
+    .delete()
+    .eq("candidate_profile_id", profileId);
+
+  const educationRows = educationList
+    .filter((edu) => edu.level || edu.institution)
+    .map((edu) => ({
+      candidate_profile_id: profileId,
+      level: edu.level || null,
+      institution: edu.institution || null,
+      graduation_year: edu.graduation_year || null,
+    }));
+
+  if (educationRows.length > 0) {
+    await supabase.from("candidate_education").insert(educationRows);
+  }
+
+  /* Reemplazar experiencia */
+  await supabase
+    .from("candidate_experience")
+    .delete()
+    .eq("candidate_profile_id", profileId);
+
+  const experienceRows = experienceList
+    .filter((exp) => exp.job_title || exp.company)
+    .map((exp) => ({
+      candidate_profile_id: profileId,
+      job_title: exp.job_title || null,
+      company: exp.company || null,
+      years: exp.years || null,
+    }));
+
+  if (experienceRows.length > 0) {
+    await supabase.from("candidate_experience").insert(experienceRows);
+  }
+
+  return result;
 
 }
 
@@ -161,7 +242,7 @@ export async function applyToJob(jobId) {
     return { data: null, error: { code: "DUPLICATE" } };
   }
 
-  return await supabase
+  const result = await supabase
     .from("applications")
     .insert({
       job_id: jobId,
@@ -171,6 +252,16 @@ export async function applyToJob(jobId) {
     })
     .select("id, current_status, applied_at")
     .single();
+
+  /* Primer evento de la linea de tiempo */
+  if (result.data) {
+    await supabase.from("application_status_history").insert({
+      application_id: result.data.id,
+      status: "applied",
+    });
+  }
+
+  return result;
 
 }
 
@@ -192,6 +283,7 @@ export async function getMyApplications() {
       id,
       current_status,
       applied_at,
+      updated_at,
       jobs (
         id,
         title,
@@ -201,5 +293,41 @@ export async function getMyApplications() {
     `)
     .eq("candidate_profile_id", profile.id)
     .order("applied_at", { ascending: false });
+
+}
+
+/*
+  Detalle de una postulacion del candidato actual: la vacante,
+  el estado y su linea de tiempo completa.
+*/
+export async function getMyApplicationDetail(applicationId) {
+
+  const { data: profile } = await getCurrentCandidateProfile();
+
+  if (!profile) {
+    return { data: null, error: null };
+  }
+
+  return await supabase
+    .from("applications")
+    .select(`
+      id,
+      current_status,
+      applied_at,
+      updated_at,
+      jobs (
+        id,
+        title,
+        department_id,
+        salary_min,
+        salary_max,
+        company_id,
+        company_profiles ( company_name )
+      ),
+      application_status_history ( status, created_at )
+    `)
+    .eq("id", applicationId)
+    .eq("candidate_profile_id", profile.id)
+    .maybeSingle();
 
 }

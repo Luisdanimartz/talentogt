@@ -77,8 +77,25 @@ export async function getPublishedJobs() {
       published_at,
       department_id,
       category_id,
-      company_profiles ( company_name )
+      description,
+      requirements,
+      benefits,
+      company_id,
+      company_profiles ( company_name, description )
     `)
     .eq("status", "published")
     .order("published_at", { ascending: false });
+}
+/* Estrellas de respuesta: numeros agregados via la funcion 005 */
+export async function getCompanyResponseStats(companyId) {
+  return await supabase.rpc("company_response_stats", {
+    cid: companyId,
+  });
+}
+
+/* Comparativa agregada de postulantes de una vacante (funcion 006) */
+export async function getJobApplicantStats(jobId) {
+  return await supabase.rpc("job_applicant_stats", {
+    jid: jobId,
+  });
 }

@@ -9,11 +9,17 @@ import {
   TextField,
   MenuItem,
   Button,
+  IconButton,
   Divider,
   LinearProgress,
-  Chip,
   Alert,
+  InputAdornment,
 } from "@mui/material";
+
+import {
+  Add as AddIcon,
+  DeleteOutline as DeleteIcon,
+} from "@mui/icons-material";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -27,13 +33,21 @@ import {
   getMunicipalitiesByDepartment,
 } from "../services/locationService";
 
-/*
-  Perfil del candidato — conectado a candidate_profiles.
+import { getEducationLevels } from "../services/jobService";
 
-  Solo incluye los campos que existen como columnas reales.
-  Formación, experiencia y habilidades quedan marcadas como
-  "Próximamente" hasta que creemos sus tablas.
+import { formatMiles, salarioANumero } from "../utils/formatSalary";
+
+/*
+  Perfil del candidato — su CV en ChanceGT.
+
+  Formacion: hasta 4 entradas (nivel, centro, año).
+  Experiencia: hasta 5 entradas (cargo, empresa, años).
+  Todo se guarda en tablas reales (candidate_education y
+  candidate_experience) y alimenta el motor de coincidencias.
 */
+
+const MAX_EDUCATION = 4;
+const MAX_EXPERIENCE = 5;
 
 const initialForm = {
   first_name: "",
@@ -47,18 +61,12 @@ const initialForm = {
   municipality: "",
   address: "",
   birth_date: "",
+  skills: "",
+  expected_salary: "",
 };
 
-/* Campos que cuentan para la barra de "perfil completado" */
-const PROGRESS_FIELDS = [
-  "first_name",
-  "last_name",
-  "phone",
-  "profession",
-  "department",
-  "municipality",
-  "birth_date",
-];
+const emptyEducation = { level: "", institution: "", graduation_year: "" };
+const emptyExperience = { job_title: "", company: "", years: "" };
 
 function CreateCV() {
 
@@ -66,8 +74,12 @@ function CreateCV() {
   const { user } = useAuth();
 
   const [form, setForm] = useState(initialForm);
+  const [education, setEducation] = useState([{ ...emptyEducation }]);
+  const [experience, setExperience] = useState([{ ...emptyExperience }]);
+
   const [departments, setDepartments] = useState([]);
   const [municipalities, setMunicipalities] = useState([]);
+  const [educationLevels, setEducationLevels] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -87,24 +99,48 @@ function CreateCV() {
 
   async function loadData() {
 
-    const [profileRes, departmentsRes] = await Promise.all([
-      getCurrentCandidateProfile(),
-      getDepartments(),
-    ]);
+    const [profileRes, departmentsRes, educationRes] =
+      await Promise.all([
+        getCurrentCandidateProfile(),
+        getDepartments(),
+        getEducationLevels(),
+      ]);
 
     setDepartments(departmentsRes.data || []);
+    setEducationLevels(educationRes.data || []);
 
-    if (profileRes.data) {
+    const profile = profileRes.data;
+
+    if (profile) {
 
       setForm({
         ...initialForm,
         ...Object.fromEntries(
-          Object.entries(profileRes.data).filter(
+          Object.entries(profile).filter(
             ([key]) => key in initialForm
           )
         ),
-        birth_date: profileRes.data.birth_date || "",
+        birth_date: profile.birth_date || "",
+        expected_salary: profile.expected_salary
+          ? formatMiles(profile.expected_salary)
+          : "",
       });
+
+      /* Listas guardadas; si no hay, precargar desde los
+         campos viejos (perfiles creados antes del 004) */
+      if (profile.candidate_education?.length > 0) {
+        setEducation(profile.candidate_education);
+      } else if (profile.education_level) {
+        setEducation([{
+          level: profile.education_level,
+          institution: profile.education_institution || "",
+          graduation_year: profile.education_year || "",
+        }]);
+      }
+
+      if (profile.candidate_experience?.length > 0) {
+        setExperience(profile.candidate_experience);
+      }
 
     }
 
@@ -112,11 +148,6 @@ function CreateCV() {
 
   }
 
-  /*
-    candidate_profiles guarda department y municipality como TEXTO
-    (el nombre), así que buscamos el id del departamento elegido
-    solo para poder cargar sus municipios.
-  */
   async function loadMunicipalities(departmentName) {
 
     const dept = departments.find((d) => d.name === departmentName);
@@ -144,15 +175,53 @@ function CreateCV() {
 
   }
 
+  /* --- Listas dinámicas --- */
+
+  function updateEducation(index, field, value) {
+
+    setEducation((prev) =>
+      prev.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      )
+    );
+
+  }
+
+  function updateExperience(index, field, value) {
+
+    setExperience((prev) =>
+      prev.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      )
+    );
+
+  }
+
   const progress = useMemo(() => {
 
-    const filled = PROGRESS_FIELDS.filter(
-      (field) => String(form[field] || "").trim() !== ""
-    ).length;
+    const basicos = [
+      "first_name",
+      "last_name",
+      "phone",
+      "profession",
+      "department",
+      "municipality",
+      "birth_date",
+      "skills",
+      "expected_salary",
+    ].filter((field) => String(form[field] || "").trim() !== "").length;
 
-    return Math.round((filled / PROGRESS_FIELDS.length) * 100);
+    const tieneFormacion = education.some(
+      (edu) => edu.level || edu.institution
+    ) ? 1 : 0;
 
-  }, [form]);
+    const tieneExperiencia = experience.some(
+      (exp) => exp.job_title || exp.company
+    ) ? 1 : 0;
+
+    return Math.round(((basicos + tieneFormacion + tieneExperiencia) / 11) * 100);
+
+  }, [form, education, experience]);
 
   async function handleSave() {
 
@@ -167,7 +236,14 @@ function CreateCV() {
     setSaving(true);
     setMessage(null);
 
-    const { error } = await saveCandidateProfile(form);
+    const { error } = await saveCandidateProfile(
+      {
+        ...form,
+        expected_salary: salarioANumero(form.expected_salary),
+      },
+      education,
+      experience
+    );
 
     setSaving(false);
 
@@ -178,7 +254,7 @@ function CreateCV() {
 
     setMessage({
       type: "success",
-      text: "Perfil guardado. Ya puedes postularte a vacantes.",
+      text: "Perfil guardado. Tus coincidencias con las vacantes ya usan esta información.",
     });
 
   }
@@ -200,7 +276,8 @@ function CreateCV() {
         </Typography>
 
         <Typography color="text.secondary" mb={4}>
-          Completa tu información para poder postularte a vacantes.
+          Este es tu CV en ChanceGT. Mientras más completo, mejores
+          coincidencias con las vacantes.
         </Typography>
 
         <Divider sx={{ mb: 4 }} />
@@ -336,7 +413,7 @@ function CreateCV() {
             </TextField>
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <TextField
               label="Dirección (opcional)"
               name="address"
@@ -347,7 +424,7 @@ function CreateCV() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <TextField
               label="Profesión u oficio"
               name="profession"
@@ -355,7 +432,32 @@ function CreateCV() {
               value={form.profession}
               onChange={handleChange}
               fullWidth
-              placeholder="Ejemplo: Perito Contador, Vendedor, Ingeniera en Sistemas"
+              placeholder="Ejemplo: Perito Contador, Vendedor"
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <TextField
+              label="Pretensión salarial mensual"
+              name="expected_salary"
+              autoComplete="off"
+              value={form.expected_salary}
+              onChange={(e) =>
+                handleChange({
+                  target: {
+                    name: "expected_salary",
+                    value: formatMiles(e.target.value),
+                  },
+                })
+              }
+              fullWidth
+              placeholder="8,000"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Q</InputAdornment>
+                ),
+              }}
+              helperText="Se compara con el salario de cada vacante"
             />
           </Grid>
 
@@ -363,16 +465,213 @@ function CreateCV() {
 
         <Divider sx={{ my: 5 }} />
 
+        {/* ================= FORMACIÓN ================= */}
+
         <Typography variant="h6" fontWeight="bold" mb={1}>
-          Formación, Experiencia y Habilidades{" "}
-          <Chip label="Próximamente" size="small" sx={{ ml: 1 }} />
+          Formación Académica
+        </Typography>
+
+        <Typography color="text.secondary" mb={3}>
+          Agrega hasta {MAX_EDUCATION} estudios, del más reciente al
+          más antiguo.
+        </Typography>
+
+        {education.map((edu, index) => (
+
+          <Grid
+            container
+            spacing={2}
+            key={index}
+            alignItems="center"
+            sx={{ mb: 2 }}
+          >
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                select
+                label="Nivel académico"
+                value={edu.level || ""}
+                onChange={(e) =>
+                  updateEducation(index, "level", e.target.value)
+                }
+                fullWidth
+              >
+                {educationLevels.map((item) => (
+                  <MenuItem key={item.id} value={item.name}>
+                    {item.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                label="Centro de estudios"
+                value={edu.institution || ""}
+                onChange={(e) =>
+                  updateEducation(index, "institution", e.target.value)
+                }
+                fullWidth
+                autoComplete="off"
+              />
+            </Grid>
+
+            <Grid item xs={8} md={3}>
+              <TextField
+                label="Año de graduación"
+                value={edu.graduation_year || ""}
+                onChange={(e) =>
+                  updateEducation(index, "graduation_year", e.target.value)
+                }
+                fullWidth
+                autoComplete="off"
+                placeholder="2020"
+              />
+            </Grid>
+
+            <Grid item xs={4} md={1}>
+              {education.length > 1 && (
+                <IconButton
+                  aria-label="Quitar formación"
+                  onClick={() =>
+                    setEducation((prev) =>
+                      prev.filter((_, i) => i !== index)
+                    )
+                  }
+                >
+                  <DeleteIcon />
+                </IconButton>
+              )}
+            </Grid>
+
+          </Grid>
+
+        ))}
+
+        {education.length < MAX_EDUCATION && (
+          <Button
+            startIcon={<AddIcon />}
+            onClick={() =>
+              setEducation((prev) => [...prev, { ...emptyEducation }])
+            }
+          >
+            Agregar formación
+          </Button>
+        )}
+
+        <Divider sx={{ my: 5 }} />
+
+        {/* ================= EXPERIENCIA ================= */}
+
+        <Typography variant="h6" fontWeight="bold" mb={1}>
+          Experiencia Laboral
+        </Typography>
+
+        <Typography color="text.secondary" mb={3}>
+          Como en tu CV: cargo, empresa y años laborados. Del más
+          reciente al más antiguo (hasta {MAX_EXPERIENCE}).
+        </Typography>
+
+        {experience.map((exp, index) => (
+
+          <Grid
+            container
+            spacing={2}
+            key={index}
+            alignItems="center"
+            sx={{ mb: 2 }}
+          >
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                label="Cargo"
+                value={exp.job_title || ""}
+                onChange={(e) =>
+                  updateExperience(index, "job_title", e.target.value)
+                }
+                fullWidth
+                autoComplete="off"
+                placeholder="Gerente de Ventas"
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                label="Empresa"
+                value={exp.company || ""}
+                onChange={(e) =>
+                  updateExperience(index, "company", e.target.value)
+                }
+                fullWidth
+                autoComplete="off"
+              />
+            </Grid>
+
+            <Grid item xs={8} md={3}>
+              <TextField
+                label="Años laborados"
+                value={exp.years || ""}
+                onChange={(e) =>
+                  updateExperience(index, "years", e.target.value)
+                }
+                fullWidth
+                autoComplete="off"
+                placeholder="2"
+              />
+            </Grid>
+
+            <Grid item xs={4} md={1}>
+              {experience.length > 1 && (
+                <IconButton
+                  aria-label="Quitar experiencia"
+                  onClick={() =>
+                    setExperience((prev) =>
+                      prev.filter((_, i) => i !== index)
+                    )
+                  }
+                >
+                  <DeleteIcon />
+                </IconButton>
+              )}
+            </Grid>
+
+          </Grid>
+
+        ))}
+
+        {experience.length < MAX_EXPERIENCE && (
+          <Button
+            startIcon={<AddIcon />}
+            onClick={() =>
+              setExperience((prev) => [...prev, { ...emptyExperience }])
+            }
+          >
+            Agregar experiencia
+          </Button>
+        )}
+
+        <Divider sx={{ my: 5 }} />
+
+        {/* ================= HABILIDADES ================= */}
+
+        <Typography variant="h6" fontWeight="bold" mb={1}>
+          Habilidades
         </Typography>
 
         <Typography color="text.secondary" mb={2}>
-          Estas secciones se activarán en una próxima versión.
-          Por ahora, tu profesión y datos de contacto son
-          suficientes para postularte.
+          Sepáralas con comas. Usa las palabras que las empresas
+          escriben en sus requisitos (por ejemplo: SAP, Excel,
+          ventas, agropecuaria) — así suben tus coincidencias.
         </Typography>
+
+        <TextField
+          label="Ejemplo: Excel, SAP, Ventas, Liderazgo"
+          name="skills"
+          autoComplete="off"
+          value={form.skills}
+          onChange={handleChange}
+          fullWidth
+        />
 
         <Divider sx={{ my: 5 }} />
 

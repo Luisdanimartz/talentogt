@@ -11,6 +11,9 @@ import {
 } from "../services/candidateService";
 
 import { getDepartments } from "../services/locationService";
+import { computeMatches } from "../utils/matching";
+import CompanyResponseBadge from "../components/CompanyResponseBadge";
+import "../styles/Jobs.css";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -123,9 +126,14 @@ function JobDetail() {
 
             <h1>{job.title}</h1>
 
-            <p style={{ color: "#555", marginBottom: 20 }}>
+            <p style={{ color: "#555", marginBottom: 12 }}>
                 {job.company_profiles?.company_name || "Empresa"}
             </p>
+
+            <CompanyResponseBadge
+                companyId={job.company_id}
+                companyName={job.company_profiles?.company_name}
+            />
 
             {showApplyButton && !application && (
 
@@ -222,56 +230,18 @@ function JobDetail() {
                 </p>
             )}
 
-            {/* Coincidencias honestas: comparación básica del
-                perfil real contra la vacante, sin porcentajes
-                inventados */}
+            {/* Coincidencias honestas: motor compartido con la
+                vista de la empresa (utils/matching.js) */}
             {role === "candidato" && profile && (() => {
 
                 const jobDept = departments.find(
                     (d) => d.id === job.department_id
                 )?.name;
 
-                const mismaUbicacion =
-                    jobDept &&
-                    profile.department &&
-                    jobDept.toLowerCase() ===
-                        profile.department.toLowerCase();
+                const { checks, score, total } =
+                    computeMatches(profile, job, jobDept);
 
-                const textoVacante = [
-                    job.title,
-                    job.description,
-                    job.requirements,
-                ]
-                    .join(" ")
-                    .toLowerCase();
-
-                const palabrasProfesion = (profile.profession || "")
-                    .toLowerCase()
-                    .split(/\s+/)
-                    .filter((palabra) => palabra.length > 3);
-
-                const profesionCoincide =
-                    palabrasProfesion.length > 0 &&
-                    palabrasProfesion.some((palabra) =>
-                        textoVacante.includes(palabra)
-                    );
-
-                const checks = [
-                    jobDept && {
-                        ok: mismaUbicacion,
-                        text: mismaUbicacion
-                            ? `La vacante está en tu departamento (${jobDept})`
-                            : `La vacante está en ${jobDept}${profile.department ? ` y tu perfil dice ${profile.department}` : ""}`,
-                    },
-                    palabrasProfesion.length > 0 && {
-                        ok: profesionCoincide,
-                        text: profesionCoincide
-                            ? "Tu profesión coincide con lo que buscan"
-                            : "Tu profesión no aparece en la descripción (igual puedes aplicar)",
-                    },
-                ].filter(Boolean);
-
-                if (checks.length === 0) return null;
+                if (total === 0) return null;
 
                 return (
 
@@ -286,7 +256,7 @@ function JobDetail() {
                     >
 
                         <strong style={{ fontSize: 14 }}>
-                            Coincidencias con tu perfil
+                            Coincidencias con tu perfil: {score} de {total}
                         </strong>
 
                         <ul
@@ -315,8 +285,8 @@ function JobDetail() {
                         </ul>
 
                         <small style={{ color: "#94A0B1", fontSize: 12 }}>
-                            Comparación básica según tu perfil. Completa tu
-                            perfil para mejores coincidencias.
+                            Comparación verificable según tu perfil. Completa
+                            tu perfil para mejores coincidencias.
                         </small>
 
                     </div>
@@ -348,6 +318,20 @@ function JobDetail() {
                 <strong>Beneficios</strong>
                 <p style={{ whiteSpace: "pre-line" }}>{job.benefits}</p>
             </div>
+
+            {job.company_profiles?.description && (
+
+                <div className="detail-about">
+
+                    <h3>
+                        Acerca de {job.company_profiles.company_name}
+                    </h3>
+
+                    <p>{job.company_profiles.description}</p>
+
+                </div>
+
+            )}
 
         </div>
 

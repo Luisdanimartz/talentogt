@@ -190,6 +190,16 @@ function CandidateDashboard() {
 
                     <div
                         key={app.id}
+                        onClick={() =>
+                            navigate(`/candidato/postulacion/${app.id}`)
+                        }
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                navigate(`/candidato/postulacion/${app.id}`);
+                            }
+                        }}
                         style={{
                             border: "1px solid #E6E8EC",
                             borderRadius: 12,
@@ -200,7 +210,15 @@ function CandidateDashboard() {
                             alignItems: "center",
                             gap: 12,
                             flexWrap: "wrap",
+                            cursor: "pointer",
+                            transition: "0.15s",
                         }}
+                        onMouseEnter={(e) =>
+                            (e.currentTarget.style.borderColor = "#0E8F73")
+                        }
+                        onMouseLeave={(e) =>
+                            (e.currentTarget.style.borderColor = "#E6E8EC")
+                        }
                     >
 
                         <div>
@@ -210,19 +228,51 @@ function CandidateDashboard() {
                                 {app.applied_at &&
                                     ` · Postulado el ${new Date(app.applied_at).toLocaleDateString("es-GT")}`}
                             </div>
+                            <div
+                                style={{
+                                    color: "#0E8F73",
+                                    fontSize: 13,
+                                    fontWeight: 600,
+                                    marginTop: 4,
+                                }}
+                            >
+                                Ver mi proceso →
+                            </div>
                         </div>
 
                         <span
                             style={{
-                                background: colors.bg,
-                                color: colors.color,
-                                borderRadius: 999,
-                                padding: "6px 14px",
-                                fontSize: 13,
-                                fontWeight: 600,
+                                textAlign: "right",
                             }}
                         >
-                            {statusLabel(app.current_status)}
+                            <span
+                                style={{
+                                    background: colors.bg,
+                                    color: colors.color,
+                                    borderRadius: 999,
+                                    padding: "6px 14px",
+                                    fontSize: 13,
+                                    fontWeight: 600,
+                                    display: "inline-block",
+                                }}
+                            >
+                                {statusLabel(app.current_status)}
+                            </span>
+
+                            {app.current_status !== "applied" &&
+                                app.updated_at && (
+                                    <span
+                                        style={{
+                                            display: "block",
+                                            color: "#94A0B1",
+                                            fontSize: 12,
+                                            marginTop: 4,
+                                        }}
+                                    >
+                                        desde el{" "}
+                                        {new Date(app.updated_at).toLocaleDateString("es-GT")}
+                                    </span>
+                                )}
                         </span>
 
                     </div>

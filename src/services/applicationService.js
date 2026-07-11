@@ -17,7 +17,7 @@ export async function getCompanyApplications(companyId) {
       id,
       current_status,
       applied_at,
-      jobs!inner ( id, title, company_id ),
+      jobs!inner ( id, title, description, requirements, department_id, salary_min, salary_max, company_id ),
       candidate_profiles (
         id,
         first_name,
@@ -25,7 +25,14 @@ export async function getCompanyApplications(companyId) {
         profession,
         phone,
         department,
-        municipality
+        municipality,
+        education_level,
+        education_institution,
+        experience,
+        skills,
+        expected_salary,
+        candidate_education ( level, institution, graduation_year ),
+        candidate_experience ( job_title, company, years )
       )
     `)
     .eq("jobs.company_id", companyId)
@@ -39,11 +46,21 @@ export async function getCompanyApplications(companyId) {
 */
 export async function updateApplicationStatus(applicationId, status) {
 
-  return await supabase
+  const result = await supabase
     .from("applications")
     .update({ current_status: status })
     .eq("id", applicationId)
     .select("id, current_status")
     .single();
+
+  /* Queda registrado en la linea de tiempo del candidato */
+  if (result.data) {
+    await supabase.from("application_status_history").insert({
+      application_id: applicationId,
+      status,
+    });
+  }
+
+  return result;
 
 }

@@ -1,12 +1,17 @@
+import { useNavigate } from "react-router-dom";
+
 import {
   Box,
   Button,
   Grid,
   InputAdornment,
   MenuItem,
+  Paper,
   TextField,
   Typography,
 } from "@mui/material";
+
+import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
 
 import { formatMiles } from "../../utils/formatSalary";
 
@@ -18,6 +23,48 @@ const STATUS_OPTIONS = [
   { value: "paused", label: "Pausada" },
   { value: "closed", label: "Cerrada" },
 ];
+
+/* Menus con altura fija y barra para bajar (departamentos Y municipios) */
+const MENU_SCROLL = {
+  MenuProps: {
+    PaperProps: { style: { maxHeight: 300 } },
+  },
+};
+
+/* Estilo compartido de cada tarjeta de seccion */
+const seccion = {
+  p: { xs: 3, md: 4 },
+  borderRadius: 3,
+  mb: 3,
+  border: "1px solid #E6E8EC",
+  boxShadow: "0 1px 2px rgba(11,31,58,0.06)",
+};
+
+function TituloSeccion({ numero, children }) {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
+      <Box
+        sx={{
+          width: 28,
+          height: 28,
+          borderRadius: "8px",
+          background: "#E4F5F0",
+          color: "#0E8F73",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontWeight: 700,
+          fontSize: 14,
+        }}
+      >
+        {numero}
+      </Box>
+      <Typography variant="h6" fontWeight="bold" color="#0B1F3A">
+        {children}
+      </Typography>
+    </Box>
+  );
+}
 
 function JobForm({
   form,
@@ -31,230 +78,351 @@ function JobForm({
   onChange,
   onSubmit,
 }) {
+
+  const navigate = useNavigate();
+
   return (
-    <Box>
 
-      <Typography variant="h4" fontWeight="bold" mb={4}>
-        {isEdit ? "Editar Vacante" : "Publicar Vacante"}
-      </Typography>
+    <Box sx={{ background: "#F3F5F8", minHeight: "100vh", pb: 8 }}>
 
-      <Grid container spacing={3}>
+      {/* ===== Encabezado navy ===== */}
+      <Box
+        sx={{
+          background: "linear-gradient(135deg, #0B1F3A 0%, #123156 70%, #0E8F73 170%)",
+          pt: 6,
+          pb: 8,
+          px: 3,
+        }}
+      >
+        <Box sx={{ maxWidth: 900, mx: "auto" }}>
 
-        <Grid item xs={12}>
-          <TextField
-            fullWidth
-            label="Título de la vacante"
-            name="title"
-            value={form.title}
-            onChange={onChange}
-          />
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <TextField
-            select
-            fullWidth
-            label="Categoría"
-            name="category_id"
-            value={form.category_id}
-            onChange={onChange}
-          >
-            {categories.map((item) => (
-              <MenuItem key={item.id} value={item.id}>
-                {item.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <TextField
-            select
-            fullWidth
-            label="Tipo de empleo"
-            name="employment_type_id"
-            value={form.employment_type_id}
-            onChange={onChange}
-          >
-            {employmentTypes.map((item) => (
-              <MenuItem key={item.id} value={item.id}>
-                {item.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <TextField
-            select
-            fullWidth
-            label="Nivel académico"
-            name="education_level_id"
-            value={form.education_level_id}
-            onChange={onChange}
-          >
-            {educationLevels.map((item) => (
-              <MenuItem key={item.id} value={item.id}>
-                {item.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <TextField
-            select
-            fullWidth
-            label="Modalidad"
-            name="work_mode"
-            value={form.work_mode}
-            onChange={onChange}
-          >
-            {WORK_MODES.map((item) => (
-              <MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <TextField
-            select
-            fullWidth
-            label="Departamento"
-            name="department_id"
-            value={form.department_id}
-            onChange={onChange}
-          >
-            {departments.map((item) => (
-              <MenuItem key={item.id} value={item.id}>
-                {item.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <TextField
-            select
-            fullWidth
-            label="Municipio"
-            name="municipality_id"
-            value={form.municipality_id}
-            onChange={onChange}
-          >
-            {municipalities.map((item) => (
-              <MenuItem key={item.id} value={item.id}>
-                {item.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <TextField
-            fullWidth
-            type="number"
-            label="Plazas disponibles"
-            name="vacancies"
-            value={form.vacancies}
-            onChange={onChange}
-          />
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <TextField
-            fullWidth
-            label="Salario mensual"
-            name="salary"
-            value={form.salary}
-            onChange={(e) =>
-              onChange({
-                target: {
-                  name: "salary",
-                  value: formatMiles(e.target.value),
-                },
-              })
-            }
-            placeholder="10,000"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">Q</InputAdornment>
-              ),
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate("/empresa/dashboard")}
+            sx={{
+              color: "rgba(255,255,255,0.85)",
+              mb: 2,
+              textTransform: "none",
+              fontWeight: 600,
+              "&:hover": { color: "#FFFFFF", background: "rgba(255,255,255,0.08)" },
             }}
-          />
-        </Grid>
+          >
+            Volver al dashboard
+          </Button>
 
-        {isEdit && (
-          <Grid item xs={12} md={6}>
-            <TextField
-              select
-              fullWidth
-              label="Estado de la vacante"
-              name="status"
-              value={form.status}
-              onChange={onChange}
-            >
-              {STATUS_OPTIONS.map((item) => (
-                <MenuItem key={item.value} value={item.value}>
-                  {item.label}
-                </MenuItem>
-              ))}
-            </TextField>
+          <Typography
+            variant="h4"
+            fontWeight="bold"
+            color="#FFFFFF"
+            sx={{ letterSpacing: "-0.02em" }}
+          >
+            {isEdit ? "Editar Vacante" : "Publicar Vacante"}
+          </Typography>
+
+          <Typography sx={{ color: "rgba(255,255,255,0.7)", mt: 1 }}>
+            Mientras más claros los requisitos, mejores candidatos
+            te mostrará ChanceGT.
+          </Typography>
+
+        </Box>
+      </Box>
+
+      {/* ===== Secciones ===== */}
+      <Box sx={{ maxWidth: 900, mx: "auto", px: 3, mt: -4 }}>
+
+        <Paper elevation={0} sx={seccion}>
+
+          <TituloSeccion numero={1}>El puesto</TituloSeccion>
+
+          <Grid container spacing={3}>
+
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Título de la vacante"
+                name="title"
+                value={form.title}
+                onChange={onChange}
+                placeholder="Ejemplo: Supervisor de ventas"
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                select
+                fullWidth
+                label="Categoría"
+                name="category_id"
+                value={form.category_id}
+                onChange={onChange}
+                SelectProps={MENU_SCROLL}
+              >
+                {categories.map((item) => (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                select
+                fullWidth
+                label="Tipo de empleo"
+                name="employment_type_id"
+                value={form.employment_type_id}
+                onChange={onChange}
+              >
+                {employmentTypes.map((item) => (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                select
+                fullWidth
+                label="Nivel académico"
+                name="education_level_id"
+                value={form.education_level_id}
+                onChange={onChange}
+              >
+                {educationLevels.map((item) => (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                select
+                fullWidth
+                label="Modalidad"
+                name="work_mode"
+                value={form.work_mode}
+                onChange={onChange}
+              >
+                {WORK_MODES.map((item) => (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
           </Grid>
-        )}
 
-        <Grid item xs={12}>
-          <TextField
-            multiline
-            rows={5}
-            fullWidth
-            label="Descripción"
-            name="description"
-            value={form.description}
-            onChange={onChange}
-          />
-        </Grid>
+        </Paper>
 
-        <Grid item xs={12}>
-          <TextField
-            multiline
-            rows={4}
-            fullWidth
-            label="Requisitos"
-            name="requirements"
-            value={form.requirements}
-            onChange={onChange}
-          />
-        </Grid>
+        <Paper elevation={0} sx={seccion}>
 
-        <Grid item xs={12}>
-          <TextField
-            multiline
-            rows={4}
-            fullWidth
-            label="Beneficios"
-            name="benefits"
-            value={form.benefits}
-            onChange={onChange}
-          />
-        </Grid>
+          <TituloSeccion numero={2}>Ubicación y plazas</TituloSeccion>
 
-      </Grid>
+          <Grid container spacing={3}>
 
-      <Box mt={4} textAlign="right">
-        <Button
-          variant="contained"
-          size="large"
-          onClick={onSubmit}
-          disabled={loading}
+            <Grid item xs={12} md={5}>
+              <TextField
+                select
+                fullWidth
+                label="Departamento"
+                name="department_id"
+                value={form.department_id}
+                onChange={onChange}
+                SelectProps={MENU_SCROLL}
+              >
+                {departments.map((item) => (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} md={5}>
+              <TextField
+                select
+                fullWidth
+                label="Municipio"
+                name="municipality_id"
+                value={form.municipality_id}
+                onChange={onChange}
+                disabled={!form.department_id}
+                SelectProps={MENU_SCROLL}
+              >
+                {municipalities.map((item) => (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} md={2}>
+              <TextField
+                fullWidth
+                type="number"
+                label="Plazas"
+                name="vacancies"
+                value={form.vacancies}
+                onChange={onChange}
+              />
+            </Grid>
+
+          </Grid>
+
+        </Paper>
+
+        <Paper elevation={0} sx={seccion}>
+
+          <TituloSeccion numero={3}>Compensación</TituloSeccion>
+
+          <Grid container spacing={3}>
+
+            <Grid item xs={12} md={5}>
+              <TextField
+                fullWidth
+                label="Salario mensual"
+                name="salary"
+                value={form.salary}
+                onChange={(e) =>
+                  onChange({
+                    target: {
+                      name: "salary",
+                      value: formatMiles(e.target.value),
+                    },
+                  })
+                }
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">Q</InputAdornment>
+                  ),
+                }}
+                helperText="Solo números; las comas se ponen solas"
+              />
+            </Grid>
+
+            {isEdit && (
+              <Grid item xs={12} md={5}>
+                <TextField
+                  select
+                  fullWidth
+                  label="Estado de la vacante"
+                  name="status"
+                  value={form.status}
+                  onChange={onChange}
+                >
+                  {STATUS_OPTIONS.map((item) => (
+                    <MenuItem key={item.value} value={item.value}>
+                      {item.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+            )}
+
+          </Grid>
+
+        </Paper>
+
+        <Paper elevation={0} sx={seccion}>
+
+          <TituloSeccion numero={4}>Descripción del puesto</TituloSeccion>
+
+          <Grid container spacing={3}>
+
+            <Grid item xs={12}>
+              <TextField
+                multiline
+                rows={5}
+                fullWidth
+                label="Descripción"
+                name="description"
+                value={form.description}
+                onChange={onChange}
+                helperText="Funciones y responsabilidades del puesto"
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                multiline
+                rows={4}
+                fullWidth
+                label="Requisitos"
+                name="requirements"
+                value={form.requirements}
+                onChange={onChange}
+                helperText="Palabras clave claras (ej.: SAP, agropecuaria) mejoran las coincidencias con candidatos"
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                multiline
+                rows={4}
+                fullWidth
+                label="Beneficios"
+                name="benefits"
+                value={form.benefits}
+                onChange={onChange}
+              />
+            </Grid>
+
+          </Grid>
+
+        </Paper>
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
         >
-          {isEdit ? "Guardar cambios" : "Publicar Vacante"}
-        </Button>
+
+          <Button
+            variant="outlined"
+            size="large"
+            onClick={() => navigate("/empresa/dashboard")}
+            sx={{ textTransform: "none", fontWeight: 600 }}
+          >
+            Cancelar y volver
+          </Button>
+
+          <Button
+            variant="contained"
+            size="large"
+            onClick={onSubmit}
+            disabled={loading}
+            sx={{
+              background: "#0E8F73",
+              textTransform: "none",
+              fontWeight: 700,
+              px: 5,
+              "&:hover": { background: "#0C7A62" },
+            }}
+          >
+            {loading
+              ? "Guardando…"
+              : isEdit
+                ? "Guardar cambios"
+                : "Publicar Vacante"}
+          </Button>
+
+        </Box>
+
       </Box>
 
     </Box>
+
   );
 }
 

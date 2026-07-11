@@ -14,6 +14,16 @@ import {
 } from "../../services/applicationService";
 
 import { APPLICATION_STATUSES } from "../../utils/applicationStatus";
+import { computeMatches } from "../../utils/matching";
+import { getDepartments } from "../../services/locationService";
+
+/* Dias que un candidato lleva esperando respuesta */
+function diasEsperando(appliedAt) {
+    if (!appliedAt) return 0;
+    return Math.floor(
+        (Date.now() - new Date(appliedAt).getTime()) / 86400000
+    );
+}
 
 function nombreCandidato(profile) {
 
@@ -29,6 +39,7 @@ function Applicants() {
 
     const [company, setCompany] = useState(null);
     const [applications, setApplications] = useState([]);
+    const [departments, setDepartments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
     const [savingId, setSavingId] = useState(null);
@@ -43,7 +54,13 @@ function Applicants() {
 
         setLoading(true);
 
-        const { data: companyData } = await getCurrentCompany();
+        const [{ data: companyData }, departmentsRes] =
+            await Promise.all([
+                getCurrentCompany(),
+                getDepartments(),
+            ]);
+
+        setDepartments(departmentsRes.data || []);
 
         if (!companyData) {
             setLoading(false);
@@ -91,10 +108,43 @@ function Applicants() {
 
     }
 
-    /* Los "por revisar" primero, luego el resto por fecha */
     const pendientes = applications.filter(
         (app) => app.current_status === "applied"
     ).length;
+
+    /*
+      Afinidad de cada candidato con SU vacante, calculada con
+      el motor compartido (utils/matching.js), y ordenada del
+      mejor al menor. Asi el reclutador ve primero a quien mas
+      coincide, con verificaciones que puede comprobar.
+    */
+    const applicationsConAfinidad = applications
+        .map((app) => {
+
+            const jobDept = departments.find(
+                (d) => d.id === app.jobs?.department_id
+            )?.name;
+
+            const match = computeMatches(
+                app.candidate_profiles,
+                app.jobs,
+                jobDept
+            );
+
+            return { ...app, match };
+
+        })
+        .sort((a, b) => {
+
+            /* Los que exceden el salario de la plaza van al final;
+               el resto, del mejor al menor puntaje */
+            if (a.match.salaryMismatch !== b.match.salaryMismatch) {
+                return a.match.salaryMismatch ? 1 : -1;
+            }
+
+            return b.match.score - a.match.score;
+
+        });
 
     return (
 
@@ -122,6 +172,30 @@ function Applicants() {
 
                 </header>
 
+                {!loading && !loadError && pendientes > 0 && (
+
+                    <div className="applicants-pending-banner">
+
+                        <strong>
+                            ⚠ {pendientes}{" "}
+                            {pendientes === 1
+                                ? "candidato espera"
+                                : "candidatos esperan"}{" "}
+                            tu respuesta
+                        </strong>
+
+                        <p>
+                            Cada candidato ve el estado de su proceso en
+                            tiempo real, y tu porcentaje de respuesta es
+                            público en todas tus vacantes. Responder a
+                            todos —aunque sea "No seleccionado"— mejora
+                            tu reputación y atrae mejor talento.
+                        </p>
+
+                    </div>
+
+                )}
+
                 {loadError && (
 
                     <div className="applicants-error">
@@ -146,7 +220,7 @@ function Applicants() {
 
                 )}
 
-                {!loading && applications.map((app) => (
+                {!loading && applicationsConAfinidad.map((app) => (
 
                     <article
                         key={app.id}
@@ -180,7 +254,144 @@ function Applicants() {
                                 <strong>{app.jobs?.title}</strong>
                                 {app.applied_at &&
                                     ` el ${new Date(app.applied_at).toLocaleDateString("es-GT")}`}
+
+                                {app.current_status === "applied" && (
+                                    <span
+                                        className={
+                                            diasEsperando(app.applied_at) >= 3
+                                                ? "waiting-chip waiting-late"
+                                                : "waiting-chip"
+                                        }
+                                    >
+                                        {diasEsperando(app.applied_at) === 0
+                                            ? "Esperando respuesta desde hoy"
+                                            : `Sin respuesta hace ${diasEsperando(app.applied_at)} ${diasEsperando(app.applied_at) === 1 ? "día" : "días"}`}
+                                    </span>
+                                )}
                             </p>
+
+                            {app.match.total > 0 && (
+
+                                <details className="applicant-match">
+
+                                    <summary>
+                                        <span
+                                            className={
+                                                app.match.salaryMismatch
+                                                    ? "match-chip match-bad"
+                                                    : app.match.score >=
+                                                        Math.ceil(app.match.total / 2)
+                                                        ? "match-chip match-good"
+                                                        : "match-chip"
+                                            }
+                                        >
+                                            Afinidad: {app.match.score} de{" "}
+                                            {app.match.total}
+                                        </span>
+
+                                        {app.match.salaryMismatch && (
+                                            <span className="match-chip match-bad">
+                                                ⚠ Pretensión salarial arriba del rango
+                                            </span>
+                                        )}
+
+                                        <em>ver por qué</em>
+                                    </summary>
+
+                                    <ul>
+                                        {app.match.checks.map((check, i) => (
+                                            <li
+                                                key={i}
+                                                className={
+                                                    check.ok
+                                                        ? "match-ok"
+                                                        : "match-no"
+                                                }
+                                            >
+                                                {check.ok ? "✓" : "•"}{" "}
+                                                {check.text}
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                </details>
+
+                            )}
+
+                            <details className="applicant-profile">
+
+                                <summary>Ver perfil completo</summary>
+
+                                <div className="profile-full">
+
+                                    {app.candidate_profiles?.expected_salary && (
+                                        <p>
+                                            <strong>Pretensión salarial:</strong>{" "}
+                                            Q{Number(app.candidate_profiles.expected_salary).toLocaleString("en-US")}{" "}
+                                            mensuales
+                                        </p>
+                                    )}
+
+                                    {app.candidate_profiles?.skills && (
+                                        <p>
+                                            <strong>Habilidades:</strong>{" "}
+                                            {app.candidate_profiles.skills}
+                                        </p>
+                                    )}
+
+                                    {app.candidate_profiles?.candidate_experience?.length > 0 && (
+                                        <div className="profile-block">
+                                            <strong>Experiencia laboral</strong>
+                                            <ul>
+                                                {app.candidate_profiles.candidate_experience.map((exp, i) => (
+                                                    <li key={i}>
+                                                        {[
+                                                            exp.job_title,
+                                                            exp.company,
+                                                            exp.years
+                                                                ? `${exp.years} años`
+                                                                : null,
+                                                        ]
+                                                            .filter(Boolean)
+                                                            .join(" — ")}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {app.candidate_profiles?.candidate_education?.length > 0 && (
+                                        <div className="profile-block">
+                                            <strong>Formación académica</strong>
+                                            <ul>
+                                                {app.candidate_profiles.candidate_education.map((edu, i) => (
+                                                    <li key={i}>
+                                                        {[
+                                                            edu.level,
+                                                            edu.institution,
+                                                            edu.graduation_year,
+                                                        ]
+                                                            .filter(Boolean)
+                                                            .join(" — ")}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {!app.candidate_profiles?.candidate_education?.length &&
+                                        !app.candidate_profiles?.candidate_experience?.length &&
+                                        !app.candidate_profiles?.skills && (
+                                            <p className="profile-empty">
+                                                El candidato aún no completa
+                                                formación, experiencia ni
+                                                habilidades en su perfil.
+                                            </p>
+                                        )}
+
+                                </div>
+
+                            </details>
 
                         </div>
 
