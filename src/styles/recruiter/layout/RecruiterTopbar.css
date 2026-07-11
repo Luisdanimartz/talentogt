@@ -1,139 +1,156 @@
-.topbar{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:30px;
-
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
 }
 
-.topbar-title h1{
-
-    margin:0;
-
-    font-size:42px;
-
-    color:#0B2F6B;
-
-    font-weight:800;
-
+.topbar-title h1 {
+    margin: 0;
+    font-size: 26px;
+    color: var(--cgt-navy);
+    font-weight: 700;
+    letter-spacing: -0.02em;
 }
 
-.topbar-title p{
-
-    margin-top:8px;
-
-    color:#64748B;
-
+.topbar-title p {
+    margin: 6px 0 0;
+    color: var(--cgt-slate);
+    font-size: 14px;
 }
 
-.topbar-actions{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:14px;
-
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
-.search-box{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
-
-    background:white;
-
-    padding:12px 18px;
-
-    border-radius:14px;
-
-    width:340px;
-
-    border:1px solid #E2E8F0;
-
+/* Buscador */
+.topbar-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--cgt-surface);
+    border: 1px solid var(--cgt-border);
+    border-radius: 10px;
+    padding: 0 12px;
+    height: 44px;
+    width: 260px;
+    color: var(--cgt-slate);
+    transition: 0.2s;
 }
 
-.search-box input{
-
-    border:none;
-
-    outline:none;
-
-    width:100%;
-
-    font-size:15px;
-
+.topbar-search:focus-within {
+    border-color: var(--cgt-teal);
+    box-shadow: 0 0 0 3px var(--cgt-teal-soft);
 }
 
-.icon-btn{
-
-    width:48px;
-
-    height:48px;
-
-    border:none;
-
-    background:white;
-
-    border-radius:14px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    cursor:pointer;
-
-    box-shadow:0 6px 18px rgba(15,23,42,.06);
-
-    transition:.25s;
-
+.topbar-search input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--cgt-ink);
+    width: 100%;
 }
 
-.icon-btn:hover{
-
-    background:#EEF4FF;
-
-    color:#2563EB;
-
+.topbar-search input::placeholder {
+    color: var(--cgt-slate);
 }
 
-.new-job-btn{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:8px;
-
-    border:none;
-
-    background:#16A34A;
-
-    color:white;
-
-    padding:14px 22px;
-
-    border-radius:14px;
-
-    font-weight:700;
-
-    cursor:pointer;
-
-    transition:.25s;
-
+/* Notificaciones */
+.topbar-bell {
+    position: relative;
 }
 
-.new-job-btn:hover{
+.bell-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 1px solid var(--cgt-border);
+    background: var(--cgt-surface);
+    color: var(--cgt-slate);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
 
-    background:#15803D;
+.bell-btn:hover {
+    color: var(--cgt-navy);
+    border-color: var(--cgt-navy);
+}
+
+.bell-btn:focus-visible {
+    outline: 2px solid var(--cgt-teal);
+    outline-offset: 2px;
+}
+
+.bell-popover {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 270px;
+    background: var(--cgt-surface);
+    border: 1px solid var(--cgt-border);
+    border-radius: var(--cgt-radius);
+    box-shadow: var(--cgt-shadow-hover);
+    padding: 16px;
+    z-index: 20;
+}
+
+.bell-popover strong {
+    display: block;
+    color: var(--cgt-ink);
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.bell-popover p {
+    margin: 0;
+    color: var(--cgt-slate);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Botón principal */
+.new-job-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: var(--cgt-teal);
+    color: white;
+    padding: 0 20px;
+    height: 44px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-family: var(--font-body);
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: var(--cgt-shadow);
+}
+
+.new-job-btn:hover {
+    background: #0C7A62;
+}
+
+.new-job-btn:focus-visible {
+    outline: 2px solid var(--cgt-navy);
+    outline-offset: 2px;
+}
+
+@media (max-width: 700px) {
+
+    .topbar-search {
+        width: 100%;
+        order: 3;
+    }
 
 }

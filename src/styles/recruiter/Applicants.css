@@ -1,0 +1,168 @@
+.applicants-header {
+    margin-bottom: 26px;
+}
+
+.applicants-header h1 {
+    margin: 0;
+    font-size: 26px;
+    color: var(--cgt-navy);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.applicants-header p {
+    margin: 6px 0 0;
+    color: var(--cgt-slate);
+    font-size: 14.5px;
+    max-width: 640px;
+    line-height: 1.5;
+}
+
+.applicants-error {
+    background: var(--cgt-red-soft);
+    color: var(--cgt-red);
+    border-radius: var(--cgt-radius);
+    padding: 16px 20px;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.applicants-empty {
+    background: var(--cgt-surface);
+    border: 1px dashed var(--cgt-border);
+    border-radius: var(--cgt-radius);
+    padding: 48px 24px;
+    text-align: center;
+}
+
+.applicants-empty h3 {
+    margin: 0 0 8px;
+    color: var(--cgt-navy);
+    font-size: 18px;
+}
+
+.applicants-empty p {
+    margin: 0 auto;
+    color: var(--cgt-slate);
+    font-size: 14px;
+    max-width: 420px;
+    line-height: 1.5;
+}
+
+.applicant-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: var(--cgt-surface);
+    border: 1px solid var(--cgt-border);
+    border-radius: var(--cgt-radius);
+    padding: 20px 22px;
+    margin-bottom: 14px;
+    box-shadow: var(--cgt-shadow);
+    flex-wrap: wrap;
+}
+
+.applicant-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--cgt-teal-soft);
+    color: var(--cgt-teal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 19px;
+    font-family: var(--font-display);
+    flex-shrink: 0;
+}
+
+.applicant-info {
+    flex: 1;
+    min-width: 220px;
+}
+
+.applicant-info h3 {
+    margin: 0 0 4px;
+    color: var(--cgt-ink);
+    font-size: 16.5px;
+    font-weight: 600;
+}
+
+.applicant-meta {
+    margin: 0 0 4px;
+    color: var(--cgt-slate);
+    font-size: 13.5px;
+}
+
+.applicant-job {
+    margin: 0;
+    color: var(--cgt-slate);
+    font-size: 13.5px;
+}
+
+.applicant-job strong {
+    color: var(--cgt-navy);
+}
+
+.applicant-status {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.applicant-status label {
+    color: var(--cgt-slate);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.status-select {
+    border: 1px solid var(--cgt-border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--cgt-surface);
+    color: var(--cgt-ink);
+    min-width: 180px;
+}
+
+.status-select:focus-visible {
+    outline: 2px solid var(--cgt-teal);
+    outline-offset: 2px;
+}
+
+.status-select.status-applied {
+    background: var(--cgt-slate-soft);
+    color: var(--cgt-slate);
+    border-color: transparent;
+}
+
+.status-select.status-reviewing {
+    background: var(--cgt-amber-soft);
+    color: var(--cgt-amber);
+    border-color: transparent;
+}
+
+.status-select.status-interview {
+    background: #E8EDF6;
+    color: var(--cgt-navy);
+    border-color: transparent;
+}
+
+.status-select.status-hired {
+    background: var(--cgt-teal-soft);
+    color: var(--cgt-teal);
+    border-color: transparent;
+}
+
+.status-select.status-rejected {
+    background: var(--cgt-red-soft);
+    color: var(--cgt-red);
+    border-color: transparent;
+}

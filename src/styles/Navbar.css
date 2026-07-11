@@ -357,3 +357,10 @@
 }
 
 }
+/* Cerrar sesion en el navbar (mismo estilo que .login pero es button) */
+.navbar-logout {
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    background: transparent;
+}

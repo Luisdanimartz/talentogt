@@ -2,10 +2,22 @@ import {
   Box,
   Button,
   Grid,
+  InputAdornment,
   MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
+
+import { formatMiles } from "../../utils/formatSalary";
+
+const WORK_MODES = ["Presencial", "Remoto", "Híbrido"];
+
+const STATUS_OPTIONS = [
+  { value: "draft", label: "Borrador" },
+  { value: "published", label: "Publicada" },
+  { value: "paused", label: "Pausada" },
+  { value: "closed", label: "Cerrada" },
+];
 
 function JobForm({
   form,
@@ -15,6 +27,7 @@ function JobForm({
   departments,
   municipalities,
   loading,
+  isEdit,
   onChange,
   onSubmit,
 }) {
@@ -22,7 +35,7 @@ function JobForm({
     <Box>
 
       <Typography variant="h4" fontWeight="bold" mb={4}>
-        Publicar Vacante
+        {isEdit ? "Editar Vacante" : "Publicar Vacante"}
       </Typography>
 
       <Grid container spacing={3}>
@@ -90,12 +103,19 @@ function JobForm({
 
         <Grid item xs={12} md={6}>
           <TextField
-            label="Modalidad"
+            select
             fullWidth
+            label="Modalidad"
             name="work_mode"
             value={form.work_mode}
             onChange={onChange}
-          />
+          >
+            {WORK_MODES.map((item) => (
+              <MenuItem key={item} value={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </TextField>
         </Grid>
 
         <Grid item xs={12} md={6}>
@@ -132,27 +152,58 @@ function JobForm({
           </TextField>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={4}>
           <TextField
             fullWidth
             type="number"
-            label="Salario mínimo"
-            name="salary_min"
-            value={form.salary_min}
+            label="Plazas disponibles"
+            name="vacancies"
+            value={form.vacancies}
             onChange={onChange}
           />
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={4}>
           <TextField
             fullWidth
-            type="number"
-            label="Salario máximo"
-            name="salary_max"
-            value={form.salary_max}
-            onChange={onChange}
+            label="Salario mensual"
+            name="salary"
+            value={form.salary}
+            onChange={(e) =>
+              onChange({
+                target: {
+                  name: "salary",
+                  value: formatMiles(e.target.value),
+                },
+              })
+            }
+            placeholder="10,000"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">Q</InputAdornment>
+              ),
+            }}
           />
         </Grid>
+
+        {isEdit && (
+          <Grid item xs={12} md={6}>
+            <TextField
+              select
+              fullWidth
+              label="Estado de la vacante"
+              name="status"
+              value={form.status}
+              onChange={onChange}
+            >
+              {STATUS_OPTIONS.map((item) => (
+                <MenuItem key={item.value} value={item.value}>
+                  {item.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+        )}
 
         <Grid item xs={12}>
           <TextField
@@ -199,7 +250,7 @@ function JobForm({
           onClick={onSubmit}
           disabled={loading}
         >
-          Publicar Vacante
+          {isEdit ? "Guardar cambios" : "Publicar Vacante"}
         </Button>
       </Box>
 

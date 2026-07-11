@@ -1,7 +1,29 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../styles/Navbar.css";
 
+import { useAuth } from "../context/AuthContext";
+import { logoutUser } from "../services/authService";
+
 function Navbar() {
+
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const role = user?.user_metadata?.role;
+
+  /* A dónde lleva "Mi panel" según el rol */
+  const panelPath =
+    role === "empresa"
+      ? "/empresa/dashboard"
+      : "/candidato/dashboard";
+
+  async function handleLogout() {
+
+    await logoutUser();
+
+    navigate("/login");
+
+  }
 
   return (
 
@@ -33,7 +55,7 @@ function Navbar() {
 
         <nav className="nav-links">
 
-          <Link to="/empleos">
+          <Link to="/vacantes">
             Buscar empleo
           </Link>
 
@@ -49,26 +71,56 @@ function Navbar() {
 
         <div className="nav-actions">
 
-          <Link
-            to="/login"
-            className="publish"
-          >
-            Publicar vacante
-          </Link>
+          {!user && (
 
-          <Link
-            to="/login"
-            className="login"
-          >
-            Ingresar
-          </Link>
+            <>
 
-          <Link
-            to="/register"
-            className="register"
-          >
-            Registrarse
-          </Link>
+              <Link
+                to="/login"
+                className="publish"
+              >
+                Publicar vacante
+              </Link>
+
+              <Link
+                to="/login"
+                className="login"
+              >
+                Ingresar
+              </Link>
+
+              <Link
+                to="/register"
+                className="register"
+              >
+                Registrarse
+              </Link>
+
+            </>
+
+          )}
+
+          {user && (
+
+            <>
+
+              <Link
+                to={panelPath}
+                className="register"
+              >
+                Mi panel
+              </Link>
+
+              <button
+                className="login navbar-logout"
+                onClick={handleLogout}
+              >
+                Cerrar sesión
+              </button>
+
+            </>
+
+          )}
 
         </div>
 

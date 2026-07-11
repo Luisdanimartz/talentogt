@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import JobForm from "./JobForm";
 
@@ -7,7 +7,8 @@ import {
   getJobCategories,
   getEmploymentTypes,
   getEducationLevels,
-  createJob,
+  getJobById,
+  updateJob,
 } from "../../services/jobService";
 
 import {
@@ -15,30 +16,14 @@ import {
   getMunicipalitiesByDepartment,
 } from "../../services/locationService";
 
-import { getCurrentCompany } from "../../services/companyService";
+import { formatMiles, salarioANumero } from "../../utils/formatSalary";
 
-import { salarioANumero } from "../../utils/formatSalary";
+function EditJob() {
 
-const initialForm = {
-  title: "",
-  category_id: "",
-  employment_type_id: "",
-  education_level_id: "",
-  work_mode: "",
-  department_id: "",
-  municipality_id: "",
-  vacancies: 1,
-  salary: "",
-  description: "",
-  requirements: "",
-  benefits: "",
-};
-
-function CreateJob() {
-
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState(null);
 
   const [categories, setCategories] = useState([]);
   const [employmentTypes, setEmploymentTypes] = useState([]);
@@ -47,32 +32,49 @@ function CreateJob() {
   const [municipalities, setMunicipalities] = useState([]);
 
   const [loading, setLoading] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
 
-    loadCatalogs();
+    loadData();
 
-  }, []);
+  }, [id]);
 
   useEffect(() => {
 
-    loadMunicipalities(form.department_id);
+    if (form?.department_id) {
+      loadMunicipalities(form.department_id);
+    }
 
-  }, [form.department_id]);
+  }, [form?.department_id]);
 
-  async function loadCatalogs() {
+  async function loadData() {
 
     const [
+      jobRes,
       categoriesRes,
       employmentRes,
       educationRes,
       departmentsRes,
     ] = await Promise.all([
+      getJobById(id),
       getJobCategories(),
       getEmploymentTypes(),
       getEducationLevels(),
       getDepartments(),
     ]);
+
+    if (jobRes.error || !jobRes.data) {
+      setNotFound(true);
+      return;
+    }
+
+    setForm({
+      ...jobRes.data,
+      salary: jobRes.data.salary_min
+        ? formatMiles(jobRes.data.salary_min)
+        : "",
+    });
 
     setCategories(categoriesRes.data || []);
     setEmploymentTypes(employmentRes.data || []);
@@ -92,13 +94,17 @@ function CreateJob() {
 
   function handleChange(e) {
 
-    setForm({
+    const { name, value } = e.target;
 
-      ...form,
+    setForm((prev) => ({
 
-      [e.target.name]: e.target.value,
+      ...prev,
 
-    });
+      [name]: value,
+
+      ...(name === "department_id" ? { municipality_id: "" } : {}),
+
+    }));
 
   }
 
@@ -106,55 +112,42 @@ function CreateJob() {
 
     setLoading(true);
 
-    try {
+    const {
+      id: jobId,
+      company_profiles,
+      created_at,
+      updated_at,
+      salary,
+      ...editableFields
+    } = form;
 
-      const { data: company, error: companyError } =
-        await getCurrentCompany();
+    const salario = salarioANumero(salary);
 
-      if (companyError || !company) {
+    const { error } = await updateJob(id, {
+      ...editableFields,
+      salary_min: salario,
+      salary_max: salario,
+    });
 
-        alert(
-          "No se encontró el perfil de tu empresa. " +
-          "Completa tu perfil antes de publicar una vacante."
-        );
+    setLoading(false);
 
-        return;
-
-      }
-
-      const { salary, ...fields } = form;
-
-      const salario = salarioANumero(salary);
-
-      const job = {
-        company_id: company.id,
-        status: "published",
-        published_at: new Date().toISOString(),
-        ...fields,
-        salary_min: salario,
-        salary_max: salario,
-      };
-
-      const { error } = await createJob(job);
-
-      if (error) {
-
-        alert(error.message);
-
-        return;
-
-      }
-
-      alert("Vacante publicada correctamente.");
-
-      navigate("/empresa/dashboard");
-
-    } finally {
-
-      setLoading(false);
-
+    if (error) {
+      alert(error.message);
+      return;
     }
 
+    alert("Vacante actualizada correctamente.");
+
+    navigate("/empresa/dashboard");
+
+  }
+
+  if (notFound) {
+    return <p style={{ textAlign: "center", marginTop: 40 }}>Vacante no encontrada.</p>;
+  }
+
+  if (!form) {
+    return <p style={{ textAlign: "center", marginTop: 40 }}>Cargando...</p>;
   }
 
   return (
@@ -175,6 +168,8 @@ function CreateJob() {
 
       loading={loading}
 
+      isEdit
+
       onChange={handleChange}
 
       onSubmit={handleSubmit}
@@ -185,4 +180,4 @@ function CreateJob() {
 
 }
 
-export default CreateJob;
+export default EditJob;

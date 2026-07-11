@@ -1,82 +1,92 @@
-import { useEffect, useState } from "react";
-
 import "./../../../styles/recruiter/dashboard/DashboardCards.css";
 
-import { getCurrentCompany } from "../../../services/companyService";
-import { getCompanyJobs } from "../../../services/jobService";
+import {
+  Work as WorkIcon,
+  RocketLaunch as RocketIcon,
+  Groups as GroupsIcon,
+  Event as EventIcon,
+} from "@mui/icons-material";
 
-function DashboardCards() {
+/*
+  Tarjetas del dashboard.
 
-    const [cards, setCards] = useState([]);
-    const [loading, setLoading] = useState(true);
+  Reales (calculadas de la tabla jobs):
+    - Vacantes activas (status = published)
+    - Publicadas esta semana (published_at >= lunes de esta semana)
 
-    useEffect(() => {
+  Reales (calculadas de la tabla applications):
+    - Candidatos por revisar (current_status = applied)
 
-        loadStats();
+  Honestas (aún sin tablas/lógica detrás):
+    - Entrevistas hoy -> se activa con el módulo de entrevistas
+*/
 
-    }, []);
+function inicioDeSemana() {
 
-    async function loadStats() {
+    const hoy = new Date();
+    const dia = hoy.getDay(); // 0 = domingo
 
-        setLoading(true);
+    const diffALunes = dia === 0 ? 6 : dia - 1;
 
-        const { data: company } = await getCurrentCompany();
+    const lunes = new Date(hoy);
+    lunes.setDate(hoy.getDate() - diffALunes);
+    lunes.setHours(0, 0, 0, 0);
 
-        if (!company) {
-            setLoading(false);
-            return;
-        }
+    return lunes;
 
-        const { data: jobs } = await getCompanyJobs(company.id);
+}
 
-        const jobList = jobs || [];
+function DashboardCards({ jobs, applications = [], applicationsError, loading, onCardClick }) {
 
-        const now = new Date();
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lunes = inicioDeSemana();
 
-        const activas = jobList.filter(
-            (job) => (job.status || "").toLowerCase() === "active"
-        ).length;
+    const activas = jobs.filter(
+        (job) => (job.status || "").toLowerCase() === "published"
+    ).length;
 
-        const esteMes = jobList.filter(
-            (job) => new Date(job.created_at) >= startOfMonth
-        ).length;
+    const estaSemana = jobs.filter(
+        (job) =>
+            job.published_at && new Date(job.published_at) >= lunes
+    ).length;
 
-        const areas = new Set(
-            jobList.map((job) => job.category_id).filter(Boolean)
-        ).size;
-
-        setCards([
-            {
-                title: "Vacantes activas",
-                value: String(activas),
-                color: "blue"
-            },
-            {
-                title: "Publicadas este mes",
-                value: String(esteMes),
-                color: "orange"
-            },
-            {
-                title: "Áreas con vacantes",
-                value: String(areas),
-                color: "green"
+    const cards = [
+        {
+            title: "Vacantes activas",
+            value: activas,
+            icon: WorkIcon,
+            tone: "teal",
+            target: "jobs",
+        },
+        {
+            title: "Publicadas esta semana",
+            value: estaSemana,
+            icon: RocketIcon,
+            tone: "amber",
+            target: "jobs",
+        },
+        applicationsError
+            ? {
+                title: "Candidatos por revisar",
+                icon: GroupsIcon,
+                tone: "navy",
+                soon: "Sin acceso a postulaciones (revisar permisos)",
             }
-        ]);
-
-        setLoading(false);
-
-    }
-
-    if (loading) {
-
-        return (
-            <section className="dashboard-cards">
-                <p>Cargando métricas...</p>
-            </section>
-        );
-
-    }
+            : {
+                title: "Candidatos por revisar",
+                value: applications.filter(
+                    (app) => (app.current_status || "applied") === "applied"
+                ).length,
+                icon: GroupsIcon,
+                tone: "navy",
+                target: "candidatos",
+            },
+        {
+            title: "Entrevistas hoy",
+            icon: EventIcon,
+            tone: "slate",
+            soon: "Se activará con el módulo de entrevistas",
+        },
+    ];
 
     return (
 
@@ -86,29 +96,67 @@ function DashboardCards() {
 
                 <article
                     key={card.title}
-                    className={`dashboard-card ${card.color}`}
+                    className={
+                        card.soon
+                            ? `dashboard-card soon ${card.tone}`
+                            : card.target
+                                ? `dashboard-card clickable ${card.tone}`
+                                : `dashboard-card ${card.tone}`
+                    }
+                    onClick={
+                        card.target && !card.soon
+                            ? () => onCardClick?.(card.target)
+                            : undefined
+                    }
+                    role={card.target && !card.soon ? "button" : undefined}
+                    tabIndex={card.target && !card.soon ? 0 : undefined}
+                    onKeyDown={
+                        card.target && !card.soon
+                            ? (e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    onCardClick?.(card.target);
+                                }
+                            }
+                            : undefined
+                    }
                 >
 
-                    <span className="card-title">
-                        {card.title}
+                    <span className={`card-icon ${card.tone}`}>
+                        <card.icon fontSize="small" />
                     </span>
 
-                    <h2>
-                        {card.value}
-                    </h2>
+                    <div className="card-body">
+
+                        <span className="card-title">
+                            {card.title}
+                        </span>
+
+                        {card.soon ? (
+
+                            <>
+                                <span className="card-soon-badge">
+                                    Próximamente
+                                </span>
+
+                                <small className="card-soon-note">
+                                    {card.soon}
+                                </small>
+                            </>
+
+                        ) : (
+
+                            <h2>
+                                {loading ? "…" : card.value}
+                            </h2>
+
+                        )}
+
+                    </div>
 
                 </article>
 
             ))}
-
-            <article className="dashboard-card gray">
-                <span className="card-title">
-                    Candidatos y métricas de IA
-                </span>
-                <h2 style={{ fontSize: 16 }}>
-                    Próximamente
-                </h2>
-            </article>
 
         </section>
 

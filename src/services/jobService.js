@@ -48,7 +48,10 @@ export async function getCompanyJobs(companyId) {
 export async function getJobById(jobId) {
   return await supabase
     .from("jobs")
-    .select("*")
+    .select(`
+      *,
+      company_profiles ( company_name, logo )
+    `)
     .eq("id", jobId)
     .single();
 }
@@ -60,4 +63,22 @@ export async function updateJob(jobId, job) {
     .eq("id", jobId)
     .select()
     .single();
+}
+
+export async function getPublishedJobs() {
+  return await supabase
+    .from("jobs")
+    .select(`
+      id,
+      title,
+      work_mode,
+      salary_min,
+      salary_max,
+      published_at,
+      department_id,
+      category_id,
+      company_profiles ( company_name )
+    `)
+    .eq("status", "published")
+    .order("published_at", { ascending: false });
 }

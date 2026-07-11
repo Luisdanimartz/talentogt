@@ -1,179 +1,270 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import StatCard from "../../components/ui/StatCard";
-import ProcessCard from "../../components/process/ProcessCard";
-import ProcessTimeline from "../../components/timeline/ProcessTimeline";
+import { useAuth } from "../../context/AuthContext";
 
-import { dashboardStats } from "../../data/dashboard";
-import { timeline } from "../../data/timeline";
-import applications from "../../mock/applications";
-import user from "../../session/user";
+import {
+    getCurrentCandidateProfile,
+    getMyApplications,
+} from "../../services/candidateService";
 
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
+import {
+    APPLICATION_STATUSES,
+    statusLabel,
+} from "../../utils/applicationStatus";
 
-function Dashboard() {
+const STATUS_COLORS = {
+    applied: { bg: "#EEF1F5", color: "#64748B" },
+    reviewing: { bg: "#FBF0DF", color: "#C98A2C" },
+    interview: { bg: "#E8EDF6", color: "#0B1F3A" },
+    hired: { bg: "#E4F5F0", color: "#0E8F73" },
+    rejected: { bg: "#FBEAE9", color: "#B3261E" },
+};
 
-  const [open, setOpen] = useState(false);
-  const [selectedProcess, setSelectedProcess] = useState(null);
+function CandidateDashboard() {
 
-  const handleOpen = (application) => {
-    setSelectedProcess(application);
-    setOpen(true);
-  };
+    const navigate = useNavigate();
+    const { user } = useAuth();
 
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedProcess(null);
-  };
+    const [profile, setProfile] = useState(null);
+    const [applications, setApplications] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-  return (
-    <div className="dashboard">
+    useEffect(() => {
 
-      {/* ENCABEZADO */}
+        loadData();
 
-      <div className="dashboard-header">
+    }, []);
 
-        <div>
+    async function loadData() {
 
-          <h1>
-            Bienvenido, {user.name} 👋
-          </h1>
+        const [profileRes, applicationsRes] = await Promise.all([
+            getCurrentCandidateProfile(),
+            getMyApplications(),
+        ]);
 
-          <p>
+        setProfile(profileRes.data);
+        setApplications(applicationsRes.data || []);
 
-            {user.accountType} • Completa tu perfil para aumentar tus posibilidades de conseguir empleo.
+        setLoading(false);
 
-          </p>
+    }
+
+    const nombre = profile?.first_name || user?.email;
+
+    /*
+      Estadísticas reales del candidato, contadas de sus
+      propias postulaciones.
+    */
+    const stats = APPLICATION_STATUSES.map((status) => ({
+        ...status,
+        count: applications.filter(
+            (app) =>
+                (app.current_status || "applied") === status.value
+        ).length,
+    }));
+
+    return (
+
+        <div style={{ maxWidth: 760, margin: "0 auto", padding: "130px 20px 60px" }}>
+
+            <h1 style={{ marginBottom: 4 }}>Bienvenido, {nombre}</h1>
+
+            {loading && <p>Cargando...</p>}
+
+            {!loading && !profile && (
+
+                <div
+                    style={{
+                        background: "#FBF0DF",
+                        borderRadius: 12,
+                        padding: 20,
+                        margin: "20px 0 24px",
+                    }}
+                >
+                    <strong>Completa tu perfil</strong>
+                    <p style={{ margin: "8px 0 14px" }}>
+                        Necesitas un perfil para poder postularte a vacantes.
+                        Toma menos de 5 minutos.
+                    </p>
+                    <button
+                        style={botonEstilo("#C98A2C")}
+                        onClick={() => navigate("/candidato/crear-cv")}
+                    >
+                        Crear mi perfil
+                    </button>
+                </div>
+
+            )}
+
+            {!loading && profile && (
+
+                <p style={{ marginBottom: 24 }}>
+                    <button
+                        style={botonLink}
+                        onClick={() => navigate("/candidato/crear-cv")}
+                    >
+                        Editar mi perfil
+                    </button>
+                </p>
+
+            )}
+
+            {/* Resumen real de postulaciones por estado */}
+            {!loading && applications.length > 0 && (
+
+                <div
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns:
+                            "repeat(auto-fit, minmax(120px, 1fr))",
+                        gap: 12,
+                        marginBottom: 28,
+                    }}
+                >
+
+                    {stats.map((stat) => {
+
+                        const colors =
+                            STATUS_COLORS[stat.value] ||
+                            STATUS_COLORS.applied;
+
+                        return (
+
+                            <div
+                                key={stat.value}
+                                style={{
+                                    background: colors.bg,
+                                    borderRadius: 12,
+                                    padding: "14px 16px",
+                                }}
+                            >
+
+                                <div
+                                    style={{
+                                        fontSize: 26,
+                                        fontWeight: 700,
+                                        color: colors.color,
+                                        fontVariantNumeric: "tabular-nums",
+                                    }}
+                                >
+                                    {stat.count}
+                                </div>
+
+                                <div
+                                    style={{
+                                        fontSize: 12.5,
+                                        color: colors.color,
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    {stat.label}
+                                </div>
+
+                            </div>
+
+                        );
+
+                    })}
+
+                </div>
+
+            )}
+
+            <h2 style={{ fontSize: 20 }}>Mis postulaciones</h2>
+
+            {!loading && applications.length === 0 && (
+                <p style={{ marginBottom: 24 }}>
+                    Todavía no tienes postulaciones. Explora las vacantes
+                    disponibles y aplica a la que más te interese.
+                </p>
+            )}
+
+            {!loading && applications.map((app) => {
+
+                const colors =
+                    STATUS_COLORS[app.current_status || "applied"] ||
+                    STATUS_COLORS.applied;
+
+                return (
+
+                    <div
+                        key={app.id}
+                        style={{
+                            border: "1px solid #E6E8EC",
+                            borderRadius: 12,
+                            padding: 16,
+                            marginBottom: 12,
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            gap: 12,
+                            flexWrap: "wrap",
+                        }}
+                    >
+
+                        <div>
+                            <strong>{app.jobs?.title || "Vacante"}</strong>
+                            <div style={{ color: "#64748B", fontSize: 14 }}>
+                                {app.jobs?.company_profiles?.company_name || ""}
+                                {app.applied_at &&
+                                    ` · Postulado el ${new Date(app.applied_at).toLocaleDateString("es-GT")}`}
+                            </div>
+                        </div>
+
+                        <span
+                            style={{
+                                background: colors.bg,
+                                color: colors.color,
+                                borderRadius: 999,
+                                padding: "6px 14px",
+                                fontSize: 13,
+                                fontWeight: 600,
+                            }}
+                        >
+                            {statusLabel(app.current_status)}
+                        </span>
+
+                    </div>
+
+                );
+
+            })}
+
+            <button
+                style={{ ...botonEstilo("#0E8F73"), marginTop: 12 }}
+                onClick={() => navigate("/vacantes")}
+            >
+                Ver vacantes disponibles
+            </button>
 
         </div>
 
-        <button className="profile-btn">
-          Ver mi perfil
-        </button>
+    );
 
-      </div>
-
-      {/* PERFIL */}
-
-      <div className="profile-progress">
-
-        <div className="progress-header">
-
-          <span>Perfil completado</span>
-
-          <strong>18%</strong>
-
-        </div>
-
-        <div className="progress-bar">
-
-          <div className="progress-fill"></div>
-
-        </div>
-
-      </div>
-
-      {/* ESTADÍSTICAS */}
-
-      <div className="dashboard-grid">
-
-        {dashboardStats.map((stat) => (
-
-          <StatCard
-            key={stat.id}
-            number={stat.number}
-            title={stat.title}
-            icon={stat.icon}
-          />
-
-        ))}
-
-      </div>
-
-      {/* CONTENIDO */}
-
-      <div className="dashboard-columns">
-
-        <div className="activity">
-
-          <h2>Actividad reciente</h2>
-
-          <ul>
-
-            <li>✅ Banco Industrial revisó tu CV.</li>
-
-            <li>📅 Entrevista programada para mañana.</li>
-
-            <li>📩 Tienes un mensaje nuevo del reclutador.</li>
-
-            <li>🎉 Has enviado {applications.length} postulaciones.</li>
-
-          </ul>
-
-        </div>
-
-        <div className="processes">
-
-          <h2>Mis procesos activos</h2>
-
-          {applications.map((application) => (
-
-            <ProcessCard
-              key={application.id}
-              job={application.job}
-              company={application.company}
-              status={application.status}
-              progress={application.progress}
-              nextStep={application.nextStep}
-              updated={application.updated}
-              onView={() => handleOpen(application)}
-            />
-
-          ))}
-
-        </div>
-
-      </div>
-
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        maxWidth="md"
-        fullWidth
-      >
-
-        <DialogTitle>
-
-          {selectedProcess?.job}
-
-          <br />
-
-          <small>{selectedProcess?.company}</small>
-
-        </DialogTitle>
-
-        <DialogContent>
-
-          <ProcessTimeline steps={timeline} />
-
-        </DialogContent>
-
-        <DialogActions>
-
-          <Button onClick={handleClose}>
-            Cerrar
-          </Button>
-
-        </DialogActions>
-
-      </Dialog>
-
-    </div>
-  );
 }
 
-export default Dashboard;
+function botonEstilo(color) {
+    return {
+        background: color,
+        color: "white",
+        border: "none",
+        borderRadius: 8,
+        padding: "12px 24px",
+        cursor: "pointer",
+        fontWeight: 600,
+    };
+}
+
+const botonLink = {
+    background: "none",
+    border: "none",
+    color: "#0E8F73",
+    cursor: "pointer",
+    fontWeight: 600,
+    padding: 0,
+    fontSize: 15,
+    textDecoration: "underline",
+};
+
+export default CandidateDashboard;

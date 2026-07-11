@@ -1,314 +1,358 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+
+import { getJobById } from "../services/jobService";
+import { formatSalary } from "../utils/formatSalary";
 
 import {
-  Box,
-  Paper,
-  Typography,
-  Chip,
-  Button,
-  Divider,
-  Grid,
-  Avatar,
-  Stack,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material";
+    applyToJob,
+    getMyApplicationForJob,
+    getCurrentCandidateProfile,
+} from "../services/candidateService";
+
+import { getDepartments } from "../services/locationService";
+
+import { useAuth } from "../context/AuthContext";
 
 function JobDetail() {
 
-  const navigate = useNavigate();
+    const { id } = useParams();
+    const navigate = useNavigate();
 
-  const [open, setOpen] = useState(false);
+    const { user } = useAuth();
+    const role = user?.user_metadata?.role;
 
-  return (
-    <Box
-      sx={{
-        maxWidth: 1200,
-        margin: "40px auto",
-        px: 3,
-      }}
-    >
-      <Grid container spacing={4}>
+    const [job, setJob] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-        {/* INFORMACIÓN */}
+    const [application, setApplication] = useState(null);
+    const [profile, setProfile] = useState(null);
+    const [departments, setDepartments] = useState([]);
+    const [applying, setApplying] = useState(false);
+    const [applyError, setApplyError] = useState(null);
 
-        <Grid item xs={12} md={8}>
+    useEffect(() => {
 
-          <Paper
-            elevation={3}
-            sx={{
-              p:4,
-              borderRadius:4,
-            }}
-          >
+        loadJob();
 
-            <Box
-              sx={{
-                display:"flex",
-                gap:3,
-                alignItems:"center",
-                mb:4,
-              }}
-            >
+    }, [id, user]);
 
-              <Avatar
-                sx={{
-                  width:70,
-                  height:70,
-                  bgcolor:"#0A4D8C",
-                  fontSize:28,
-                }}
-              >
-                BI
-              </Avatar>
+    async function loadJob() {
 
-              <Box>
+        setLoading(true);
 
-                <Typography
-                  variant="h5"
-                  fontWeight="bold"
+        const { data, error } = await getJobById(id);
+
+        if (!error) {
+            setJob(data);
+        }
+
+        /* Si es candidato, revisamos si ya se postuló
+           y traemos su perfil para las coincidencias */
+        if (user && role === "candidato") {
+
+            const [existingRes, profileRes, departmentsRes] =
+                await Promise.all([
+                    getMyApplicationForJob(id),
+                    getCurrentCandidateProfile(),
+                    getDepartments(),
+                ]);
+
+            setApplication(existingRes.data || null);
+            setProfile(profileRes.data || null);
+            setDepartments(departmentsRes.data || []);
+
+        }
+
+        setLoading(false);
+
+    }
+
+    async function handleApply() {
+
+        /* Sin sesión: primero debe iniciar sesión */
+        if (!user) {
+            navigate("/login");
+            return;
+        }
+
+        setApplying(true);
+        setApplyError(null);
+
+        const { data, error } = await applyToJob(id);
+
+        setApplying(false);
+
+        if (error?.code === "NO_PROFILE") {
+            alert(
+                "Antes de postularte necesitas completar tu perfil. " +
+                "Te llevamos al formulario."
+            );
+            navigate("/candidato/crear-cv");
+            return;
+        }
+
+        if (error?.code === "DUPLICATE") {
+            setApplyError("Ya te habías postulado a esta vacante.");
+            return;
+        }
+
+        if (error) {
+            setApplyError(error.message || "No se pudo enviar tu postulación.");
+            return;
+        }
+
+        setApplication(data);
+
+    }
+
+    if (loading) {
+        return <p style={{ textAlign: "center", marginTop: 40 }}>Cargando...</p>;
+    }
+
+    if (!job) {
+        return <p style={{ textAlign: "center", marginTop: 40 }}>Vacante no encontrada.</p>;
+    }
+
+    /* La empresa no se postula a sus propias vacantes */
+    const showApplyButton = !user || role === "candidato";
+
+    return (
+
+        <div style={{ maxWidth: 800, margin: "0 auto", padding: "130px 20px 60px" }}>
+
+            <h1>{job.title}</h1>
+
+            <p style={{ color: "#555", marginBottom: 20 }}>
+                {job.company_profiles?.company_name || "Empresa"}
+            </p>
+
+            {showApplyButton && !application && (
+
+                <button
+                    onClick={handleApply}
+                    disabled={applying}
+                    style={{
+                        background: "#0E8F73",
+                        color: "white",
+                        border: "none",
+                        borderRadius: 8,
+                        padding: "12px 28px",
+                        marginBottom: 12,
+                        cursor: applying ? "default" : "pointer",
+                        fontWeight: 600,
+                        fontSize: 15,
+                        opacity: applying ? 0.7 : 1,
+                    }}
                 >
-                  Banco Industrial
-                </Typography>
+                    {applying
+                        ? "Enviando postulación..."
+                        : user
+                            ? "Postularme"
+                            : "Inicia sesión para postularte"}
+                </button>
 
-                <Typography color="text.secondary">
-                  ⭐ 4.8 · Empresa verificada
-                </Typography>
+            )}
 
-                <Typography color="text.secondary">
-                  Guatemala · Sector Financiero
-                </Typography>
+            {showApplyButton && application && (
 
-                <Typography color="text.secondary">
-                  Más de 350 colaboradores
-                </Typography>
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 12,
+                        flexWrap: "wrap",
+                        marginBottom: 12,
+                    }}
+                >
 
-              </Box>
+                    <div
+                        style={{
+                            background: "#E4F5F0",
+                            color: "#0E8F73",
+                            borderRadius: 8,
+                            padding: "12px 20px",
+                            fontWeight: 600,
+                        }}
+                    >
+                        ✓ Ya te postulaste a esta vacante
+                        {application.applied_at &&
+                            ` el ${new Date(application.applied_at).toLocaleDateString("es-GT")}`}
+                    </div>
 
-            </Box>
+                    <button
+                        onClick={() => navigate("/candidato/dashboard")}
+                        style={{
+                            background: "#0B1F3A",
+                            color: "white",
+                            border: "none",
+                            borderRadius: 8,
+                            padding: "12px 20px",
+                            cursor: "pointer",
+                            fontWeight: 600,
+                            fontSize: 14,
+                        }}
+                    >
+                        Ver mis postulaciones
+                    </button>
 
-            <Divider sx={{mb:4}} />
+                    <button
+                        onClick={() => navigate("/vacantes")}
+                        style={{
+                            background: "transparent",
+                            color: "#0E8F73",
+                            border: "1px solid #0E8F73",
+                            borderRadius: 8,
+                            padding: "12px 20px",
+                            cursor: "pointer",
+                            fontWeight: 600,
+                            fontSize: 14,
+                        }}
+                    >
+                        Seguir viendo vacantes
+                    </button>
 
-            <Typography
-              variant="h4"
-              fontWeight="bold"
-            >
-              Asesor Comercial
-            </Typography>
+                </div>
 
-            <Typography
-              color="text.secondary"
-              mt={1}
-            >
-              Publicado hace 2 días · 25 postulantes
-            </Typography>
+            )}
 
-            <Stack
-              direction="row"
-              spacing={1}
-              mt={3}
-              flexWrap="wrap"
-            >
+            {applyError && (
+                <p style={{ color: "#B3261E", marginBottom: 12 }}>
+                    {applyError}
+                </p>
+            )}
 
-              <Chip label="Guatemala"/>
+            {/* Coincidencias honestas: comparación básica del
+                perfil real contra la vacante, sin porcentajes
+                inventados */}
+            {role === "candidato" && profile && (() => {
 
-              <Chip label="Tiempo completo"/>
+                const jobDept = departments.find(
+                    (d) => d.id === job.department_id
+                )?.name;
 
-              <Chip label="Presencial"/>
+                const mismaUbicacion =
+                    jobDept &&
+                    profile.department &&
+                    jobDept.toLowerCase() ===
+                        profile.department.toLowerCase();
 
-              <Chip
-                label="Q8,000 - Q10,000"
-                color="success"
-              />
+                const textoVacante = [
+                    job.title,
+                    job.description,
+                    job.requirements,
+                ]
+                    .join(" ")
+                    .toLowerCase();
 
-            </Stack>
+                const palabrasProfesion = (profile.profession || "")
+                    .toLowerCase()
+                    .split(/\s+/)
+                    .filter((palabra) => palabra.length > 3);
 
-            <Divider sx={{my:4}} />
+                const profesionCoincide =
+                    palabrasProfesion.length > 0 &&
+                    palabrasProfesion.some((palabra) =>
+                        textoVacante.includes(palabra)
+                    );
 
-            <Typography
-              variant="h5"
-              fontWeight="bold"
-              mb={2}
-            >
-              Descripción
-            </Typography>
+                const checks = [
+                    jobDept && {
+                        ok: mismaUbicacion,
+                        text: mismaUbicacion
+                            ? `La vacante está en tu departamento (${jobDept})`
+                            : `La vacante está en ${jobDept}${profile.department ? ` y tu perfil dice ${profile.department}` : ""}`,
+                    },
+                    palabrasProfesion.length > 0 && {
+                        ok: profesionCoincide,
+                        text: profesionCoincide
+                            ? "Tu profesión coincide con lo que buscan"
+                            : "Tu profesión no aparece en la descripción (igual puedes aplicar)",
+                    },
+                ].filter(Boolean);
 
-            <Typography color="text.secondary">
+                if (checks.length === 0) return null;
 
-              Estamos buscando un Asesor Comercial con experiencia
-              en ventas consultivas, negociación y servicio al cliente.
-              Será responsable de desarrollar nuevas oportunidades,
-              administrar cartera de clientes y cumplir indicadores
-              comerciales.
+                return (
 
-            </Typography>
+                    <div
+                        style={{
+                            background: "#F6F7F9",
+                            border: "1px solid #E6E8EC",
+                            borderRadius: 12,
+                            padding: "14px 18px",
+                            margin: "16px 0",
+                        }}
+                    >
 
-            <Divider sx={{my:4}}/>
+                        <strong style={{ fontSize: 14 }}>
+                            Coincidencias con tu perfil
+                        </strong>
 
-            <Typography
-              variant="h5"
-              fontWeight="bold"
-              mb={2}
-            >
-              Requisitos
-            </Typography>
+                        <ul
+                            style={{
+                                margin: "8px 0 4px",
+                                paddingLeft: 0,
+                                listStyle: "none",
+                            }}
+                        >
 
-            <ul>
-              <li>Graduado a nivel diversificado.</li>
-              <li>Experiencia mínima de 2 años.</li>
-              <li>Excel intermedio.</li>
-              <li>Excelente presentación.</li>
-              <li>Disponibilidad para viajar.</li>
-            </ul>
+                            {checks.map((check, i) => (
+                                <li
+                                    key={i}
+                                    style={{
+                                        fontSize: 14,
+                                        marginBottom: 4,
+                                        color: check.ok
+                                            ? "#0E8F73"
+                                            : "#64748B",
+                                    }}
+                                >
+                                    {check.ok ? "✓" : "•"} {check.text}
+                                </li>
+                            ))}
 
-            <Divider sx={{my:4}}/>
+                        </ul>
 
-            <Typography
-              variant="h5"
-              fontWeight="bold"
-              mb={2}
-            >
-              Beneficios
-            </Typography>
+                        <small style={{ color: "#94A0B1", fontSize: 12 }}>
+                            Comparación básica según tu perfil. Completa tu
+                            perfil para mejores coincidencias.
+                        </small>
 
-            <ul>
-              <li>Prestaciones de ley.</li>
-              <li>Seguro médico.</li>
-              <li>Bonificación por resultados.</li>
-              <li>Capacitaciones constantes.</li>
-              <li>Plan de crecimiento.</li>
-            </ul>
+                    </div>
 
-          </Paper>
+                );
 
-        </Grid>
+            })()}
 
-        {/* PANEL DERECHO */}
+            <div style={{ marginBottom: 16, marginTop: 16 }}>
+                <strong>Modalidad:</strong> {job.work_mode || "No especificada"}
+            </div>
 
-        <Grid item xs={12} md={4}>
+            <div style={{ marginBottom: 16 }}>
+                <strong>Salario:</strong>{" "}
+                {formatSalary(job.salary_min, job.salary_max)}
+            </div>
 
-          <Paper
-            elevation={3}
-            sx={{
-              p:4,
-              borderRadius:4,
-              position:"sticky",
-              top:30,
-            }}
-          >
+            <div style={{ marginBottom: 16 }}>
+                <strong>Descripción</strong>
+                <p>{job.description}</p>
+            </div>
 
-            <Typography
-              variant="h6"
-              fontWeight="bold"
-              mb={3}
-            >
-              Postulación
-            </Typography>
+            <div style={{ marginBottom: 16 }}>
+                <strong>Requisitos</strong>
+                <p style={{ whiteSpace: "pre-line" }}>{job.requirements}</p>
+            </div>
 
-            <Button
-              variant="contained"
-              fullWidth
-              size="large"
-              sx={{mb:2}}
-              onClick={() => setOpen(true)}
-            >
-              Postularme
-            </Button>
+            <div style={{ marginBottom: 16 }}>
+                <strong>Beneficios</strong>
+                <p style={{ whiteSpace: "pre-line" }}>{job.benefits}</p>
+            </div>
 
-            <Button
-              variant="outlined"
-              fullWidth
-              sx={{mb:2}}
-            >
-              Guardar Vacante
-            </Button>
+        </div>
 
-            <Button
-              variant="outlined"
-              fullWidth
-              sx={{mb:2}}
-            >
-              Compartir
-            </Button>
+    );
 
-            <Button
-              color="error"
-              fullWidth
-            >
-              Reportar Vacante
-            </Button>
-
-            <Divider sx={{my:4}}/>
-
-            <Typography
-              variant="subtitle1"
-              fontWeight="bold"
-            >
-              Compromiso TalentoGT
-            </Typography>
-
-            <Typography
-              color="text.secondary"
-              mt={1}
-            >
-              Esta empresa mantiene informados a todos los candidatos
-              durante el proceso de selección.
-            </Typography>
-
-          </Paper>
-
-        </Grid>
-
-      </Grid>
-
-      {/* VENTANA DE CONFIRMACIÓN */}
-
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-      >
-
-        <DialogTitle>
-          Confirmar postulación
-        </DialogTitle>
-
-        <DialogContent>
-
-          <Typography>
-
-            ¿Deseas postularte a la vacante de
-            <strong> Asesor Comercial </strong>
-            en
-            <strong> Banco Industrial</strong>?
-
-          </Typography>
-
-        </DialogContent>
-
-        <DialogActions>
-
-          <Button
-            onClick={() => setOpen(false)}
-          >
-            Cancelar
-          </Button>
-
-          <Button
-            variant="contained"
-            onClick={() => navigate("/candidato/dashboard")}
-          >
-            Confirmar Postulación
-          </Button>
-
-        </DialogActions>
-
-      </Dialog>
-
-    </Box>
-  );
 }
 
 export default JobDetail;

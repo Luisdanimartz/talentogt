@@ -1,42 +1,43 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import "./../../../styles/recruiter/dashboard/JobsTable.css";
 
-import { getCurrentCompany } from "../../../services/companyService";
-import { getCompanyJobs } from "../../../services/jobService";
+import { formatSalary } from "../../../utils/formatSalary";
 
-function JobsTable() {
+const STATUS_LABELS = {
+    draft: "Borrador",
+    published: "Publicada",
+    paused: "Pausada",
+    closed: "Cerrada",
+};
+
+/* Cuántas vacantes se muestran antes del botón "Mostrar todas" */
+const VISIBLE_JOBS = 5;
+
+function StatusBadge({ status }) {
+
+    const className = `job-status-badge job-status-${status || "draft"}`;
+
+    return (
+        <span className={className}>
+            {STATUS_LABELS[status] || status || "—"}
+        </span>
+    );
+
+}
+
+function JobsTable({ jobs, loading, searching }) {
 
     const navigate = useNavigate();
 
-    const [jobs, setJobs] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [showAll, setShowAll] = useState(false);
 
-    useEffect(() => {
+    const visibleJobs = showAll
+        ? jobs
+        : jobs.slice(0, VISIBLE_JOBS);
 
-        loadJobs();
-
-    }, []);
-
-    async function loadJobs() {
-
-        setLoading(true);
-
-        const { data: company } = await getCurrentCompany();
-
-        if (!company) {
-            setLoading(false);
-            return;
-        }
-
-        const { data } = await getCompanyJobs(company.id);
-
-        setJobs(data || []);
-
-        setLoading(false);
-
-    }
+    const hiddenCount = jobs.length - VISIBLE_JOBS;
 
     return (
 
@@ -44,7 +45,12 @@ function JobsTable() {
 
             <div className="jobs-header">
 
-                <h2>Vacantes</h2>
+                <h2>
+                    Tus vacantes
+                    {!loading && jobs.length > 0 && (
+                        <span className="jobs-count">{jobs.length}</span>
+                    )}
+                </h2>
 
                 <button onClick={() => navigate("/empresa/nueva-vacante")}>
                     Publicar vacante
@@ -52,15 +58,50 @@ function JobsTable() {
 
             </div>
 
-            {loading && <p>Cargando vacantes...</p>}
+            {loading && (
 
-            {!loading && jobs.length === 0 && (
-                <p>
-                    Todavía no has publicado ninguna vacante.
-                </p>
+                <div className="jobs-skeleton" aria-hidden="true">
+                    <div className="skeleton-row" />
+                    <div className="skeleton-row" />
+                    <div className="skeleton-row" />
+                </div>
+
             )}
 
-            {!loading && jobs.map((job) => (
+            {!loading && jobs.length === 0 && !searching && (
+
+                <div className="jobs-empty">
+
+                    <h3>Todavía no has publicado vacantes</h3>
+
+                    <p>
+                        Publica tu primera vacante y aparecerá aquí y en
+                        el portal público de ChanceGT.
+                    </p>
+
+                    <button onClick={() => navigate("/empresa/nueva-vacante")}>
+                        Publicar mi primera vacante
+                    </button>
+
+                </div>
+
+            )}
+
+            {!loading && jobs.length === 0 && searching && (
+
+                <div className="jobs-empty">
+
+                    <h3>Sin resultados</h3>
+
+                    <p>
+                        Ninguna de tus vacantes coincide con la búsqueda.
+                    </p>
+
+                </div>
+
+            )}
+
+            {!loading && visibleJobs.map((job) => (
 
                 <div
                     key={job.id}
@@ -71,9 +112,7 @@ function JobsTable() {
 
                         <h3>{job.title}</h3>
 
-                        <span className="status">
-                            {job.status || "—"}
-                        </span>
+                        <StatusBadge status={job.status} />
 
                     </div>
 
@@ -95,15 +134,13 @@ function JobsTable() {
 
                         <div>
                             <strong>
-                                {job.salary_min && job.salary_max
-                                    ? `Q${job.salary_min} - Q${job.salary_max}`
-                                    : "No especificado"}
+                                {formatSalary(job.salary_min, job.salary_max)}
                             </strong>
                             <small>Salario</small>
                         </div>
 
-                        <button onClick={() => navigate("/empresa/nueva-vacante")}>
-                            Ver →
+                        <button onClick={() => navigate(`/empresa/vacante/${job.id}`)}>
+                            Ver detalle
                         </button>
 
                     </div>
@@ -111,6 +148,19 @@ function JobsTable() {
                 </div>
 
             ))}
+
+            {!loading && hiddenCount > 0 && (
+
+                <button
+                    className="jobs-show-all"
+                    onClick={() => setShowAll((prev) => !prev)}
+                >
+                    {showAll
+                        ? "Mostrar menos"
+                        : `Mostrar todas (${hiddenCount} más)`}
+                </button>
+
+            )}
 
         </section>
 

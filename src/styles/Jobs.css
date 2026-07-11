@@ -1,0 +1,172 @@
+.jobs-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 130px 20px 60px;
+    font-family: var(--font-body);
+}
+
+.jobs-page h1 {
+    margin: 0;
+    color: var(--cgt-navy);
+    font-family: var(--font-display);
+    font-size: 28px;
+    letter-spacing: -0.02em;
+}
+
+.jobs-subtitle {
+    margin: 6px 0 20px;
+    color: var(--cgt-slate);
+    font-size: 14.5px;
+}
+
+/* Filtros */
+.jobs-filters {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 10px;
+    background: var(--cgt-surface);
+    border: 1px solid var(--cgt-border);
+    border-radius: var(--cgt-radius);
+    padding: 14px;
+    box-shadow: var(--cgt-shadow);
+    margin-bottom: 24px;
+}
+
+.jobs-filters input,
+.jobs-filters select {
+    border: 1px solid var(--cgt-border);
+    border-radius: 10px;
+    padding: 11px 12px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--cgt-ink);
+    background: var(--cgt-surface);
+    min-width: 0;
+}
+
+.jobs-filters input:focus,
+.jobs-filters select:focus {
+    outline: 2px solid var(--cgt-teal);
+    outline-offset: 1px;
+    border-color: var(--cgt-teal);
+}
+
+.jobs-clear {
+    grid-column: 1 / -1;
+    justify-self: start;
+    border: none;
+    background: transparent;
+    color: var(--cgt-teal);
+    font-weight: 600;
+    font-size: 13.5px;
+    cursor: pointer;
+    padding: 4px 0;
+    font-family: var(--font-body);
+    text-decoration: underline;
+}
+
+/* Tarjetas de vacante */
+.job-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: var(--cgt-surface);
+    border: 1px solid var(--cgt-border);
+    border-radius: var(--cgt-radius);
+    padding: 20px 22px;
+    margin-bottom: 14px;
+    box-shadow: var(--cgt-shadow);
+    transition: 0.2s;
+    flex-wrap: wrap;
+}
+
+.job-card:hover {
+    box-shadow: var(--cgt-shadow-hover);
+    border-color: var(--cgt-teal);
+}
+
+.job-card-info {
+    min-width: 220px;
+    flex: 1;
+}
+
+.job-card h2 {
+    margin: 0 0 2px;
+    color: var(--cgt-ink);
+    font-family: var(--font-display);
+    font-size: 18px;
+}
+
+.job-card-company {
+    margin: 0 0 10px;
+    color: var(--cgt-slate);
+    font-size: 14px;
+}
+
+.job-card-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.job-card-tags span {
+    background: var(--cgt-slate-soft);
+    color: var(--cgt-slate);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+.job-card-tags .job-card-salary {
+    background: var(--cgt-teal-soft);
+    color: var(--cgt-teal);
+}
+
+.job-card-btn {
+    border: none;
+    background: var(--cgt-navy);
+    color: white;
+    padding: 11px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-family: var(--font-body);
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.job-card-btn:hover {
+    background: var(--cgt-navy-soft);
+}
+
+.jobs-none {
+    text-align: center;
+    padding: 48px 20px;
+    border: 1px dashed var(--cgt-border);
+    border-radius: var(--cgt-radius);
+}
+
+.jobs-none h3 {
+    margin: 0 0 8px;
+    color: var(--cgt-navy);
+    font-family: var(--font-display);
+    font-size: 18px;
+}
+
+.jobs-none p {
+    margin: 0 auto;
+    color: var(--cgt-slate);
+    font-size: 14px;
+    max-width: 400px;
+}
+
+@media (max-width: 800px) {
+    .jobs-filters {
+        grid-template-columns: 1fr 1fr;
+    }
+    .jobs-filters input {
+        grid-column: 1 / -1;
+    }
+}

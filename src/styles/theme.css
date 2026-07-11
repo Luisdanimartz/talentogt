@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+
+    /* Color */
+    --cgt-navy: #0B1F3A;
+    --cgt-navy-soft: #16305C;
+    --cgt-teal: #0E8F73;
+    --cgt-teal-soft: #E4F5F0;
+    --cgt-amber: #C98A2C;
+    --cgt-amber-soft: #FBF0DF;
+    --cgt-red: #B3261E;
+    --cgt-red-soft: #FBEAE9;
+    --cgt-slate: #64748B;
+    --cgt-slate-soft: #EEF1F5;
+
+    --cgt-bg: #F6F7F9;
+    --cgt-surface: #FFFFFF;
+    --cgt-border: #E6E8EC;
+    --cgt-ink: #101828;
+
+    /* Tipografía */
+    --font-display: 'Sora', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    /* Sombra y radio, consistentes en todo el panel */
+    --cgt-radius: 14px;
+    --cgt-shadow: 0 8px 24px rgba(11, 31, 58, 0.06);
+    --cgt-shadow-hover: 0 14px 30px rgba(11, 31, 58, 0.10);
+
+}
