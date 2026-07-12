@@ -64,6 +64,9 @@ const initialForm = {
   address: "",
   birth_date: "",
   skills: "",
+  summary: "",
+  linkedin: "",
+  availability: "",
   expected_salary: "",
 };
 
@@ -91,7 +94,7 @@ const SKILL_SUGGESTIONS = [
 ];
 
 const emptyEducation = { level: "", institution: "", graduation_year: "" };
-const emptyExperience = { job_title: "", company: "", years: "" };
+const emptyExperience = { job_title: "", company: "", years: "", period: "", description: "" };
 
 function CreateCV() {
 
@@ -573,7 +576,62 @@ function CreateCV() {
             />
           </Grid>
 
+          <Grid item xs={12} md={6}>
+            <TextField
+              label="LinkedIn (opcional)"
+              name="linkedin"
+              autoComplete="off"
+              value={form.linkedin}
+              onChange={handleChange}
+              fullWidth
+              helperText="Pega el enlace a tu perfil"
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <TextField
+              select
+              label="Disponibilidad"
+              name="availability"
+              value={form.availability}
+              onChange={handleChange}
+              fullWidth
+            >
+              <MenuItem value="Disponibilidad inmediata">
+                Disponibilidad inmediata
+              </MenuItem>
+              <MenuItem value="Disponible en 15 días">
+                Disponible en 15 días
+              </MenuItem>
+              <MenuItem value="Disponible en 1 mes">
+                Disponible en 1 mes
+              </MenuItem>
+            </TextField>
+          </Grid>
+
         </Grid>
+
+        <Divider sx={{ my: 5 }} />
+
+        <Typography variant="h6" fontWeight="bold" mb={1}>
+          Perfil Profesional
+        </Typography>
+
+        <Typography color="text.secondary" mb={2}>
+          El párrafo que abre tu CV: quién eres, tus años de
+          experiencia y tus fortalezas. Usa palabras clave de tu
+          sector — también cuentan para tus coincidencias.
+        </Typography>
+
+        <TextField
+          label="Resumen profesional"
+          name="summary"
+          value={form.summary}
+          onChange={handleChange}
+          multiline
+          rows={4}
+          fullWidth
+        />
 
         <Divider sx={{ my: 5 }} />
 
@@ -726,6 +784,34 @@ function CreateCV() {
                 }
                 fullWidth
                 autoComplete="off"
+              />
+            </Grid>
+
+            <Grid item xs={12} md={5}>
+              <TextField
+                label="Período (opcional)"
+                value={exp.period || ""}
+                onChange={(e) =>
+                  updateExperience(index, "period", e.target.value)
+                }
+                fullWidth
+                autoComplete="off"
+                helperText="Ejemplo: Junio 2024 – Junio 2026"
+              />
+            </Grid>
+
+            <Grid item xs={12} md={7}>
+              <TextField
+                label="Logros principales (uno por línea)"
+                value={exp.description || ""}
+                onChange={(e) =>
+                  updateExperience(index, "description", e.target.value)
+                }
+                fullWidth
+                multiline
+                rows={3}
+                autoComplete="off"
+                helperText="Se convierten en viñetas de tu CV"
               />
             </Grid>
 

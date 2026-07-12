@@ -106,6 +106,13 @@ function CandidateDashboard() {
                     >
                         Editar mi perfil
                     </button>
+                    {"  ·  "}
+                    <button
+                        style={botonLink}
+                        onClick={() => navigate("/candidato/mi-cv")}
+                    >
+                        📄 Descargar mi CV
+                    </button>
                 </p>
 
             )}

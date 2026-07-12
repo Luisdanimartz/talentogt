@@ -24,11 +24,14 @@ const CANDIDATE_COLUMNS = `
   education_year,
   experience,
   skills,
+  summary,
+  linkedin,
+  availability,
   expected_salary,
   created_at,
   updated_at,
   candidate_education ( id, level, institution, graduation_year ),
-  candidate_experience ( id, job_title, company, years )
+  candidate_experience ( id, job_title, company, years, period, description )
 `;
 
 export async function getCurrentCandidateProfile() {
@@ -84,6 +87,9 @@ export async function saveCandidateProfile(form, educationList = [], experienceL
     address: form.address || null,
     birth_date: form.birth_date || null,
     skills: form.skills || null,
+    summary: form.summary || null,
+    linkedin: form.linkedin || null,
+    availability: form.availability || null,
     expected_salary: form.expected_salary || null,
 
     /*
@@ -101,6 +107,7 @@ export async function saveCandidateProfile(form, educationList = [], experienceL
           exp.job_title,
           exp.company,
           exp.years ? `${exp.years} años` : null,
+          exp.description || null,
         ]
           .filter(Boolean)
           .join(" — ")
@@ -173,6 +180,8 @@ export async function saveCandidateProfile(form, educationList = [], experienceL
       job_title: exp.job_title || null,
       company: exp.company || null,
       years: exp.years || null,
+      period: exp.period || null,
+      description: exp.description || null,
     }));
 
   if (experienceRows.length > 0) {

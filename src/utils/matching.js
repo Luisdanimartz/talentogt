@@ -77,6 +77,7 @@ function textoDelCandidato(profile) {
             profile.profession,
             profile.skills,
             profile.experience,
+            profile.summary,
             profile.education_level,
             profile.education_institution,
         ].join(" ")

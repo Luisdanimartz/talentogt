@@ -18,6 +18,7 @@ import Applicants from "./pages/company/Applicants";
 import CandidateDashboard from "./pages/candidate/Dashboard";
 import CreateCV from "./pages/CreateCV";
 import ApplicationDetail from "./pages/candidate/ApplicationDetail";
+import MyCV from "./pages/candidate/MyCV";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -88,6 +89,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["candidato"]}>
               <ApplicationDetail />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/candidato/mi-cv"
+          element={
+            <ProtectedRoute allowedRoles={["candidato"]}>
+              <MyCV />
             </ProtectedRoute>
           }
         />
