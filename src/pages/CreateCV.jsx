@@ -13,6 +13,7 @@ import {
   Divider,
   LinearProgress,
   Alert,
+  Chip,
   InputAdornment,
 } from "@mui/material";
 
@@ -36,6 +37,7 @@ import {
 import { getEducationLevels } from "../services/jobService";
 
 import { formatMiles, salarioANumero } from "../utils/formatSalary";
+import { toTitleCase } from "../utils/textFormat";
 
 /*
   Perfil del candidato — su CV en ChanceGT.
@@ -64,6 +66,29 @@ const initialForm = {
   skills: "",
   expected_salary: "",
 };
+
+const MESES = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+];
+
+const DIAS = Array.from({ length: 31 }, (_, i) =>
+  String(i + 1).padStart(2, "0")
+);
+
+/* Del mas reciente al mas antiguo: llegar a 1987 toma un toque */
+const ANIOS = Array.from({ length: 76 }, (_, i) => 2012 - i);
+
+/* Sugerencias de habilidades: un toque y listo */
+const SKILL_SUGGESTIONS = [
+  "Ventas", "Atención al cliente", "Servicio al cliente", "Excel",
+  "Word", "SAP", "Caja", "Inventarios", "Bodega", "Logística",
+  "Manejo de personal", "Liderazgo", "Cobros", "Facturación",
+  "Contabilidad", "Marketing digital", "Redes sociales", "Inglés",
+  "Computación", "Call center", "Digitación", "Negociación",
+  "Trabajo en equipo", "Mecánica", "Electricidad", "Cocina",
+  "Repostería", "Licencia de conducir", "Seguridad", "Limpieza",
+];
 
 const emptyEducation = { level: "", institution: "", graduation_year: "" };
 const emptyExperience = { job_title: "", company: "", years: "" };
@@ -160,6 +185,55 @@ function CreateCV() {
     const { data } = await getMunicipalitiesByDepartment(dept.id);
 
     setMunicipalities(data || []);
+
+  }
+
+  /* Fecha de nacimiento en tres partes (dia, mes, año) */
+  const [birthParts, setBirthParts] = useState({
+    day: "", month: "", year: "",
+  });
+
+  useEffect(() => {
+
+    if (form.birth_date) {
+      const [year, month, day] = form.birth_date.split("-");
+      setBirthParts({ day: day || "", month: month || "", year: year || "" });
+    }
+
+  }, [loading]);
+
+  function updateBirth(part, value) {
+
+    const next = { ...birthParts, [part]: value };
+
+    setBirthParts(next);
+
+    if (next.day && next.month && next.year) {
+      setForm((prev) => ({
+        ...prev,
+        birth_date: `${next.year}-${next.month}-${next.day}`,
+      }));
+    }
+
+  }
+
+  /* Sugerencia de habilidad: click agrega, click quita */
+  function toggleSkill(skill) {
+
+    const actuales = (form.skills || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    const existe = actuales.some(
+      (s) => s.toLowerCase() === skill.toLowerCase()
+    );
+
+    const nuevas = existe
+      ? actuales.filter((s) => s.toLowerCase() !== skill.toLowerCase())
+      : [...actuales, skill];
+
+    setForm((prev) => ({ ...prev, skills: nuevas.join(", ") }));
 
   }
 
@@ -367,15 +441,55 @@ function CreateCV() {
           </Grid>
 
           <Grid item xs={12} md={4}>
-            <TextField
-              label="Fecha de nacimiento"
-              name="birth_date"
-              type="date"
-              value={form.birth_date}
-              onChange={handleChange}
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-            />
+
+            <Grid container spacing={1}>
+
+              <Grid item xs={4}>
+                <TextField
+                  select
+                  label="Día"
+                  value={birthParts.day}
+                  onChange={(e) => updateBirth("day", e.target.value)}
+                  fullWidth
+                >
+                  {DIAS.map((d) => (
+                    <MenuItem key={d} value={d}>{d}</MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              <Grid item xs={4}>
+                <TextField
+                  select
+                  label="Mes"
+                  value={birthParts.month}
+                  onChange={(e) => updateBirth("month", e.target.value)}
+                  fullWidth
+                >
+                  {MESES.map((m, i) => (
+                    <MenuItem key={m} value={String(i + 1).padStart(2, "0")}>
+                      {m}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              <Grid item xs={4}>
+                <TextField
+                  select
+                  label="Año"
+                  value={birthParts.year}
+                  onChange={(e) => updateBirth("year", e.target.value)}
+                  fullWidth
+                >
+                  {ANIOS.map((a) => (
+                    <MenuItem key={a} value={String(a)}>{a}</MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+            </Grid>
+
           </Grid>
 
           <Grid item xs={12} md={4}>
@@ -406,8 +520,8 @@ function CreateCV() {
               disabled={!form.department}
             >
               {municipalities.map((item) => (
-                <MenuItem key={item.id} value={item.name}>
-                  {item.name}
+                <MenuItem key={item.id} value={toTitleCase(item.name)}>
+                  {toTitleCase(item.name)}
                 </MenuItem>
               ))}
             </TextField>
@@ -432,7 +546,6 @@ function CreateCV() {
               value={form.profession}
               onChange={handleChange}
               fullWidth
-              placeholder="Ejemplo: Perito Contador, Vendedor"
             />
           </Grid>
 
@@ -451,7 +564,6 @@ function CreateCV() {
                 })
               }
               fullWidth
-              placeholder="8,000"
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">Q</InputAdornment>
@@ -525,7 +637,6 @@ function CreateCV() {
                 }
                 fullWidth
                 autoComplete="off"
-                placeholder="2020"
               />
             </Grid>
 
@@ -591,7 +702,6 @@ function CreateCV() {
                 }
                 fullWidth
                 autoComplete="off"
-                placeholder="Gerente de Ventas"
               />
             </Grid>
 
@@ -616,7 +726,6 @@ function CreateCV() {
                 }
                 fullWidth
                 autoComplete="off"
-                placeholder="2"
               />
             </Grid>
 
@@ -665,13 +774,48 @@ function CreateCV() {
         </Typography>
 
         <TextField
-          label="Ejemplo: Excel, SAP, Ventas, Liderazgo"
+          label="Tus habilidades"
           name="skills"
           autoComplete="off"
           value={form.skills}
           onChange={handleChange}
           fullWidth
         />
+
+        <Typography
+          color="text.secondary"
+          sx={{ mt: 2, mb: 1, fontSize: 14 }}
+        >
+          Sugerencias — toca para agregar o quitar:
+        </Typography>
+
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+
+          {SKILL_SUGGESTIONS.map((skill) => {
+
+            const activa = (form.skills || "")
+              .toLowerCase()
+              .split(",")
+              .map((s) => s.trim())
+              .includes(skill.toLowerCase());
+
+            return (
+              <Chip
+                key={skill}
+                label={skill}
+                onClick={() => toggleSkill(skill)}
+                color={activa ? "primary" : "default"}
+                variant={activa ? "filled" : "outlined"}
+                sx={activa ? {
+                  background: "#0E8F73",
+                  "&:hover": { background: "#0C7A62" },
+                } : {}}
+              />
+            );
+
+          })}
+
+        </Box>
 
         <Divider sx={{ my: 5 }} />
 

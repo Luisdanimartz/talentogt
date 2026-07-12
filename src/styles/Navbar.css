@@ -364,3 +364,42 @@
     cursor: pointer;
     background: transparent;
 }
+
+/* ===== Navbar en celular: sin traslapes ===== */
+
+@media (max-width: 760px) {
+
+    .logo-text small {
+        display: none;
+    }
+
+    .logo-text h2 {
+        font-size: 19px;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .navbar-container {
+        gap: 8px;
+        padding: 0 10px;
+    }
+
+    .nav-actions {
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+
+    .nav-actions a,
+    .nav-actions .navbar-logout {
+        padding: 9px 12px;
+        font-size: 12.5px;
+        white-space: nowrap;
+    }
+
+    .nav-actions .publish {
+        display: none;
+    }
+
+}

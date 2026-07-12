@@ -14,6 +14,7 @@ import {
 import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
 
 import { formatMiles } from "../../utils/formatSalary";
+import { toTitleCase } from "../../utils/textFormat";
 
 const WORK_MODES = ["Presencial", "Remoto", "Híbrido"];
 
@@ -143,7 +144,6 @@ function JobForm({
                 name="title"
                 value={form.title}
                 onChange={onChange}
-                placeholder="Ejemplo: Supervisor de ventas"
               />
             </Grid>
 
@@ -257,7 +257,7 @@ function JobForm({
               >
                 {municipalities.map((item) => (
                   <MenuItem key={item.id} value={item.id}>
-                    {item.name}
+                    {toTitleCase(item.name)}
                   </MenuItem>
                 ))}
               </TextField>
