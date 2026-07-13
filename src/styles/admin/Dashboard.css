@@ -1,0 +1,33 @@
+@media print {
+
+    .sidebar,
+    .no-print {
+        display: none !important;
+    }
+
+    .dashboard-content {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Por defecto (sin body[data-print-only]) se imprime todo.
+       Si se marca una seccion especifica, se ocultan las demas. */
+
+    body[data-print-only="kpis"] .dash-section:not([data-section="kpis"]) {
+        display: none !important;
+    }
+
+    body[data-print-only="crecimiento"] .dash-section:not([data-section="crecimiento"]) {
+        display: none !important;
+    }
+
+    body[data-print-only="facturacion"] .dash-section:not([data-section="facturacion"]) {
+        display: none !important;
+    }
+
+    @page {
+        margin: 12mm;
+    }
+
+}

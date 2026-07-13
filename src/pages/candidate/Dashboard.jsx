@@ -230,7 +230,14 @@ function CandidateDashboard() {
 
                         <div>
                             <strong>{app.jobs?.title || "Vacante"}</strong>
-                            <div style={{ color: "#64748B", fontSize: 14 }}>
+                            <div style={{ color: "#64748B", fontSize: 14, display: "flex", alignItems: "center", gap: 6 }}>
+                                {app.jobs?.company_profiles?.logo && (
+                                    <img
+                                        src={app.jobs.company_profiles.logo}
+                                        alt=""
+                                        style={{ width: 16, height: 16, objectFit: "contain", borderRadius: 3 }}
+                                    />
+                                )}
                                 {app.jobs?.company_profiles?.company_name || ""}
                                 {app.applied_at &&
                                     ` · Postulado el ${new Date(app.applied_at).toLocaleDateString("es-GT")}`}

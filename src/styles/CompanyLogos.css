@@ -131,3 +131,57 @@
 }
 
 }
+
+/* =======================================================
+   ESTADO "PROXIMAMENTE" (colaboradoras)
+======================================================= */
+
+.logos-pendiente-box{
+
+    max-width:640px;
+
+    margin:0 auto;
+
+    text-align:center;
+
+    background:#F7F9FC;
+
+    border:1px dashed #C7D0DC;
+
+    border-radius:16px;
+
+    padding:32px 28px;
+
+}
+
+.logos-pendiente-tag{
+
+    display:inline-block;
+
+    background:#0A4D8C;
+
+    color:#fff;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    padding:4px 14px;
+
+    border-radius:20px;
+
+    margin-bottom:14px;
+
+}
+
+.logos-pendiente-box p{
+
+    color:#64748B;
+
+    font-size:15px;
+
+    line-height:1.6;
+
+    margin:0;
+
+}

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import "../styles/theme.css";
 import "../styles/Jobs.css";
@@ -62,7 +62,8 @@ function Jobs() {
     const [loading, setLoading] = useState(true);
 
     /* Filtros */
-    const [search, setSearch] = useState("");
+    const [searchParams] = useSearchParams();
+    const [search, setSearch] = useState(searchParams.get("q") || "");
     const [departmentId, setDepartmentId] = useState("");
     const [categoryId, setCategoryId] = useState("");
     const [workMode, setWorkMode] = useState("");
@@ -365,6 +366,20 @@ function Jobs() {
                                 <h2>{job.title}</h2>
 
                                 <p className="job-item-company">
+                                    {job.company_profiles?.logo && (
+                                        <img
+                                            src={job.company_profiles.logo}
+                                            alt=""
+                                            style={{
+                                                width: 20,
+                                                height: 20,
+                                                objectFit: "contain",
+                                                borderRadius: 4,
+                                                marginRight: 6,
+                                                verticalAlign: "middle",
+                                            }}
+                                        />
+                                    )}
                                     {job.company_profiles?.company_name || "Empresa"}
                                 </p>
 
@@ -419,6 +434,20 @@ function Jobs() {
                             <h2>{selectedJob.title}</h2>
 
                             <p className="detail-company">
+                                {selectedJob.company_profiles?.logo && (
+                                    <img
+                                        src={selectedJob.company_profiles.logo}
+                                        alt=""
+                                        style={{
+                                            width: 28,
+                                            height: 28,
+                                            objectFit: "contain",
+                                            borderRadius: 6,
+                                            marginRight: 8,
+                                            verticalAlign: "middle",
+                                        }}
+                                    />
+                                )}
                                 {selectedJob.company_profiles?.company_name || "Empresa"}
                                 {" · "}
                                 {tiempoDesde(selectedJob.published_at)}

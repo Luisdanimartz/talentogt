@@ -97,7 +97,7 @@ function HowItWorks() {
             </div>
 
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/vacantes")}
             >
               Buscar empleos
             </button>
@@ -181,7 +181,7 @@ function HowItWorks() {
             </div>
 
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/register?tipo=empresa")}
             >
               Publicar empleo
             </button>

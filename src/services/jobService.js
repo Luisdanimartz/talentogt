@@ -50,7 +50,7 @@ export async function getJobById(jobId) {
     .from("jobs")
     .select(`
       *,
-      company_profiles ( company_name, logo )
+      company_profiles ( company_name, logo, status )
     `)
     .eq("id", jobId)
     .single();
@@ -65,6 +65,12 @@ export async function updateJob(jobId, job) {
     .single();
 }
 
+/*
+  Solo vacantes publicadas de empresas ACTIVAS. Si el admin
+  suspende una empresa, sus vacantes desaparecen de aqui de
+  inmediato (y reaparecen solas si la reactiva) sin tener que
+  tocar cada vacante una por una.
+*/
 export async function getPublishedJobs() {
   return await supabase
     .from("jobs")
@@ -81,9 +87,10 @@ export async function getPublishedJobs() {
       requirements,
       benefits,
       company_id,
-      company_profiles ( company_name, description )
+      company_profiles!inner ( company_name, description, logo, status )
     `)
     .eq("status", "published")
+    .eq("company_profiles.status", "activa")
     .order("published_at", { ascending: false });
 }
 /* Estrellas de respuesta: numeros agregados via la funcion 005 */

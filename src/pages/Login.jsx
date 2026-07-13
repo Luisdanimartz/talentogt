@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { handlePostLoginRedirect } from "../flows/handlePostLoginRedirect";
 import { loginUser } from "../services/authService";
 
@@ -17,6 +17,32 @@ import {
 function Login() {
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const tipo = searchParams.get("tipo");
+
+  const TEXTOS =
+    tipo === "empresa"
+      ? {
+          titulo: "Encuentra al talento que tu empresa necesita.",
+          texto:
+            "Publica tus vacantes, revisa candidatos calificados y mantén " +
+            "informado a cada postulante durante todo tu proceso de selección.",
+        }
+      : tipo === "candidato"
+      ? {
+          titulo: "Tu talento merece una respuesta.",
+          texto:
+            "La primera plataforma de empleo en Guatemala donde las empresas " +
+            "mantienen informados a los candidatos durante todo el proceso " +
+            "de selección.",
+        }
+      : {
+          titulo: "Hoy es un gran día para dar el siguiente paso.",
+          texto:
+            "La plataforma donde candidatos y empresas de Guatemala se " +
+            "encuentran, con seguimiento real durante todo el proceso.",
+        };
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -116,21 +142,19 @@ function Login() {
                 fontWeight="bold"
                 mb={3}
               >
-                TalentoGT
+                ChanceGT
               </Typography>
 
               <Typography
                 variant="h5"
                 mb={2}
               >
-                Tu talento merece una respuesta.
+                {TEXTOS.titulo}
               </Typography>
 
               <Typography>
 
-                La primera plataforma de empleo en Guatemala donde las empresas
-                mantienen informados a los candidatos durante todo el proceso
-                de selección.
+                {TEXTOS.texto}
 
               </Typography>
 
@@ -214,7 +238,9 @@ function Login() {
                 fullWidth
                 variant="outlined"
                 sx={{ mb: 2 }}
-                onClick={() => navigate("/register")}
+                onClick={() =>
+                  navigate(tipo ? `/register?tipo=${tipo}` : "/register")
+                }
               >
                 Crear una cuenta
               </Button>

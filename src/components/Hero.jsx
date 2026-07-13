@@ -1,119 +1,147 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import "../styles/Hero.css";
+import { getPlatformStats } from "../services/publicService";
+
+function numeroBonito(n) {
+    if (n === null || n === undefined) return "—";
+    return n.toLocaleString("es-GT");
+}
 
 function Hero() {
-  return (
-    <section className="hero">
 
-      <div className="hero-container">
+    const navigate = useNavigate();
 
-        {/* ================= IZQUIERDA ================= */}
+    const [busqueda, setBusqueda] = useState("");
+    const [stats, setStats] = useState(null);
 
-        <div className="hero-left">
+    useEffect(() => {
 
-          <span className="hero-badge">
-            🇬🇹 Plataforma de empleo para Guatemala
-          </span>
+        getPlatformStats().then(({ data }) => {
+            setStats(data || null);
+        });
 
-          <h1>
-            Encuentra el
-            <br />
-            empleo que
-            <br />
-            <span>mereces.</span>
-          </h1>
+    }, []);
 
-          <p>
-            La plataforma donde las empresas se comprometen a responder
-            a cada candidato durante todo el proceso de selección.
-          </p>
+    function handleBuscar() {
 
-          {/* ================= BUSCADOR ================= */}
+        if (busqueda.trim()) {
+            navigate(`/vacantes?q=${encodeURIComponent(busqueda.trim())}`);
+        } else {
+            navigate("/vacantes");
+        }
 
-          <div className="hero-search">
+    }
 
-            <input
-              type="text"
-              placeholder="Puesto, empresa o palabra clave"
-            />
+    return (
+        <section className="hero">
 
-            <select defaultValue="">
-              <option value="" disabled>
-                Categoría
-              </option>
+            <div className="hero-container">
 
-              <option>Ventas</option>
-              <option>Administración</option>
-              <option>Tecnología</option>
-              <option>Marketing</option>
-              <option>Contabilidad</option>
-            </select>
+                {/* ================= IZQUIERDA ================= */}
 
-            <button>
-              Buscar empleo
-            </button>
+                <div className="hero-left">
 
-          </div>
+                    <span className="hero-badge">
+                        🇬🇹 Plataforma de empleo para Guatemala
+                    </span>
 
-          {/* ================= ETIQUETAS ================= */}
+                    <h1>
+                        Encuentra el
+                        <br />
+                        empleo que
+                        <br />
+                        <span>mereces.</span>
+                    </h1>
 
-          <div className="hero-tags">
+                    <p>
+                        La plataforma donde las empresas se comprometen a responder
+                        a cada candidato durante todo el proceso de selección.
+                    </p>
 
-            <span>Ventas</span>
-            <span>Atención al cliente</span>
-            <span>Tecnología</span>
-            <span>Marketing</span>
-            <span>Recursos Humanos</span>
+                    {/* ================= BUSCADOR ================= */}
 
-          </div>
+                    <div className="hero-search">
 
-          {/* ================= ESTADÍSTICAS ================= */}
+                        <input
+                            type="text"
+                            placeholder="Puesto, empresa o palabra clave"
+                            value={busqueda}
+                            onChange={(e) => setBusqueda(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleBuscar()}
+                        />
 
-          <div className="hero-stats">
+                        <button onClick={handleBuscar}>
+                            Buscar empleo
+                        </button>
 
-            <div className="stat-box">
-              <h3>5,000+</h3>
-              <p>Vacantes activas</p>
+                    </div>
+
+                    {/* ================= ETIQUETAS ================= */}
+
+                    <div className="hero-tags">
+
+                        <span>Ventas</span>
+                        <span>Atención al cliente</span>
+                        <span>Tecnología</span>
+                        <span>Marketing</span>
+                        <span>Recursos Humanos</span>
+
+                    </div>
+
+                    {/* ================= ESTADÍSTICAS REALES ================= */}
+
+                    <div className="hero-stats">
+
+                        <div className="stat-box">
+                            <h3>{numeroBonito(stats?.vacantes_activas)}</h3>
+                            <p>Vacantes activas</p>
+                        </div>
+
+                        <div className="stat-box">
+                            <h3>{numeroBonito(stats?.empresas_registradas)}</h3>
+                            <p>Empresas registradas</p>
+                        </div>
+
+                        <div className="stat-box">
+                            <h3>{numeroBonito(stats?.candidatos_activos)}</h3>
+                            <p>Candidatos activos</p>
+                        </div>
+
+                        <div className="stat-box">
+                            <h3>
+                                {stats?.porcentaje_empresas_responden !== undefined
+                                    ? `${stats.porcentaje_empresas_responden}%`
+                                    : "—"}
+                            </h3>
+                            <p>Empresas responden</p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {/* ================= DERECHA ================= */}
+
+                <div className="hero-right">
+
+                    <div className="hero-photo">
+
+                        <img
+                            className="hero-people"
+                            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80"
+                            alt="Equipo de trabajo"
+                        />
+
+                    </div>
+
+                </div>
+
             </div>
 
-            <div className="stat-box">
-              <h3>2,500+</h3>
-              <p>Empresas registradas</p>
-            </div>
-
-            <div className="stat-box">
-              <h3>12,000+</h3>
-              <p>Candidatos activos</p>
-            </div>
-
-            <div className="stat-box">
-              <h3>98%</h3>
-              <p>Empresas responden</p>
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* ================= DERECHA ================= */}
-
-        <div className="hero-right">
-
-          <div className="hero-photo">
-
-            <img
-              className="hero-people"
-              src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80"
-              alt="Equipo de trabajo"
-            />
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-  );
+        </section>
+    );
 }
 
 export default Hero;

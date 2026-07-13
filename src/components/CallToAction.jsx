@@ -24,14 +24,14 @@ fue visto, revisado o si el proceso finalizó.
 
           <button
             className="candidate-btn"
-            onClick={() => navigate("/register")}
+            onClick={() => navigate("/register?tipo=candidato")}
           >
             Crear mi perfil
           </button>
 
           <button
             className="company-btn"
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/register?tipo=empresa")}
           >
             Publicar una vacante
           </button>

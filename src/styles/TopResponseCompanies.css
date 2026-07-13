@@ -1,0 +1,167 @@
+/* =======================================================
+   EMPRESAS MAS RAPIDAS EN RESPONDER
+======================================================= */
+
+.top-response {
+
+    width: 100%;
+
+    background: #F7F9FC;
+
+    padding: 70px 0;
+
+}
+
+.top-response-container {
+
+    width: 100%;
+
+    max-width: 900px;
+
+    margin: 0 auto;
+
+    padding: 0 24px;
+
+}
+
+.top-response-container h2 {
+
+    text-align: center;
+
+    font-size: 34px;
+
+    color: #0B2F6B;
+
+    font-weight: 800;
+
+    margin-bottom: 10px;
+
+}
+
+.top-response-sub {
+
+    text-align: center;
+
+    color: #64748B;
+
+    font-size: 15px;
+
+    margin-bottom: 36px;
+
+}
+
+.top-response-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+.top-response-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+    background: #FFFFFF;
+
+    border: 1px solid #E6E8EC;
+
+    border-radius: 14px;
+
+    padding: 14px 20px;
+
+}
+
+.top-response-rank {
+
+    font-weight: 800;
+
+    color: #94A3B8;
+
+    width: 24px;
+
+    text-align: center;
+
+    flex-shrink: 0;
+
+}
+
+.top-response-item img {
+
+    width: 36px;
+
+    height: 36px;
+
+    object-fit: contain;
+
+    border-radius: 8px;
+
+    flex-shrink: 0;
+
+}
+
+.top-response-avatar {
+
+    width: 36px;
+
+    height: 36px;
+
+    border-radius: 8px;
+
+    background: #0A4D8C;
+
+    color: #fff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-weight: 700;
+
+    flex-shrink: 0;
+
+}
+
+.top-response-name {
+
+    flex: 1;
+
+    font-weight: 600;
+
+    color: #0B1F3A;
+
+}
+
+.top-response-time {
+
+    font-weight: 800;
+
+    color: #0E8F73;
+
+    background: #E4F5F0;
+
+    padding: 4px 12px;
+
+    border-radius: 20px;
+
+    font-size: 14px;
+
+}
+
+@media (max-width: 600px) {
+
+    .top-response-name {
+
+        font-size: 14px;
+
+    }
+
+}

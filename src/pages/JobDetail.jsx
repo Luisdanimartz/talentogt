@@ -140,6 +140,10 @@ function JobDetail() {
         return <p style={{ textAlign: "center", marginTop: 40 }}>Vacante no encontrada.</p>;
     }
 
+    if (job.company_profiles?.status === "suspendida") {
+        return <p style={{ textAlign: "center", marginTop: 40 }}>Esta vacante ya no está disponible.</p>;
+    }
+
     /* La empresa no se postula a sus propias vacantes */
     const showApplyButton = !user || role === "candidato";
 
@@ -149,7 +153,21 @@ function JobDetail() {
 
             <h1>{job.title}</h1>
 
-            <p style={{ color: "#555", marginBottom: 12 }}>
+            <p style={{ color: "#555", marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+                {job.company_profiles?.logo && (
+                    <img
+                        src={job.company_profiles.logo}
+                        alt=""
+                        style={{
+                            width: 32,
+                            height: 32,
+                            objectFit: "contain",
+                            borderRadius: 6,
+                            border: "1px solid #E6E8EC",
+                            background: "#fff",
+                        }}
+                    />
+                )}
                 {job.company_profiles?.company_name || "Empresa"}
             </p>
 

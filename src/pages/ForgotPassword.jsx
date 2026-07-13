@@ -61,7 +61,7 @@ function ForgotPassword() {
                 fontWeight="bold"
                 mb={3}
               >
-                TalentoGT
+                ChanceGT
               </Typography>
 
               <Typography

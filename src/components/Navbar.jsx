@@ -13,7 +13,9 @@ function Navbar() {
 
   /* A dónde lleva "Mi panel" según el rol */
   const panelPath =
-    role === "empresa"
+    role === "admin"
+      ? "/admin/dashboard"
+      : role === "empresa"
       ? "/empresa/dashboard"
       : "/candidato/dashboard";
 
@@ -59,13 +61,13 @@ function Navbar() {
             Buscar empleo
           </Link>
 
-          <Link to="/empresas">
-            Explorar empresas
-          </Link>
+          <span className="nav-link-soon" title="Disponible próximamente">
+            Explorar empresas <em>Pronto</em>
+          </span>
 
-          <Link to="/consejos">
-            Consejos profesionales
-          </Link>
+          <span className="nav-link-soon" title="Disponible próximamente">
+            Consejos profesionales <em>Pronto</em>
+          </span>
 
         </nav>
 
@@ -76,7 +78,7 @@ function Navbar() {
             <>
 
               <Link
-                to="/login"
+                to="/register?tipo=empresa"
                 className="publish"
               >
                 Publicar vacante

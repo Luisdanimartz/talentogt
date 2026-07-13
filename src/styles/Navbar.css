@@ -147,6 +147,40 @@
     color:#60A5FA;
 
 }
+
+.nav-link-soon{
+
+    color:rgba(255,255,255,0.45);
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:default;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+}
+
+.nav-link-soon em{
+
+    font-style:normal;
+
+    font-size:10.5px;
+
+    font-weight:700;
+
+    background:rgba(255,255,255,0.15);
+
+    padding:2px 7px;
+
+    border-radius:20px;
+
+}
 /* =======================================================
    BOTONES
 ======================================================= */

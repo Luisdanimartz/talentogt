@@ -1,0 +1,20 @@
+/* Reutilizable en cualquier pantalla de admin con tabla imprimible */
+
+@media print {
+
+    .sidebar,
+    .no-print {
+        display: none !important;
+    }
+
+    .dashboard-content {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    @page {
+        margin: 12mm;
+    }
+
+}

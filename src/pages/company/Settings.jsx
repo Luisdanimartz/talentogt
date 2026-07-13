@@ -26,9 +26,13 @@ import {
     updateMemberRole,
     removeMember,
     puedeGestionarEquipo,
+    puedeCrearVacantes,
     TEAM_ROLES,
     ROLE_LABELS,
 } from "../../services/teamService";
+
+import { updateCompanyLogo } from "../../services/companyService";
+import { subirLogoEmpresa } from "../../services/storageService";
 
 import { useAuth } from "../../context/AuthContext";
 
@@ -59,6 +63,8 @@ function Settings() {
     const [inviteEmail, setInviteEmail] = useState("");
     const [inviteRole, setInviteRole] = useState("reclutador");
     const [sending, setSending] = useState(false);
+
+    const [subiendoLogo, setSubiendoLogo] = useState(false);
 
     useEffect(() => {
 
@@ -170,7 +176,46 @@ function Settings() {
 
     }
 
+    async function handleLogoChange(e) {
+
+        const file = e.target.files?.[0];
+
+        e.target.value = "";
+
+        if (!file) return;
+
+        setSubiendoLogo(true);
+        setMessage(null);
+
+        const { data, error } = await subirLogoEmpresa(company.id, file);
+
+        if (error) {
+            setSubiendoLogo(false);
+            setMessage({ type: "error", text: error.message });
+            return;
+        }
+
+        const { data: updated, error: updateError } =
+            await updateCompanyLogo(company.id, data.url);
+
+        setSubiendoLogo(false);
+
+        if (updateError) {
+            setMessage({ type: "error", text: updateError.message });
+            return;
+        }
+
+        setCompany(updated);
+
+        setMessage({
+            type: "success",
+            text: "Logo actualizado. Ya se muestra en tus vacantes publicadas.",
+        });
+
+    }
+
     const soyDueno = puedeGestionarEquipo(myRole);
+    const puedeEditarLogo = puedeCrearVacantes(myRole);
 
     /* El dueño no se puede quitar ni degradar a sí mismo desde aquí */
     function esYo(member) {
@@ -210,6 +255,120 @@ function Settings() {
                                     {message.text}
                                 </Alert>
                             )}
+
+                            {/* ===== Logo ===== */}
+
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    p: 3,
+                                    mb: 3,
+                                    borderRadius: 3,
+                                    border: "1px solid #E6E8EC",
+                                }}
+                            >
+
+                                <Typography fontWeight="bold" mb={0.5}>
+                                    Logo de tu empresa
+                                </Typography>
+
+                                <Typography
+                                    fontSize={13}
+                                    color="text.secondary"
+                                    mb={2}
+                                >
+                                    Aparece automáticamente en todas tus
+                                    vacantes publicadas y en tu panel.
+                                    Recomendado: imagen cuadrada, mínimo
+                                    400×400 px, fondo blanco o transparente,
+                                    formato PNG, JPG o WEBP, máximo 2MB.
+                                </Typography>
+
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 2.5,
+                                        flexWrap: "wrap",
+                                    }}
+                                >
+
+                                    <Box
+                                        sx={{
+                                            width: 72,
+                                            height: 72,
+                                            borderRadius: 2,
+                                            border: "1px solid #E6E8EC",
+                                            background: "#F7F8FA",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            overflow: "hidden",
+                                            flexShrink: 0,
+                                        }}
+                                    >
+
+                                        {company?.logo ? (
+                                            <img
+                                                src={company.logo}
+                                                alt="Logo actual"
+                                                style={{
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    objectFit: "contain",
+                                                }}
+                                            />
+                                        ) : (
+                                            <Typography
+                                                fontSize={12}
+                                                color="text.secondary"
+                                                textAlign="center"
+                                            >
+                                                Sin logo
+                                            </Typography>
+                                        )}
+
+                                    </Box>
+
+                                    {puedeEditarLogo ? (
+
+                                        <Button
+                                            component="label"
+                                            variant="outlined"
+                                            disabled={subiendoLogo}
+                                            sx={{ textTransform: "none" }}
+                                        >
+
+                                            {subiendoLogo
+                                                ? "Subiendo…"
+                                                : company?.logo
+                                                    ? "Cambiar logo"
+                                                    : "Subir logo"}
+
+                                            <input
+                                                type="file"
+                                                hidden
+                                                accept="image/png,image/jpeg,image/webp"
+                                                onChange={handleLogoChange}
+                                            />
+
+                                        </Button>
+
+                                    ) : (
+
+                                        <Typography
+                                            fontSize={13}
+                                            color="text.secondary"
+                                        >
+                                            Solo el dueño o un reclutador
+                                            pueden cambiar el logo.
+                                        </Typography>
+
+                                    )}
+
+                                </Box>
+
+                            </Paper>
 
                             {/* ===== Invitar ===== */}
 

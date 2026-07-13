@@ -298,7 +298,7 @@ export async function getMyApplications() {
         id,
         title,
         status,
-        company_profiles ( company_name )
+        company_profiles ( company_name, logo )
       )
     `)
     .eq("candidate_profile_id", profile.id)
@@ -332,7 +332,7 @@ export async function getMyApplicationDetail(applicationId) {
         salary_min,
         salary_max,
         company_id,
-        company_profiles ( company_name )
+        company_profiles ( company_name, logo )
       ),
       application_status_history ( status, created_at )
     `)

@@ -183,7 +183,7 @@ function Recruitment() {
                 onChange={(e) => setNotify(e.target.checked)}
               />
             }
-            label="Notificar al candidato en TalentoGT"
+            label="Notificar al candidato en ChanceGT"
           />
 
           <FormControlLabel

@@ -1,0 +1,29 @@
+/* Reportes: al imprimir/descargar, solo el contenido del reporte */
+
+.reports-print-header {
+    display: none;
+}
+
+@media print {
+
+    .sidebar,
+    .no-print {
+        display: none !important;
+    }
+
+    .dashboard-content {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .reports-print-header {
+        display: block;
+        margin-bottom: 18px;
+    }
+
+    @page {
+        margin: 12mm;
+    }
+
+}

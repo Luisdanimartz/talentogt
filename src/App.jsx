@@ -16,7 +16,16 @@ import EditJob from "./pages/company/EditJob";
 import RecruiterDashboard from "./pages/recruiter/RecruiterDashboard";
 import Applicants from "./pages/company/Applicants";
 import Interviews from "./pages/company/Interviews";
+import Reports from "./pages/company/Reports";
 import Settings from "./pages/company/Settings";
+
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminCompanies from "./pages/admin/Companies";
+import AdminJobs from "./pages/admin/Jobs";
+import AdminCandidates from "./pages/admin/Candidates";
+import AdminReports from "./pages/admin/Reports";
+import AdminSettings from "./pages/admin/Settings";
+
 import CandidateDashboard from "./pages/candidate/Dashboard";
 import CreateCV from "./pages/CreateCV";
 import ApplicationDetail from "./pages/candidate/ApplicationDetail";
@@ -29,7 +38,8 @@ function App() {
   const location = useLocation();
 
   const hideNavbar =
-    location.pathname.startsWith("/empresa");
+    location.pathname.startsWith("/empresa") ||
+    location.pathname.startsWith("/admin");
 
   return (
 
@@ -134,6 +144,15 @@ function App() {
         />
 
         <Route
+          path="/empresa/reportes"
+          element={
+            <ProtectedRoute allowedRoles={["empresa"]}>
+              <Reports />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/empresa/configuracion"
           element={
             <ProtectedRoute allowedRoles={["empresa"]}>
@@ -165,6 +184,62 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["empresa"]}>
               <EditJob />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ADMIN */}
+
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/empresas"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminCompanies />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/vacantes"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminJobs />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/candidatos"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminCandidates />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/reportes"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminReports />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/configuracion"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminSettings />
             </ProtectedRoute>
           }
         />

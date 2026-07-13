@@ -98,3 +98,13 @@ export async function updateCompanyProfile(profileId, form) {
     .select(COMPANY_PROFILE_COLUMNS)
     .single();
 }
+
+/* Actualiza SOLO el logo, sin tocar el resto de los datos */
+export async function updateCompanyLogo(profileId, logoUrl) {
+  return await supabase
+    .from("company_profiles")
+    .update({ logo: logoUrl })
+    .eq("id", profileId)
+    .select(COMPANY_PROFILE_COLUMNS)
+    .single();
+}

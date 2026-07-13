@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { registerUser } from "../services/authService";
 
 import {
@@ -20,6 +20,32 @@ import Select from "@mui/material/Select";
 function Register() {
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const tipo = searchParams.get("tipo");
+  const esEmpresa = tipo === "empresa";
+
+  const TEXTOS =
+    tipo === "empresa"
+      ? {
+          titulo: "Publica tu primera vacante hoy.",
+          texto:
+            "Crea tu cuenta empresarial gratis y empieza a recibir " +
+            "candidatos calificados para tu organización.",
+        }
+      : tipo === "candidato"
+      ? {
+          titulo: "Crea tu cuenta.",
+          texto:
+            "Regístrate gratuitamente y encuentra oportunidades laborales " +
+            "con seguimiento durante todo el proceso de selección.",
+        }
+      : {
+          titulo: "Únete a ChanceGT.",
+          texto:
+            "Crea tu cuenta gratis, ya sea que busques empleo o busques " +
+            "talento para tu empresa.",
+        };
 
   const [form, setForm] = useState({
     names: "",
@@ -27,7 +53,7 @@ function Register() {
     email: "",
     password: "",
     confirmPassword: "",
-    accountType: "",
+    accountType: esEmpresa ? "empresa" : tipo === "candidato" ? "candidato" : "",
   });
 
   const [errors, setErrors] = useState({});
@@ -111,7 +137,7 @@ function Register() {
 
     }
 
-    navigate("/login");
+    navigate(tipo ? `/login?tipo=${tipo}` : "/login");
 
   };
 
@@ -163,19 +189,18 @@ function Register() {
                 fontWeight="bold"
                 mb={3}
               >
-                TalentoGT
+                ChanceGT
               </Typography>
 
               <Typography
                 variant="h5"
                 mb={3}
               >
-                Crea tu cuenta.
+                {TEXTOS.titulo}
               </Typography>
 
               <Typography>
-                Regístrate gratuitamente y encuentra oportunidades laborales
-                con seguimiento durante todo el proceso de selección.
+                {TEXTOS.texto}
               </Typography>
 
             </Box>
@@ -336,7 +361,9 @@ function Register() {
               <Button
                 fullWidth
                 sx={{ mt: 2 }}
-                onClick={() => navigate("/login")}
+                onClick={() =>
+                  navigate(tipo ? `/login?tipo=${tipo}` : "/login")
+                }
               >
                 Ya tengo una cuenta
               </Button>

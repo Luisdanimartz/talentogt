@@ -1,159 +1,285 @@
+import { useEffect, useMemo, useState } from "react";
+
+import "./../../styles/theme.css";
+import "./../../styles/recruiter/layout/RecruiterDashboard.css";
+import "./../../styles/admin/Print.css";
+
 import {
-  Box,
-  Paper,
-  Typography,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Button,
-  Avatar,
+    Alert,
+    Avatar,
+    Box,
+    Button,
+    Chip,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    TextField,
+    Typography,
 } from "@mui/material";
+import { Download as DownloadIcon } from "@mui/icons-material";
+
+import AdminSidebar from "../../components/admin/AdminSidebar";
+import {
+    getAdminCandidates,
+    setCandidateStatus,
+} from "../../services/adminService";
+
+function nombreCompleto(c) {
+    return [c.first_name, c.last_name].filter(Boolean).join(" ") || "Candidato";
+}
+
+function fechaCorta(iso) {
+    if (!iso) return "—";
+    return new Date(iso).toLocaleDateString("es-GT", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+    });
+}
 
 function Candidates() {
 
-  const candidates = [
-    {
-      id: 1,
-      name: "Luis Martz",
-      profession: "Supervisor de Ventas",
-      applications: 12,
-    },
-    {
-      id: 2,
-      name: "María López",
-      profession: "Contadora",
-      applications: 5,
-    },
-    {
-      id: 3,
-      name: "Carlos Pérez",
-      profession: "Ingeniero Industrial",
-      applications: 8,
-    },
-  ];
+    const [candidates, setCandidates] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [busyId, setBusyId] = useState(null);
+    const [busqueda, setBusqueda] = useState("");
 
-  return (
+    useEffect(() => {
 
-    <Box
-      sx={{
-        maxWidth: 1400,
-        margin: "40px auto",
-        p: 3,
-      }}
-    >
+        cargar();
 
-      <Typography
-        variant="h4"
-        fontWeight="bold"
-        mb={4}
-      >
-        Administración de Candidatos
-      </Typography>
+    }, []);
 
-      <Paper
-        elevation={3}
-        sx={{
-          borderRadius: 4,
-          overflow: "hidden",
-        }}
-      >
+    async function cargar() {
 
-        <Table>
+        setLoading(true);
+        setError(null);
 
-          <TableHead>
+        const { data, error } = await getAdminCandidates();
 
-            <TableRow>
+        if (error) {
+            setError(error.message);
+        }
 
-              <TableCell><strong>Candidato</strong></TableCell>
+        setCandidates(data || []);
+        setLoading(false);
 
-              <TableCell><strong>Profesión</strong></TableCell>
+    }
 
-              <TableCell><strong>Postulaciones</strong></TableCell>
+    async function toggleStatus(candidate) {
 
-              <TableCell align="center">
-                <strong>Acciones</strong>
-              </TableCell>
+        const nuevo = candidate.status === "activa" ? "suspendida" : "activa";
 
-            </TableRow>
+        const confirmacion =
+            nuevo === "suspendida"
+                ? `¿Suspender a ${nombreCompleto(candidate)}? No podrá postularse a nuevas vacantes (sus postulaciones ya hechas siguen visibles para las empresas).`
+                : `¿Reactivar a ${nombreCompleto(candidate)}?`;
 
-          </TableHead>
+        if (!window.confirm(confirmacion)) return;
 
-          <TableBody>
+        setBusyId(candidate.id);
 
-            {candidates.map((candidate) => (
+        const { error } = await setCandidateStatus(candidate.id, nuevo);
 
-              <TableRow key={candidate.id}>
+        setBusyId(null);
 
-                <TableCell>
+        if (error) {
+            setError(error.message);
+            return;
+        }
 
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 2,
-                    }}
-                  >
+        setCandidates((prev) =>
+            prev.map((c) =>
+                c.id === candidate.id ? { ...c, status: nuevo } : c
+            )
+        );
 
-                    <Avatar>
-                      {candidate.name.charAt(0)}
-                    </Avatar>
+    }
 
-                    {candidate.name}
+    const filtrados = useMemo(() => {
 
-                  </Box>
+        const q = busqueda.trim().toLowerCase();
 
-                </TableCell>
+        if (!q) return candidates;
 
-                <TableCell>
-                  {candidate.profession}
-                </TableCell>
+        return candidates.filter((c) =>
+            [nombreCompleto(c), c.email, c.phone, c.profession, c.department]
+                .filter(Boolean)
+                .some((campo) => campo.toLowerCase().includes(q))
+        );
 
-                <TableCell>
-                  {candidate.applications}
-                </TableCell>
+    }, [candidates, busqueda]);
 
-                <TableCell align="center">
+    return (
 
-                  <Button
-                    size="small"
-                    variant="contained"
-                    sx={{ mr: 1 }}
-                  >
-                    Ver Perfil
-                  </Button>
+        <div className="dashboard">
 
-                  <Button
-                    size="small"
-                    color="warning"
-                    sx={{ mr: 1 }}
-                  >
-                    Suspender
-                  </Button>
+            <AdminSidebar />
 
-                  <Button
-                    size="small"
-                    color="error"
-                  >
-                    Eliminar
-                  </Button>
+            <main className="dashboard-content">
 
-                </TableCell>
+                <Box sx={{ maxWidth: 1300, py: 4, px: { xs: 2, md: 0 } }}>
 
-              </TableRow>
+                    <Box
+                        className="no-print"
+                        sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 2 }}
+                    >
 
-            ))}
+                        <Box>
+                            <Typography variant="h4" fontWeight="bold" color="#0B1F3A">
+                                Candidatos
+                            </Typography>
+                            <Typography color="text.secondary" mb={2}>
+                                {candidates.length} candidato{candidates.length === 1 ? "" : "s"} registrado
+                                {candidates.length === 1 ? "" : "s"}.
+                            </Typography>
+                        </Box>
 
-          </TableBody>
+                        <Button
+                            variant="outlined"
+                            startIcon={<DownloadIcon />}
+                            onClick={() => window.print()}
+                            disabled={loading || filtrados.length === 0}
+                            sx={{ textTransform: "none" }}
+                        >
+                            Descargar / Imprimir
+                        </Button>
 
-        </Table>
+                    </Box>
 
-      </Paper>
+                    <TextField
+                        size="small"
+                        className="no-print"
+                        placeholder="Buscar por nombre, correo, teléfono, profesión o departamento…"
+                        value={busqueda}
+                        onChange={(e) => setBusqueda(e.target.value)}
+                        sx={{ mb: 3, width: "100%", maxWidth: 460, background: "#fff" }}
+                    />
 
-    </Box>
+                    {error && (
+                        <Alert severity="error" sx={{ mb: 3 }} className="no-print">
+                            {error}
+                        </Alert>
+                    )}
 
-  );
+                    {loading && <Typography>Cargando…</Typography>}
+
+                    {!loading && (
+
+                        <Paper
+                            elevation={0}
+                            sx={{ borderRadius: 3, border: "1px solid #E6E8EC", overflowX: "auto" }}
+                        >
+
+                            <Table size="small">
+
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell><strong>Candidato</strong></TableCell>
+                                        <TableCell><strong>Contacto</strong></TableCell>
+                                        <TableCell><strong>Profesión</strong></TableCell>
+                                        <TableCell><strong>Ubicación</strong></TableCell>
+                                        <TableCell><strong>Postulaciones</strong></TableCell>
+                                        <TableCell><strong>Registrado</strong></TableCell>
+                                        <TableCell><strong>Estado</strong></TableCell>
+                                        <TableCell align="center" className="no-print"><strong>Acciones</strong></TableCell>
+                                    </TableRow>
+                                </TableHead>
+
+                                <TableBody>
+
+                                    {filtrados.map((c) => (
+
+                                        <TableRow key={c.id}>
+
+                                            <TableCell>
+
+                                                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+
+                                                    <Avatar sx={{ width: 30, height: 30, fontSize: 13 }} className="no-print">
+                                                        {nombreCompleto(c).charAt(0)}
+                                                    </Avatar>
+
+                                                    <Typography fontWeight={600} fontSize={13.5}>
+                                                        {nombreCompleto(c)}
+                                                    </Typography>
+
+                                                </Box>
+
+                                            </TableCell>
+
+                                            <TableCell>
+                                                <Typography fontSize={12.5}>{c.email}</Typography>
+                                                <Typography fontSize={12.5} color="text.secondary">
+                                                    {c.phone || "—"}
+                                                </Typography>
+                                            </TableCell>
+
+                                            <TableCell>{c.profession || "—"}</TableCell>
+
+                                            <TableCell>
+                                                {[c.department, c.municipality].filter(Boolean).join(", ") || "—"}
+                                            </TableCell>
+
+                                            <TableCell>{c.total_postulaciones}</TableCell>
+
+                                            <TableCell>{fechaCorta(c.created_at)}</TableCell>
+
+                                            <TableCell>
+                                                <Chip
+                                                    size="small"
+                                                    label={c.status === "activa" ? "Activo" : "Suspendido"}
+                                                    color={c.status === "activa" ? "success" : "error"}
+                                                />
+                                            </TableCell>
+
+                                            <TableCell align="center" className="no-print">
+                                                <Button
+                                                    size="small"
+                                                    color={c.status === "activa" ? "error" : "success"}
+                                                    disabled={busyId === c.id}
+                                                    onClick={() => toggleStatus(c)}
+                                                    sx={{ textTransform: "none" }}
+                                                >
+                                                    {c.status === "activa" ? "Suspender" : "Reactivar"}
+                                                </Button>
+                                            </TableCell>
+
+                                        </TableRow>
+
+                                    ))}
+
+                                    {filtrados.length === 0 && (
+                                        <TableRow>
+                                            <TableCell colSpan={8}>
+                                                <Typography color="text.secondary" sx={{ py: 3 }}>
+                                                    {candidates.length === 0
+                                                        ? "Todavía no hay candidatos registrados."
+                                                        : "No se encontraron candidatos con ese criterio."}
+                                                </Typography>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+
+                                </TableBody>
+
+                            </Table>
+
+                        </Paper>
+
+                    )}
+
+                </Box>
+
+            </main>
+
+        </div>
+
+    );
 
 }
 

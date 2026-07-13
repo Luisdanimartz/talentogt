@@ -66,7 +66,7 @@ function AdminLayout({ children }) {
             variant="h5"
             fontWeight="bold"
           >
-            TalentoGT
+            ChanceGT
           </Typography>
 
         </Toolbar>

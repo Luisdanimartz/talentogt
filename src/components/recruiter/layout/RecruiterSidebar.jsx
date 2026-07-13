@@ -11,6 +11,7 @@ import {
   BarChart as BarChartIcon,
   Settings as SettingsIcon,
   BusinessCenter as BusinessCenterIcon,
+  OpenInNew as OpenInNewIcon,
 } from "@mui/icons-material";
 
 import { useAuth } from "../../../context/AuthContext";
@@ -29,7 +30,7 @@ const MENU = [
     { icon: WorkIcon, title: "Nueva vacante", path: "/empresa/nueva-vacante", requiere: "gestionar" },
     { icon: GroupsIcon, title: "Candidatos", path: "/empresa/candidatos" },
     { icon: EventIcon, title: "Entrevistas", path: "/empresa/entrevistas" },
-    { icon: BarChartIcon, title: "Reportes", soon: true },
+    { icon: BarChartIcon, title: "Reportes", path: "/empresa/reportes" },
     { icon: SettingsIcon, title: "Configuración", path: "/empresa/configuracion" },
 ];
 
@@ -62,7 +63,11 @@ function RecruiterSidebar({ company, role }) {
             <div className="sidebar-brand">
 
                 <span className="brand-mark">
-                    <BusinessCenterIcon fontSize="small" />
+                    <img
+                        src="/favicon.svg"
+                        alt="ChanceGT"
+                        style={{ width: "100%", height: "100%" }}
+                    />
                 </span>
 
                 <div>
@@ -76,6 +81,16 @@ function RecruiterSidebar({ company, role }) {
             </div>
 
             <nav className="sidebar-menu">
+
+                <a
+                    href="/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="sidebar-item"
+                >
+                    <OpenInNewIcon fontSize="small" />
+                    <span>Ver sitio (ChanceGT)</span>
+                </a>
 
                 {MENU.filter(
                     (item) =>
@@ -117,7 +132,20 @@ function RecruiterSidebar({ company, role }) {
 
                     <div className="avatar">
 
-                        {initials}
+                        {company?.logo ? (
+                            <img
+                                src={company.logo}
+                                alt=""
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                    borderRadius: "inherit",
+                                }}
+                            />
+                        ) : (
+                            initials
+                        )}
 
                     </div>
 
