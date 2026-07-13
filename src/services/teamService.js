@@ -63,13 +63,9 @@ export async function getMyCompanyContext() {
     return { company: ownCompany, role: "dueno", error: null };
   }
 
-  /* 2. Reclamar invitaciones pendientes a mi correo */
+  /* 2. Reclamar invitaciones pendientes a mi correo (funcion segura) */
   if (user.email) {
-    await supabase
-      .from("company_members")
-      .update({ user_id: user.id, status: "activo" })
-      .is("user_id", null)
-      .ilike("email", user.email);
+    await supabase.rpc("claim_my_invitations");
   }
 
   /* 3. Buscar mi membresia activa (con el perfil de la empresa) */
