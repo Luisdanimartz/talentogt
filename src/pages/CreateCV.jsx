@@ -117,6 +117,7 @@ const emptyExperience = {
   years: "",
   period: "",
   description: "",
+  reference_phone: "",
   /* Selectores del periodo (solo en el formulario; no van a la BD) */
   mesInicio: "",
   anioInicio: "",
@@ -843,11 +844,11 @@ function CreateCV() {
             container
             spacing={2}
             key={index}
-            alignItems="center"
+            alignItems="flex-start"
             sx={{ mb: 2 }}
           >
 
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={3}>
               <TextField
                 label="Cargo"
                 value={exp.job_title || ""}
@@ -859,7 +860,7 @@ function CreateCV() {
               />
             </Grid>
 
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={3}>
               <TextField
                 label="Empresa"
                 value={exp.company || ""}
@@ -871,7 +872,20 @@ function CreateCV() {
               />
             </Grid>
 
-            <Grid item xs={4} md={1}>
+            <Grid item xs={12} md={3}>
+              <TextField
+                label="Teléfono de referencia (opcional)"
+                value={exp.reference_phone || ""}
+                onChange={(e) =>
+                  updateExperience(index, "reference_phone", e.target.value)
+                }
+                fullWidth
+                autoComplete="off"
+                helperText="Jefe o RRHH, para verificar tu experiencia"
+              />
+            </Grid>
+
+            <Grid item xs={4} md={1} sx={{ pt: 1 }}>
               {experience.length > 1 && (
                 <IconButton
                   aria-label="Quitar experiencia"

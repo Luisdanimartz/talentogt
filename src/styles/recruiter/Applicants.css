@@ -1,5 +1,127 @@
 .applicants-header {
     margin-bottom: 26px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+/* --- Filtro por vacante --- */
+
+.applicants-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.applicants-filter label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--cgt-slate);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.applicants-filter select {
+    border: 1px solid var(--cgt-border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--cgt-ink);
+    background: var(--cgt-surface);
+    cursor: pointer;
+    min-width: 220px;
+}
+
+@media (max-width: 480px) {
+
+    .applicants-filter {
+        width: 100%;
+    }
+
+    .applicants-filter select {
+        width: 100%;
+        min-width: 0;
+    }
+
+}
+
+/* --- Checkbox de seleccion en cada tarjeta --- */
+
+.applicant-checkbox {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--cgt-teal);
+}
+
+/* --- Barra de accion masiva --- */
+
+.bulk-bar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: #0B1F3A;
+    color: #FFFFFF;
+    border-radius: var(--cgt-radius);
+    padding: 14px 20px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.bulk-bar-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.bulk-clear {
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: transparent;
+    color: #FFFFFF;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    cursor: pointer;
+}
+
+.bulk-clear:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.bulk-reject {
+    border: none;
+    background: var(--cgt-red);
+    color: #FFFFFF;
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    cursor: pointer;
+}
+
+.bulk-reject:hover {
+    background: #8f2323;
+}
+
+.bulk-reject:disabled,
+.bulk-clear:disabled {
+    opacity: 0.6;
+    cursor: default;
 }
 
 .applicants-header h1 {

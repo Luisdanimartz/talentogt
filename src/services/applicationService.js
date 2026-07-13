@@ -64,6 +64,7 @@ export async function getApplicationForCV(applicationId) {
         profession,
         department,
         municipality,
+        address,
         education_level,
         education_institution,
         education_year,
@@ -74,7 +75,7 @@ export async function getApplicationForCV(applicationId) {
         availability,
         expected_salary,
         candidate_education ( id, level, institution, graduation_year ),
-        candidate_experience ( id, job_title, company, years, period, description )
+        candidate_experience ( id, job_title, company, years, period, description, reference_phone )
       )
     `)
     .eq("id", applicationId)

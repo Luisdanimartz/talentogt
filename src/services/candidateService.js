@@ -31,7 +31,7 @@ const CANDIDATE_COLUMNS = `
   created_at,
   updated_at,
   candidate_education ( id, level, institution, graduation_year ),
-  candidate_experience ( id, job_title, company, years, period, description )
+  candidate_experience ( id, job_title, company, years, period, description, reference_phone )
 `;
 
 export async function getCurrentCandidateProfile() {
@@ -183,6 +183,7 @@ export async function saveCandidateProfile(form, educationList = [], experienceL
       years: exp.years || null,
       period: exp.period || null,
       description: exp.description || null,
+      reference_phone: exp.reference_phone || null,
     }));
 
   if (experienceRows.length > 0) {

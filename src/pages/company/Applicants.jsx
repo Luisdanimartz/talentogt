@@ -57,6 +57,13 @@ function Applicants() {
     const [loadError, setLoadError] = useState(null);
     const [savingId, setSavingId] = useState(null);
 
+    /* Filtro por vacante publicada */
+    const [jobFilter, setJobFilter] = useState("todas");
+
+    /* Seleccion masiva (para avisar a varios candidatos a la vez) */
+    const [seleccionados, setSeleccionados] = useState([]);
+    const [bulkSaving, setBulkSaving] = useState(false);
+
     /* Agendar entrevista: id de la postulacion abierta y el borrador */
     const [schedulingId, setSchedulingId] = useState(null);
     const [schedulingSaving, setSchedulingSaving] = useState(false);
@@ -133,6 +140,56 @@ function Applicants() {
 
     }
 
+    function toggleSeleccionado(applicationId) {
+        setSeleccionados((prev) =>
+            prev.includes(applicationId)
+                ? prev.filter((id) => id !== applicationId)
+                : [...prev, applicationId]
+        );
+    }
+
+    function limpiarSeleccion() {
+        setSeleccionados([]);
+    }
+
+    async function handleBulkReject() {
+
+        if (seleccionados.length === 0) return;
+
+        const seguro = window.confirm(
+            `¿Marcar ${seleccionados.length} ${seleccionados.length === 1 ? "candidato" : "candidatos"} como "No seleccionado"? Cada uno verá el cambio en su proceso y recibirá el aviso automático.`
+        );
+
+        if (!seguro) return;
+
+        setBulkSaving(true);
+
+        const resultados = await Promise.all(
+            seleccionados.map((id) => updateApplicationStatus(id, "rejected"))
+        );
+
+        setBulkSaving(false);
+
+        const fallidos = resultados.filter((r) => r.error);
+
+        setApplications((prev) =>
+            prev.map((app) =>
+                seleccionados.includes(app.id)
+                    ? { ...app, current_status: "rejected" }
+                    : app
+            )
+        );
+
+        setSeleccionados([]);
+
+        if (fallidos.length > 0) {
+            alert(
+                `Se actualizaron algunos, pero ${fallidos.length} no se pudieron marcar. Intenta de nuevo con esos.`
+            );
+        }
+
+    }
+
     function abrirAgendar(app) {
 
         setSchedulingId(app.id);
@@ -200,6 +257,15 @@ function Applicants() {
         (app) => app.current_status === "applied"
     ).length;
 
+    /* Vacantes unicas presentes en las postulaciones, para el filtro */
+    const vacantesDisponibles = Array.from(
+        new Map(
+            applications
+                .filter((app) => app.jobs?.id)
+                .map((app) => [app.jobs.id, app.jobs.title])
+        ).entries()
+    ).map(([id, title]) => ({ id, title }));
+
     /*
       Afinidad de cada candidato con SU vacante, calculada con
       el motor compartido (utils/matching.js), y ordenada del
@@ -207,6 +273,9 @@ function Applicants() {
       coincide, con verificaciones que puede comprobar.
     */
     const applicationsConAfinidad = applications
+        .filter((app) =>
+            jobFilter === "todas" ? true : app.jobs?.id === jobFilter
+        )
         .map((app) => {
 
             const jobDept = departments.find(
@@ -258,6 +327,37 @@ function Applicants() {
 
                     </div>
 
+                    {!loading && vacantesDisponibles.length > 0 && (
+
+                        <div className="applicants-filter">
+
+                            <label htmlFor="job-filter">
+                                Filtrar por vacante
+                            </label>
+
+                            <select
+                                id="job-filter"
+                                value={jobFilter}
+                                onChange={(e) => {
+                                    setJobFilter(e.target.value);
+                                    limpiarSeleccion();
+                                }}
+                            >
+                                <option value="todas">
+                                    Todas las vacantes
+                                </option>
+
+                                {vacantesDisponibles.map((v) => (
+                                    <option key={v.id} value={v.id}>
+                                        {v.title}
+                                    </option>
+                                ))}
+                            </select>
+
+                        </div>
+
+                    )}
+
                 </header>
 
                 {!loading && !loadError && pendientes > 0 && (
@@ -308,12 +408,61 @@ function Applicants() {
 
                 )}
 
+                {puedoGestionar && seleccionados.length > 0 && (
+
+                    <div className="bulk-bar">
+
+                        <span>
+                            {seleccionados.length}{" "}
+                            {seleccionados.length === 1
+                                ? "candidato seleccionado"
+                                : "candidatos seleccionados"}
+                        </span>
+
+                        <div className="bulk-bar-actions">
+
+                            <button
+                                type="button"
+                                className="bulk-clear"
+                                onClick={limpiarSeleccion}
+                                disabled={bulkSaving}
+                            >
+                                Cancelar
+                            </button>
+
+                            <button
+                                type="button"
+                                className="bulk-reject"
+                                onClick={handleBulkReject}
+                                disabled={bulkSaving}
+                            >
+                                {bulkSaving
+                                    ? "Actualizando…"
+                                    : "Marcar como No seleccionado"}
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                )}
+
                 {!loading && applicationsConAfinidad.map((app) => (
 
                     <article
                         key={app.id}
                         className="applicant-card"
                     >
+
+                        {puedoGestionar && (
+                            <input
+                                type="checkbox"
+                                className="applicant-checkbox"
+                                aria-label={`Seleccionar a ${nombreCandidato(app.candidate_profiles)}`}
+                                checked={seleccionados.includes(app.id)}
+                                onChange={() => toggleSeleccionado(app.id)}
+                            />
+                        )}
 
                         <div className="applicant-avatar">
                             {nombreCandidato(app.candidate_profiles)

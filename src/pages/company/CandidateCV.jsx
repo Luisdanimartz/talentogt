@@ -74,7 +74,7 @@ function CandidateCV() {
                         {loadError ||
                             "El candidato aún no ha completado su perfil."}
                     </p>
-                    <button onClick={() => navigate(-1)}>
+                    <button onClick={() => navigate("/empresa/candidatos")}>
                         Volver
                     </button>
                 </div>
@@ -95,6 +95,8 @@ function CandidateCV() {
             ? `📍 ${[profile.municipality, profile.department].filter(Boolean).join(", ")}`
             : null,
     ].filter(Boolean);
+
+    const direccion = profile.address || null;
 
     const habilidades = String(profile.skills || "")
         .split(",")
@@ -150,7 +152,7 @@ function CandidateCV() {
 
                 <button
                     className="cv-back"
-                    onClick={() => navigate(-1)}
+                    onClick={() => navigate("/empresa/candidatos")}
                 >
                     ← Volver a candidatos
                 </button>
@@ -187,6 +189,12 @@ function CandidateCV() {
                     <p className="cv-contact">
                         {contacto.join("  ·  ")}
                     </p>
+
+                    {direccion && (
+                        <p className="cv-contact">
+                            🏠 {direccion}
+                        </p>
+                    )}
 
                     {(profile.linkedin || profile.availability) && (
                         <p className="cv-contact">
@@ -280,6 +288,12 @@ function CandidateCV() {
                                                 <li key={j}>{logro}</li>
                                             ))}
                                     </ul>
+                                )}
+
+                                {exp.reference_phone && (
+                                    <p className="cv-reference">
+                                        Referencia laboral: {exp.reference_phone}
+                                    </p>
                                 )}
 
                             </div>

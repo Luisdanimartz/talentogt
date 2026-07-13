@@ -94,6 +94,8 @@ function MyCV() {
             : null,
     ].filter(Boolean);
 
+    const direccion = profile.address || null;
+
     const habilidades = String(profile.skills || "")
         .split(",")
         .map((s) => s.trim())
@@ -197,6 +199,12 @@ function MyCV() {
                         {contacto.join("  ·  ")}
                     </p>
 
+                    {direccion && (
+                        <p className="cv-contact">
+                            🏠 {direccion}
+                        </p>
+                    )}
+
                     {(profile.linkedin || profile.availability) && (
                         <p className="cv-contact">
                             {[profile.linkedin, profile.availability]
@@ -289,6 +297,12 @@ function MyCV() {
                                                 <li key={j}>{logro}</li>
                                             ))}
                                     </ul>
+                                )}
+
+                                {exp.reference_phone && (
+                                    <p className="cv-reference">
+                                        Referencia laboral: {exp.reference_phone}
+                                    </p>
                                 )}
 
                             </div>
