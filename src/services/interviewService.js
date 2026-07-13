@@ -77,6 +77,7 @@ export async function getCompanyInterviews(companyId) {
       notes,
       status,
       created_at,
+      updated_at,
       applications!inner (
         id,
         current_status,

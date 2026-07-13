@@ -18,6 +18,7 @@ export async function getCompanyApplications(companyId) {
       current_status,
       applied_at,
       jobs!inner ( id, title, description, requirements, department_id, salary_min, salary_max, company_id ),
+      interviews ( id, status, scheduled_at ),
       candidate_profiles (
         id,
         first_name,
@@ -37,6 +38,47 @@ export async function getCompanyApplications(companyId) {
     `)
     .eq("jobs.company_id", companyId)
     .order("applied_at", { ascending: false });
+
+}
+
+/*
+  Datos completos de UNA postulación para que la empresa
+  vea/descargue el CV del candidato (misma info que ve el
+  propio candidato en "Mi CV", pero desde el lado empresa).
+*/
+export async function getApplicationForCV(applicationId) {
+
+  return await supabase
+    .from("applications")
+    .select(`
+      id,
+      applied_at,
+      jobs!inner ( id, title, company_id ),
+      candidate_profiles (
+        id,
+        first_name,
+        middle_name,
+        last_name,
+        second_last_name,
+        phone,
+        profession,
+        department,
+        municipality,
+        education_level,
+        education_institution,
+        education_year,
+        experience,
+        skills,
+        summary,
+        linkedin,
+        availability,
+        expected_salary,
+        candidate_education ( id, level, institution, graduation_year ),
+        candidate_experience ( id, job_title, company, years, period, description )
+      )
+    `)
+    .eq("id", applicationId)
+    .single();
 
 }
 

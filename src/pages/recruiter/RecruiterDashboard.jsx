@@ -27,6 +27,7 @@ function RecruiterDashboard() {
     const [jobs, setJobs] = useState([]);
     const [applications, setApplications] = useState([]);
     const [applicationsError, setApplicationsError] = useState(false);
+    const [interviews, setInterviews] = useState([]);
     const [interviewsToday, setInterviewsToday] = useState(null);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
@@ -72,7 +73,10 @@ function RecruiterDashboard() {
         */
         if (interviewsRes.error) {
             setInterviewsToday(null);
+            setInterviews([]);
         } else {
+            setInterviews(interviewsRes.data || []);
+
             setInterviewsToday(
                 (interviewsRes.data || []).filter(
                     (i) =>
@@ -150,7 +154,11 @@ function RecruiterDashboard() {
                             searching={search.trim().length > 0}
                         />
 
-                        <RecentActivity jobs={jobs} loading={loading} />
+                        <RecentActivity
+                            jobs={jobs}
+                            interviews={interviews}
+                            loading={loading}
+                        />
 
                     </section>
 

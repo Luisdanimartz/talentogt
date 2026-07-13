@@ -1,12 +1,24 @@
 import "./../../../styles/recruiter/dashboard/RecentActivity.css";
 
 /*
-  Actividad reciente construida SOLO con los timestamps reales
-  de la tabla jobs (created_at, published_at). Cuando existan
-  applications, agregaremos aquí las postulaciones.
+  Actividad reciente construida con timestamps reales:
+  jobs (created_at, published_at) y entrevistas marcadas
+  como realizadas (interviews.updated_at).
 */
 
-function buildEvents(jobs) {
+function nombreCandidato(app) {
+
+    const profile = app?.candidate_profiles;
+
+    if (!profile) return "el candidato";
+
+    return [profile.first_name, profile.last_name]
+        .filter(Boolean)
+        .join(" ") || "el candidato";
+
+}
+
+function buildEvents(jobs, interviews) {
 
     const events = [];
 
@@ -28,6 +40,19 @@ function buildEvents(jobs) {
 
     });
 
+    interviews
+        .filter((iv) => iv.status === "realizada")
+        .forEach((iv) => {
+
+            if (!iv.updated_at) return;
+
+            events.push({
+                date: new Date(iv.updated_at),
+                text: `Marcaste como realizada la entrevista de ${nombreCandidato(iv.applications)} para "${iv.applications?.jobs?.title || "una vacante"}".`,
+            });
+
+        });
+
     return events
         .sort((a, b) => b.date - a.date)
         .slice(0, 6);
@@ -43,9 +68,9 @@ function formatDate(date) {
 
 }
 
-function RecentActivity({ jobs, loading }) {
+function RecentActivity({ jobs, interviews = [], loading }) {
 
-    const events = buildEvents(jobs);
+    const events = buildEvents(jobs, interviews);
 
     return (
 

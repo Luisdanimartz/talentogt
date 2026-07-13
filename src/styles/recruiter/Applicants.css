@@ -433,3 +433,31 @@
     font-size: 13px;
     cursor: pointer;
 }
+
+/* --- Descargar CV --- */
+
+.applicant-cv-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--cgt-teal);
+    font-size: 13.5px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.applicant-cv-link:hover {
+    text-decoration: underline;
+}
+
+/* --- Aviso de entrevista ya realizada --- */
+
+.interview-done-chip {
+    display: inline-block;
+    margin-top: 8px;
+    background: var(--cgt-teal-soft);
+    color: var(--cgt-teal);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 700;
+}

@@ -38,9 +38,13 @@ function nombreCandidato(profile) {
     if (!profile) return "Candidato";
 
     return [profile.first_name, profile.last_name]
-        .filter(Boolean)
-        .join(" ") || "Candidato";
+        .filter(Boolean).join(" ") || "Candidato";
 
+}
+
+/* ¿Ya se realizó al menos una entrevista de esta postulación? */
+function tieneEntrevistaRealizada(app) {
+    return (app.interviews || []).some((iv) => iv.status === "realizada");
 }
 
 function Applicants() {
@@ -477,6 +481,15 @@ function Applicants() {
 
                             </details>
 
+                            <a
+                                href={`/empresa/candidatos/${app.id}/cv`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="applicant-cv-link"
+                            >
+                                ⬇ Descargar CV
+                            </a>
+
                         </div>
 
                         <div className="applicant-status">
@@ -512,6 +525,12 @@ function Applicants() {
                                 ))}
 
                             </select>
+
+                            {tieneEntrevistaRealizada(app) && (
+                                <span className="interview-done-chip">
+                                    ✓ Entrevista realizada
+                                </span>
+                            )}
 
                             {puedoGestionar && schedulingId !== app.id && (
                                 <button
