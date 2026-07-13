@@ -339,3 +339,97 @@
     font-size: 13px;
     margin: 0;
 }
+
+/* ===== Agendar entrevista (formulario inline) ===== */
+
+.schedule-button {
+    margin-top: 10px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #0E8F73;
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: #0E8F73;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.schedule-button:hover {
+    background: #E4F5F0;
+}
+
+.schedule-form {
+    margin-top: 10px;
+    padding: 12px;
+    border: 1px solid #E6E8EC;
+    border-radius: 10px;
+    background: #F9FAFB;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 220px;
+}
+
+.schedule-form strong {
+    color: #0B1F3A;
+    font-size: 13px;
+}
+
+.schedule-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4A5568;
+}
+
+.schedule-form input,
+.schedule-form select,
+.schedule-form textarea {
+    padding: 7px 8px;
+    border: 1px solid #D5D9E0;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    background: #FFFFFF;
+}
+
+.schedule-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.schedule-confirm {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    background: #0E8F73;
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.schedule-confirm:hover {
+    background: #0C7A62;
+}
+
+.schedule-confirm:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.schedule-cancel {
+    padding: 8px 12px;
+    border: 1px solid #D5D9E0;
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: #4A5568;
+    font-size: 13px;
+    cursor: pointer;
+}

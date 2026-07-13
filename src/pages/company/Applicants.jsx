@@ -6,7 +6,15 @@ import "./../../styles/recruiter/Applicants.css";
 
 import RecruiterSidebar from "../../components/recruiter/layout/RecruiterSidebar";
 
-import { getCurrentCompany } from "../../services/companyService";
+import {
+    getMyCompanyContext,
+    puedeGestionarCandidatos,
+} from "../../services/teamService";
+
+import {
+    scheduleInterview,
+    INTERVIEW_MODALITIES,
+} from "../../services/interviewService";
 
 import {
     getCompanyApplications,
@@ -38,11 +46,23 @@ function nombreCandidato(profile) {
 function Applicants() {
 
     const [company, setCompany] = useState(null);
+    const [myRole, setMyRole] = useState(null);
     const [applications, setApplications] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
     const [savingId, setSavingId] = useState(null);
+
+    /* Agendar entrevista: id de la postulacion abierta y el borrador */
+    const [schedulingId, setSchedulingId] = useState(null);
+    const [schedulingSaving, setSchedulingSaving] = useState(false);
+    const [draft, setDraft] = useState({
+        fecha: "",
+        hora: "",
+        modality: "Presencial",
+        locationOrLink: "",
+        notes: "",
+    });
 
     useEffect(() => {
 
@@ -54,9 +74,9 @@ function Applicants() {
 
         setLoading(true);
 
-        const [{ data: companyData }, departmentsRes] =
+        const [{ company: companyData, role }, departmentsRes] =
             await Promise.all([
-                getCurrentCompany(),
+                getMyCompanyContext(),
                 getDepartments(),
             ]);
 
@@ -68,6 +88,7 @@ function Applicants() {
         }
 
         setCompany(companyData);
+        setMyRole(role);
 
         const { data, error } =
             await getCompanyApplications(companyData.id);
@@ -107,6 +128,69 @@ function Applicants() {
         );
 
     }
+
+    function abrirAgendar(app) {
+
+        setSchedulingId(app.id);
+
+        setDraft({
+            fecha: "",
+            hora: "",
+            modality: "Presencial",
+            locationOrLink: "",
+            notes: "",
+        });
+
+    }
+
+    async function handleAgendar(app) {
+
+        if (!draft.fecha || !draft.hora) {
+            alert("Elige fecha y hora para la entrevista.");
+            return;
+        }
+
+        /* Fecha local del navegador -> timestamp */
+        const scheduledAt = new Date(
+            `${draft.fecha}T${draft.hora}`
+        ).toISOString();
+
+        setSchedulingSaving(true);
+
+        const { error } = await scheduleInterview({
+            applicationId: app.id,
+            scheduledAt,
+            modality: draft.modality,
+            locationOrLink: draft.locationOrLink,
+            notes: draft.notes,
+            currentStatus: app.current_status,
+        });
+
+        setSchedulingSaving(false);
+
+        if (error) {
+            alert("No se pudo agendar: " + error.message);
+            return;
+        }
+
+        /* La postulacion pasa a Entrevista (con correo automatico) */
+        setApplications((prev) =>
+            prev.map((a) =>
+                a.id === app.id
+                    ? { ...a, current_status: "interview" }
+                    : a
+            )
+        );
+
+        setSchedulingId(null);
+
+        alert(
+            "Entrevista agendada. El candidato ve el paso en su proceso y recibe el aviso por correo. La encuentras en la sección Entrevistas."
+        );
+
+    }
+
+    const puedoGestionar = puedeGestionarCandidatos(myRole);
 
     const pendientes = applications.filter(
         (app) => app.current_status === "applied"
@@ -150,7 +234,7 @@ function Applicants() {
 
         <div className="dashboard">
 
-            <RecruiterSidebar company={company} />
+            <RecruiterSidebar company={company} role={myRole} />
 
             <main className="dashboard-content">
 
@@ -404,7 +488,14 @@ function Applicants() {
                             <select
                                 id={`status-${app.id}`}
                                 value={app.current_status || "applied"}
-                                disabled={savingId === app.id}
+                                disabled={
+                                    savingId === app.id || !puedoGestionar
+                                }
+                                title={
+                                    !puedoGestionar
+                                        ? "Tu rol es de solo lectura"
+                                        : undefined
+                                }
                                 onChange={(e) =>
                                     handleStatusChange(app.id, e.target.value)
                                 }
@@ -421,6 +512,137 @@ function Applicants() {
                                 ))}
 
                             </select>
+
+                            {puedoGestionar && schedulingId !== app.id && (
+                                <button
+                                    type="button"
+                                    className="schedule-button"
+                                    onClick={() => abrirAgendar(app)}
+                                >
+                                    🗓 Agendar entrevista
+                                </button>
+                            )}
+
+                            {schedulingId === app.id && (
+
+                                <div className="schedule-form">
+
+                                    <strong>Agendar entrevista</strong>
+
+                                    <label>
+                                        Fecha
+                                        <input
+                                            type="date"
+                                            value={draft.fecha}
+                                            onChange={(e) =>
+                                                setDraft((d) => ({
+                                                    ...d,
+                                                    fecha: e.target.value,
+                                                }))
+                                            }
+                                        />
+                                    </label>
+
+                                    <label>
+                                        Hora
+                                        <input
+                                            type="time"
+                                            value={draft.hora}
+                                            onChange={(e) =>
+                                                setDraft((d) => ({
+                                                    ...d,
+                                                    hora: e.target.value,
+                                                }))
+                                            }
+                                        />
+                                    </label>
+
+                                    <label>
+                                        Modalidad
+                                        <select
+                                            value={draft.modality}
+                                            onChange={(e) =>
+                                                setDraft((d) => ({
+                                                    ...d,
+                                                    modality: e.target.value,
+                                                }))
+                                            }
+                                        >
+                                            {INTERVIEW_MODALITIES.map((m) => (
+                                                <option key={m} value={m}>
+                                                    {m}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </label>
+
+                                    <label>
+                                        {draft.modality === "Virtual"
+                                            ? "Enlace de la reunión"
+                                            : draft.modality === "Telefónica"
+                                                ? "Teléfono"
+                                                : "Dirección"}
+                                        <input
+                                            type="text"
+                                            value={draft.locationOrLink}
+                                            onChange={(e) =>
+                                                setDraft((d) => ({
+                                                    ...d,
+                                                    locationOrLink:
+                                                        e.target.value,
+                                                }))
+                                            }
+                                            placeholder={
+                                                draft.modality === "Virtual"
+                                                    ? "https://meet…"
+                                                    : ""
+                                            }
+                                        />
+                                    </label>
+
+                                    <label>
+                                        Notas internas (opcional)
+                                        <textarea
+                                            rows={2}
+                                            value={draft.notes}
+                                            onChange={(e) =>
+                                                setDraft((d) => ({
+                                                    ...d,
+                                                    notes: e.target.value,
+                                                }))
+                                            }
+                                            placeholder="Solo las ve tu equipo"
+                                        />
+                                    </label>
+
+                                    <div className="schedule-actions">
+
+                                        <button
+                                            type="button"
+                                            className="schedule-confirm"
+                                            disabled={schedulingSaving}
+                                            onClick={() => handleAgendar(app)}
+                                        >
+                                            {schedulingSaving
+                                                ? "Agendando…"
+                                                : "Confirmar"}
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="schedule-cancel"
+                                            onClick={() =>
+                                                setSchedulingId(null)
+                                            }
+                                        >
+                                            Cancelar
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            )}
 
                         </div>
 

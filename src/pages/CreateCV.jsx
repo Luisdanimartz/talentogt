@@ -39,6 +39,16 @@ import { getEducationLevels } from "../services/jobService";
 import { formatMiles, salarioANumero } from "../utils/formatSalary";
 import { toTitleCase } from "../utils/textFormat";
 
+import {
+  manejarEnterConVineta,
+  vinetaInicial,
+  normalizarVinetas,
+  ESTILO_RENGLONES,
+  duracionEntre,
+  parsearPeriodo,
+  MESES_NOMBRES,
+} from "../utils/bullets";
+
 /*
   Perfil del candidato — su CV en ChanceGT.
 
@@ -82,6 +92,13 @@ const DIAS = Array.from({ length: 31 }, (_, i) =>
 /* Del mas reciente al mas antiguo: llegar a 1987 toma un toque */
 const ANIOS = Array.from({ length: 76 }, (_, i) => 2012 - i);
 
+/* Años para experiencia laboral: del actual hacia atras */
+const ANIO_ACTUAL = new Date().getFullYear();
+const ANIOS_TRABAJO = Array.from(
+  { length: ANIO_ACTUAL - 1974 },
+  (_, i) => ANIO_ACTUAL - i
+);
+
 /* Sugerencias de habilidades: un toque y listo */
 const SKILL_SUGGESTIONS = [
   "Ventas", "Atención al cliente", "Servicio al cliente", "Excel",
@@ -94,7 +111,18 @@ const SKILL_SUGGESTIONS = [
 ];
 
 const emptyEducation = { level: "", institution: "", graduation_year: "" };
-const emptyExperience = { job_title: "", company: "", years: "", period: "", description: "" };
+const emptyExperience = {
+  job_title: "",
+  company: "",
+  years: "",
+  period: "",
+  description: "",
+  /* Selectores del periodo (solo en el formulario; no van a la BD) */
+  mesInicio: "",
+  anioInicio: "",
+  mesFin: "",
+  anioFin: "",
+};
 
 function CreateCV() {
 
@@ -167,7 +195,19 @@ function CreateCV() {
       }
 
       if (profile.candidate_experience?.length > 0) {
-        setExperience(profile.candidate_experience);
+        setExperience(
+          profile.candidate_experience.map((exp) => {
+            const partes = parsearPeriodo(exp.period);
+            return {
+              ...emptyExperience,
+              ...exp,
+              mesInicio: partes?.mesInicio || "",
+              anioInicio: partes?.anioInicio || "",
+              mesFin: partes?.mesFin || "",
+              anioFin: partes?.anioFin || "",
+            };
+          })
+        );
       }
 
     }
@@ -270,6 +310,62 @@ function CreateCV() {
       prev.map((item, i) =>
         i === index ? { ...item, [field]: value } : item
       )
+    );
+
+  }
+
+  /*
+    Cambio en los selectores Mes/Año del periodo:
+    recalcula el texto del periodo ("Junio 2024 – Actualidad")
+    y la duracion humana ("1 año 6 meses") automaticamente.
+  */
+  function updatePeriodo(index, field, value) {
+
+    setExperience((prev) =>
+      prev.map((item, i) => {
+
+        if (i !== index) return item;
+
+        const next = { ...item, [field]: value };
+
+        /* "Actualidad" en el mes de fin apaga el año de fin */
+        if (field === "mesFin") {
+          next.anioFin = value === "actual" ? "actual" : "";
+        }
+
+        const inicioListo = next.mesInicio && next.anioInicio;
+        const finListo =
+          next.anioFin === "actual" || (next.mesFin && next.anioFin);
+
+        if (inicioListo && finListo) {
+
+          const inicio =
+            `${MESES_NOMBRES[Number(next.mesInicio) - 1]} ${next.anioInicio}`;
+
+          const fin = next.anioFin === "actual"
+            ? "Actualidad"
+            : `${MESES_NOMBRES[Number(next.mesFin) - 1]} ${next.anioFin}`;
+
+          const duracion = duracionEntre(
+            next.mesInicio,
+            next.anioInicio,
+            next.mesFin,
+            next.anioFin
+          );
+
+          next.period = `${inicio} – ${fin}`;
+          next.years = duracion ? duracion.texto : "";
+
+        } else {
+
+          next.period = "";
+          next.years = "";
+
+        }
+
+        return next;
+
+      })
     );
 
   }
@@ -775,46 +871,6 @@ function CreateCV() {
               />
             </Grid>
 
-            <Grid item xs={8} md={3}>
-              <TextField
-                label="Años laborados"
-                value={exp.years || ""}
-                onChange={(e) =>
-                  updateExperience(index, "years", e.target.value)
-                }
-                fullWidth
-                autoComplete="off"
-              />
-            </Grid>
-
-            <Grid item xs={12} md={5}>
-              <TextField
-                label="Período (opcional)"
-                value={exp.period || ""}
-                onChange={(e) =>
-                  updateExperience(index, "period", e.target.value)
-                }
-                fullWidth
-                autoComplete="off"
-                helperText="Ejemplo: Junio 2024 – Junio 2026"
-              />
-            </Grid>
-
-            <Grid item xs={12} md={7}>
-              <TextField
-                label="Logros principales (uno por línea)"
-                value={exp.description || ""}
-                onChange={(e) =>
-                  updateExperience(index, "description", e.target.value)
-                }
-                fullWidth
-                multiline
-                rows={3}
-                autoComplete="off"
-                helperText="Se convierten en viñetas de tu CV"
-              />
-            </Grid>
-
             <Grid item xs={4} md={1}>
               {experience.length > 1 && (
                 <IconButton
@@ -828,6 +884,123 @@ function CreateCV() {
                   <DeleteIcon />
                 </IconButton>
               )}
+            </Grid>
+
+            {/* Periodo con selectores: inicio y fin (fin puede ser Actualidad) */}
+
+            <Grid item xs={6} md={2}>
+              <TextField
+                select
+                label="Mes inicio"
+                value={exp.mesInicio || ""}
+                onChange={(e) =>
+                  updatePeriodo(index, "mesInicio", e.target.value)
+                }
+                fullWidth
+              >
+                {MESES_NOMBRES.map((m, i) => (
+                  <MenuItem key={m} value={String(i + 1)}>{m}</MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={6} md={2}>
+              <TextField
+                select
+                label="Año inicio"
+                value={exp.anioInicio || ""}
+                onChange={(e) =>
+                  updatePeriodo(index, "anioInicio", e.target.value)
+                }
+                fullWidth
+              >
+                {ANIOS_TRABAJO.map((a) => (
+                  <MenuItem key={a} value={String(a)}>{a}</MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={6} md={2}>
+              <TextField
+                select
+                label="Mes fin"
+                value={exp.mesFin || ""}
+                onChange={(e) =>
+                  updatePeriodo(index, "mesFin", e.target.value)
+                }
+                fullWidth
+              >
+                <MenuItem value="actual">Actualidad</MenuItem>
+                {MESES_NOMBRES.map((m, i) => (
+                  <MenuItem key={m} value={String(i + 1)}>{m}</MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={6} md={2}>
+              <TextField
+                select
+                label="Año fin"
+                value={exp.anioFin === "actual" ? "" : (exp.anioFin || "")}
+                onChange={(e) =>
+                  updatePeriodo(index, "anioFin", e.target.value)
+                }
+                fullWidth
+                disabled={exp.mesFin === "actual"}
+              >
+                {ANIOS_TRABAJO.map((a) => (
+                  <MenuItem key={a} value={String(a)}>{a}</MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                label="Duración"
+                value={
+                  exp.years ||
+                  (exp.mesInicio && exp.anioInicio &&
+                   (exp.anioFin === "actual" || (exp.mesFin && exp.anioFin))
+                    ? "Revisa las fechas: el fin es antes del inicio"
+                    : "Se calcula sola")
+                }
+                fullWidth
+                disabled
+                helperText="Se llena automáticamente con el período"
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                label="Funciones y atribuciones del puesto (una por línea)"
+                value={exp.description || ""}
+                onChange={(e) =>
+                  updateExperience(index, "description", e.target.value)
+                }
+                onKeyDown={(e) =>
+                  manejarEnterConVineta(e, (nuevo) =>
+                    updateExperience(index, "description", nuevo)
+                  )
+                }
+                onFocus={(e) =>
+                  vinetaInicial(e, exp.description, (v) =>
+                    updateExperience(index, "description", v)
+                  )
+                }
+                onBlur={() =>
+                  updateExperience(
+                    index,
+                    "description",
+                    normalizarVinetas(exp.description)
+                  )
+                }
+                fullWidth
+                multiline
+                rows={4}
+                autoComplete="off"
+                helperText="Presiona Enter y la viñeta aparece sola. Se convierten en viñetas de tu CV."
+                sx={ESTILO_RENGLONES}
+              />
             </Grid>
 
           </Grid>

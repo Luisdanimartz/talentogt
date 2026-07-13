@@ -19,8 +19,35 @@ import {
 import { useAuth } from "../context/AuthContext";
 
 import CompanyResponseBadge from "../components/CompanyResponseBadge";
+import { sinVineta } from "../utils/bullets";
 
 const WORK_MODES = ["Presencial", "Remoto", "Híbrido"];
+
+/*
+  Requisitos y beneficios: si vienen con lineas (viñetas del
+  formulario), se muestran como lista ordenada; si es un parrafo
+  de una publicacion vieja, se muestra tal cual.
+*/
+function BloqueLineas({ texto }) {
+
+    const lineas = String(texto || "")
+        .split("\n")
+        .map((l) => sinVineta(l))
+        .filter(Boolean);
+
+    if (lineas.length <= 1) {
+        return <p style={{ whiteSpace: "pre-line" }}>{texto}</p>;
+    }
+
+    return (
+        <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
+            {lineas.map((linea, i) => (
+                <li key={i}>{linea}</li>
+            ))}
+        </ul>
+    );
+
+}
 
 function Jobs() {
 
@@ -484,14 +511,14 @@ function Jobs() {
                             {selectedJob.requirements && (
                                 <div className="detail-section">
                                     <h3>Requisitos</h3>
-                                    <p>{selectedJob.requirements}</p>
+                                    <BloqueLineas texto={selectedJob.requirements} />
                                 </div>
                             )}
 
                             {selectedJob.benefits && (
                                 <div className="detail-section">
                                     <h3>Beneficios</h3>
-                                    <p>{selectedJob.benefits}</p>
+                                    <BloqueLineas texto={selectedJob.benefits} />
                                 </div>
                             )}
 

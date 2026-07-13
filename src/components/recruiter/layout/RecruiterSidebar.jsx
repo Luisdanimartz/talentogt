@@ -20,17 +20,20 @@ import { logoutUser } from "../../../services/authService";
   Solo mostramos como navegables las secciones que existen hoy.
   Las demás quedan visibles pero deshabilitadas con la etiqueta
   "Pronto" — sin rutas falsas ni pantallas vacías.
+
+  Ademas, el menu respeta el rol del miembro:
+  el observador (solo lectura) no ve "Nueva vacante".
 */
 const MENU = [
     { icon: DashboardIcon, title: "Dashboard", path: "/empresa/dashboard" },
-    { icon: WorkIcon, title: "Nueva vacante", path: "/empresa/nueva-vacante" },
+    { icon: WorkIcon, title: "Nueva vacante", path: "/empresa/nueva-vacante", requiere: "gestionar" },
     { icon: GroupsIcon, title: "Candidatos", path: "/empresa/candidatos" },
-    { icon: EventIcon, title: "Entrevistas", soon: true },
+    { icon: EventIcon, title: "Entrevistas", path: "/empresa/entrevistas" },
     { icon: BarChartIcon, title: "Reportes", soon: true },
-    { icon: SettingsIcon, title: "Configuración", soon: true },
+    { icon: SettingsIcon, title: "Configuración", path: "/empresa/configuracion" },
 ];
 
-function RecruiterSidebar({ company }) {
+function RecruiterSidebar({ company, role }) {
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -74,7 +77,11 @@ function RecruiterSidebar({ company }) {
 
             <nav className="sidebar-menu">
 
-                {MENU.map((item) => (
+                {MENU.filter(
+                    (item) =>
+                        !(item.requiere === "gestionar" &&
+                            role === "observador")
+                ).map((item) => (
 
                     <button
                         key={item.title}
@@ -118,7 +125,11 @@ function RecruiterSidebar({ company }) {
 
                         <strong>{companyName || "Mi empresa"}</strong>
 
-                        <small>{user?.email}</small>
+                        <small>
+                            {user?.email}
+                            {role === "reclutador" && " · Reclutador"}
+                            {role === "observador" && " · Observador"}
+                        </small>
 
                     </div>
 

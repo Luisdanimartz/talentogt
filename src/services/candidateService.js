@@ -106,7 +106,8 @@ export async function saveCandidateProfile(form, educationList = [], experienceL
         [
           exp.job_title,
           exp.company,
-          exp.years ? `${exp.years} años` : null,
+          /* years ya viene humano ("1 año 6 meses"); no agregar "años" */
+          exp.years || null,
           exp.description || null,
         ]
           .filter(Boolean)

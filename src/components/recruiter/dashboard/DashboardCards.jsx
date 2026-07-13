@@ -17,8 +17,8 @@ import {
   Reales (calculadas de la tabla applications):
     - Candidatos por revisar (current_status = applied)
 
-  Honestas (aún sin tablas/lógica detrás):
-    - Entrevistas hoy -> se activa con el módulo de entrevistas
+  Reales (calculadas de la tabla interviews):
+    - Entrevistas hoy (status = programada y fecha = hoy)
 */
 
 function inicioDeSemana() {
@@ -36,7 +36,7 @@ function inicioDeSemana() {
 
 }
 
-function DashboardCards({ jobs, applications = [], applicationsError, loading, onCardClick }) {
+function DashboardCards({ jobs, applications = [], applicationsError, interviewsToday = null, loading, onCardClick }) {
 
     const lunes = inicioDeSemana();
 
@@ -80,12 +80,20 @@ function DashboardCards({ jobs, applications = [], applicationsError, loading, o
                 tone: "navy",
                 target: "candidatos",
             },
-        {
-            title: "Entrevistas hoy",
-            icon: EventIcon,
-            tone: "slate",
-            soon: "Se activará con el módulo de entrevistas",
-        },
+        interviewsToday === null
+            ? {
+                title: "Entrevistas hoy",
+                icon: EventIcon,
+                tone: "slate",
+                soon: "Corre el SQL 009 para activar entrevistas",
+            }
+            : {
+                title: "Entrevistas hoy",
+                value: interviewsToday,
+                icon: EventIcon,
+                tone: "slate",
+                target: "entrevistas",
+            },
     ];
 
     return (

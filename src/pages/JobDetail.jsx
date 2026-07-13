@@ -16,6 +16,29 @@ import CompanyResponseBadge from "../components/CompanyResponseBadge";
 import "../styles/Jobs.css";
 
 import { useAuth } from "../context/AuthContext";
+import { sinVineta } from "../utils/bullets";
+
+/* Igual que en la vista de vacantes: lineas con viñeta -> lista */
+function BloqueLineas({ texto }) {
+
+    const lineas = String(texto || "")
+        .split("\n")
+        .map((l) => sinVineta(l))
+        .filter(Boolean);
+
+    if (lineas.length <= 1) {
+        return <p style={{ whiteSpace: "pre-line" }}>{texto}</p>;
+    }
+
+    return (
+        <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
+            {lineas.map((linea, i) => (
+                <li key={i}>{linea}</li>
+            ))}
+        </ul>
+    );
+
+}
 
 function JobDetail() {
 
@@ -311,12 +334,12 @@ function JobDetail() {
 
             <div style={{ marginBottom: 16 }}>
                 <strong>Requisitos</strong>
-                <p style={{ whiteSpace: "pre-line" }}>{job.requirements}</p>
+                <BloqueLineas texto={job.requirements} />
             </div>
 
             <div style={{ marginBottom: 16 }}>
                 <strong>Beneficios</strong>
-                <p style={{ whiteSpace: "pre-line" }}>{job.benefits}</p>
+                <BloqueLineas texto={job.benefits} />
             </div>
 
             {job.company_profiles?.description && (

@@ -15,6 +15,8 @@ import EditJob from "./pages/company/EditJob";
 
 import RecruiterDashboard from "./pages/recruiter/RecruiterDashboard";
 import Applicants from "./pages/company/Applicants";
+import Interviews from "./pages/company/Interviews";
+import Settings from "./pages/company/Settings";
 import CandidateDashboard from "./pages/candidate/Dashboard";
 import CreateCV from "./pages/CreateCV";
 import ApplicationDetail from "./pages/candidate/ApplicationDetail";
@@ -118,6 +120,24 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["empresa"]}>
               <Applicants />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/empresa/entrevistas"
+          element={
+            <ProtectedRoute allowedRoles={["empresa"]}>
+              <Interviews />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/empresa/configuracion"
+          element={
+            <ProtectedRoute allowedRoles={["empresa"]}>
+              <Settings />
             </ProtectedRoute>
           }
         />

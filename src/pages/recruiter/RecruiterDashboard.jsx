@@ -13,18 +13,21 @@ import RecentActivity from "../../components/recruiter/dashboard/RecentActivity"
 import StatusOverview from "../../components/recruiter/dashboard/StatusOverview";
 import RoadmapPanel from "../../components/recruiter/dashboard/RoadmapPanel";
 
-import { getCurrentCompany } from "../../services/companyService";
+import { getMyCompanyContext } from "../../services/teamService";
 import { getCompanyJobs } from "../../services/jobService";
 import { getCompanyApplications } from "../../services/applicationService";
+import { getCompanyInterviews, esHoy } from "../../services/interviewService";
 
 function RecruiterDashboard() {
 
     const navigate = useNavigate();
 
     const [company, setCompany] = useState(null);
+    const [myRole, setMyRole] = useState(null);
     const [jobs, setJobs] = useState([]);
     const [applications, setApplications] = useState([]);
     const [applicationsError, setApplicationsError] = useState(false);
+    const [interviewsToday, setInterviewsToday] = useState(null);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
 
@@ -38,7 +41,7 @@ function RecruiterDashboard() {
 
         setLoading(true);
 
-        const { data: companyData } = await getCurrentCompany();
+        const { company: companyData, role } = await getMyCompanyContext();
 
         if (!companyData) {
             setLoading(false);
@@ -46,10 +49,12 @@ function RecruiterDashboard() {
         }
 
         setCompany(companyData);
+        setMyRole(role);
 
-        const [jobsRes, appsRes] = await Promise.all([
+        const [jobsRes, appsRes, interviewsRes] = await Promise.all([
             getCompanyJobs(companyData.id),
             getCompanyApplications(companyData.id),
+            getCompanyInterviews(companyData.id),
         ]);
 
         setJobs(jobsRes.data || []);
@@ -60,6 +65,23 @@ function RecruiterDashboard() {
 
         setApplications(appsRes.data || []);
 
+        /*
+          Entrevistas de HOY (programadas). Si la tabla aun no
+          existe (SQL 009 sin correr), la tarjeta queda honesta
+          en modo "pronto".
+        */
+        if (interviewsRes.error) {
+            setInterviewsToday(null);
+        } else {
+            setInterviewsToday(
+                (interviewsRes.data || []).filter(
+                    (i) =>
+                        i.status === "programada" &&
+                        esHoy(i.scheduled_at)
+                ).length
+            );
+        }
+
         setLoading(false);
 
     }
@@ -68,6 +90,11 @@ function RecruiterDashboard() {
 
         if (target === "candidatos") {
             navigate("/empresa/candidatos");
+            return;
+        }
+
+        if (target === "entrevistas") {
+            navigate("/empresa/entrevistas");
             return;
         }
 
@@ -94,7 +121,7 @@ function RecruiterDashboard() {
 
         <div className="dashboard">
 
-            <RecruiterSidebar company={company} />
+            <RecruiterSidebar company={company} role={myRole} />
 
             <main className="dashboard-content">
 
@@ -108,6 +135,7 @@ function RecruiterDashboard() {
                     jobs={jobs}
                     applications={applications}
                     applicationsError={applicationsError}
+                    interviewsToday={interviewsToday}
                     loading={loading}
                     onCardClick={handleCardClick}
                 />

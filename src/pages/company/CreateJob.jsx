@@ -15,7 +15,7 @@ import {
   getMunicipalitiesByDepartment,
 } from "../../services/locationService";
 
-import { getCurrentCompany } from "../../services/companyService";
+import { getMyCompanyContext } from "../../services/teamService";
 
 import { salarioANumero } from "../../utils/formatSalary";
 
@@ -108,8 +108,20 @@ function CreateJob() {
 
     try {
 
-      const { data: company, error: companyError } =
-        await getCurrentCompany();
+      /* Multi-usuario: dueño o reclutador de la empresa */
+      const { company, role, error: companyError } =
+        await getMyCompanyContext();
+
+      if (role === "observador") {
+
+        alert(
+          "Tu rol es de solo lectura (observador): " +
+          "no puedes publicar vacantes."
+        );
+
+        return;
+
+      }
 
       if (companyError || !company) {
 

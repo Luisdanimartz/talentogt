@@ -6,6 +6,7 @@ import "../../styles/ApplicationDetail.css";
 
 import { getMyApplicationDetail } from "../../services/candidateService";
 import { getJobApplicantStats } from "../../services/jobService";
+import { getMyInterviewsForApplication } from "../../services/interviewService";
 import { formatSalary } from "../../utils/formatSalary";
 import { statusLabel } from "../../utils/applicationStatus";
 import CompanyResponseBadge from "../../components/CompanyResponseBadge";
@@ -42,6 +43,7 @@ function ApplicationDetail() {
 
     const [application, setApplication] = useState(null);
     const [stats, setStats] = useState(null);
+    const [interview, setInterview] = useState(null);
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
 
@@ -71,6 +73,25 @@ function ApplicationDetail() {
             if (statsData && statsData.length > 0) {
                 setStats(statsData[0]);
             }
+
+        }
+
+        /*
+          ¿Hay entrevista agendada? (funcion candidate_interviews:
+          solo fecha, modalidad, lugar/enlace y estado — nunca las
+          notas internas del reclutador). Si el SQL 009 aun no se
+          corre, simplemente no se muestra nada.
+        */
+        if (data?.id) {
+
+            const { data: interviewData } =
+                await getMyInterviewsForApplication(data.id);
+
+            const programada = (interviewData || []).find(
+                (i) => i.status === "programada"
+            );
+
+            setInterview(programada || null);
 
         }
 
@@ -192,6 +213,53 @@ function ApplicationDetail() {
                     </button>
 
                 </header>
+
+                {/* ===== Tu entrevista (si hay una programada) ===== */}
+
+                {interview && (
+
+                    <div
+                        style={{
+                            background: "#E8F0FE",
+                            border: "1px solid #BDD3F7",
+                            borderRadius: 12,
+                            padding: "16px 20px",
+                            marginBottom: 24,
+                        }}
+                    >
+
+                        <strong style={{ color: "#1A4B9B" }}>
+                            🗓 Tienes una entrevista agendada
+                        </strong>
+
+                        <p style={{ margin: "6px 0 0", color: "#0B1F3A" }}>
+                            {new Date(interview.scheduled_at).toLocaleString(
+                                "es-GT",
+                                {
+                                    weekday: "long",
+                                    day: "numeric",
+                                    month: "long",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                }
+                            )}
+                            {" · "}{interview.modality}
+                            {interview.location_or_link && (
+                                <>
+                                    {" · "}
+                                    {interview.modality === "Virtual"
+                                        ? "Enlace: "
+                                        : interview.modality === "Telefónica"
+                                            ? "Teléfono: "
+                                            : "Lugar: "}
+                                    {interview.location_or_link}
+                                </>
+                            )}
+                        </p>
+
+                    </div>
+
+                )}
 
                 <div className="appdetail-grid">
 

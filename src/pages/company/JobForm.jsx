@@ -16,6 +16,13 @@ import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
 import { formatMiles } from "../../utils/formatSalary";
 import { toTitleCase } from "../../utils/textFormat";
 
+import {
+  manejarEnterConVineta,
+  vinetaInicial,
+  normalizarVinetas,
+  ESTILO_RENGLONES,
+} from "../../utils/bullets";
+
 const WORK_MODES = ["Presencial", "Remoto", "Híbrido"];
 
 const STATUS_OPTIONS = [
@@ -354,11 +361,34 @@ function JobForm({
                 multiline
                 rows={4}
                 fullWidth
-                label="Requisitos"
+                label="Requisitos (uno por línea)"
                 name="requirements"
                 value={form.requirements}
                 onChange={onChange}
-                helperText="Palabras clave claras (ej.: SAP, agropecuaria) mejoran las coincidencias con candidatos"
+                onKeyDown={(e) =>
+                  manejarEnterConVineta(e, (nuevo) =>
+                    onChange({
+                      target: { name: "requirements", value: nuevo },
+                    })
+                  )
+                }
+                onFocus={(e) =>
+                  vinetaInicial(e, form.requirements, (v) =>
+                    onChange({
+                      target: { name: "requirements", value: v },
+                    })
+                  )
+                }
+                onBlur={() =>
+                  onChange({
+                    target: {
+                      name: "requirements",
+                      value: normalizarVinetas(form.requirements),
+                    },
+                  })
+                }
+                helperText="Presiona Enter y la viñeta aparece sola. Palabras clave claras (ej.: SAP, agropecuaria) mejoran las coincidencias con candidatos"
+                sx={ESTILO_RENGLONES}
               />
             </Grid>
 
@@ -367,10 +397,34 @@ function JobForm({
                 multiline
                 rows={4}
                 fullWidth
-                label="Beneficios"
+                label="Beneficios (uno por línea)"
                 name="benefits"
                 value={form.benefits}
                 onChange={onChange}
+                onKeyDown={(e) =>
+                  manejarEnterConVineta(e, (nuevo) =>
+                    onChange({
+                      target: { name: "benefits", value: nuevo },
+                    })
+                  )
+                }
+                onFocus={(e) =>
+                  vinetaInicial(e, form.benefits, (v) =>
+                    onChange({
+                      target: { name: "benefits", value: v },
+                    })
+                  )
+                }
+                onBlur={() =>
+                  onChange({
+                    target: {
+                      name: "benefits",
+                      value: normalizarVinetas(form.benefits),
+                    },
+                  })
+                }
+                helperText="Presiona Enter y la viñeta aparece sola. Se muestran como lista en la publicación"
+                sx={ESTILO_RENGLONES}
               />
             </Grid>
 

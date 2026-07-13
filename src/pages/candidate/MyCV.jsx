@@ -6,6 +6,23 @@ import "../../styles/MyCV.css";
 
 import { getCurrentCandidateProfile } from "../../services/candidateService";
 import { useAuth } from "../../context/AuthContext";
+import { sinVineta, duracionEnMeses } from "../../utils/bullets";
+
+/* "2" (perfiles viejos) -> "2 años"; "1 año 6 meses" queda igual */
+function duracionHumana(years) {
+
+    const t = String(years || "").trim();
+
+    if (!t) return null;
+
+    if (/^\d+(\.\d+)?$/.test(t)) {
+        const n = Number(t);
+        return `${n} ${n === 1 ? "año" : "años"}`;
+    }
+
+    return t;
+
+}
 
 /*
   Mi CV — nivel profesional, generado del perfil real.
@@ -87,10 +104,13 @@ function MyCV() {
 
     /* ===== Franja de numeros: calculados, no inventados ===== */
 
-    const totalAnios = experiencia.reduce(
-        (suma, exp) => suma + (Number(exp.years) || 0),
+    /* Suma de duraciones humanas ("1 año 6 meses" -> 18 meses) */
+    const totalMeses = experiencia.reduce(
+        (suma, exp) => suma + duracionEnMeses(exp.years),
         0
     );
+
+    const totalAnios = Math.floor(totalMeses / 12);
 
     const empresas = new Set(
         experiencia.map((exp) => exp.company).filter(Boolean)
@@ -102,6 +122,12 @@ function MyCV() {
         totalAnios > 0 && {
             valor: `${totalAnios}+`,
             texto: "Años de experiencia",
+        },
+        totalAnios === 0 && totalMeses > 0 && {
+            valor: totalMeses,
+            texto: totalMeses === 1
+                ? "Mes de experiencia"
+                : "Meses de experiencia",
         },
         empresas > 0 && {
             valor: empresas,
@@ -248,12 +274,7 @@ function MyCV() {
                                 </strong>
 
                                 <span>
-                                    {[
-                                        exp.period ||
-                                            (exp.years
-                                                ? `${exp.years} ${Number(exp.years) === 1 ? "año" : "años"}`
-                                                : null),
-                                    ]
+                                    {[exp.period, duracionHumana(exp.years)]
                                         .filter(Boolean)
                                         .join(" · ")}
                                 </span>
@@ -262,7 +283,7 @@ function MyCV() {
                                     <ul className="cv-bullets">
                                         {exp.description
                                             .split("\n")
-                                            .map((linea) => linea.trim())
+                                            .map((linea) => sinVineta(linea))
                                             .filter(Boolean)
                                             .map((logro, j) => (
                                                 <li key={j}>{logro}</li>
