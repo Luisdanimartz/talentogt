@@ -108,3 +108,13 @@ export async function updateCompanyLogo(profileId, logoUrl) {
     .select(COMPANY_PROFILE_COLUMNS)
     .single();
 }
+
+/* Actualiza SOLO el nombre comercial, sin tocar el resto de los datos */
+export async function updateCompanyName(profileId, companyName) {
+  return await supabase
+    .from("company_profiles")
+    .update({ company_name: companyName })
+    .eq("id", profileId)
+    .select(COMPANY_PROFILE_COLUMNS)
+    .single();
+}

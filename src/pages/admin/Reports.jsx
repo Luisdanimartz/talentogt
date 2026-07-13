@@ -182,24 +182,26 @@ function Reports() {
                                         Todavía no hay datos suficientes.
                                     </Typography>
                                 ) : (
-                                    <Table size="small">
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell><strong>Empresa</strong></TableCell>
-                                                <TableCell><strong>Vacantes</strong></TableCell>
-                                                <TableCell><strong>Postulaciones</strong></TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {topEmpresas.map((e) => (
-                                                <TableRow key={e.company_name}>
-                                                    <TableCell>{e.company_name}</TableCell>
-                                                    <TableCell>{e.total_vacantes}</TableCell>
-                                                    <TableCell>{e.total_postulaciones}</TableCell>
+                                    <Box sx={{ overflowX: "auto" }}>
+                                        <Table size="small">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell><strong>Empresa</strong></TableCell>
+                                                    <TableCell><strong>Vacantes</strong></TableCell>
+                                                    <TableCell><strong>Postulaciones</strong></TableCell>
                                                 </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
+                                            </TableHead>
+                                            <TableBody>
+                                                {topEmpresas.map((e) => (
+                                                    <TableRow key={e.company_name}>
+                                                        <TableCell>{e.company_name}</TableCell>
+                                                        <TableCell>{e.total_vacantes}</TableCell>
+                                                        <TableCell>{e.total_postulaciones}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </Box>
                                 )}
 
                             </Paper>

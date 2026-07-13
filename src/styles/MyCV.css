@@ -309,3 +309,19 @@
         grid-template-columns: 1fr 1fr;
     }
 }
+
+@media (max-width: 480px) {
+
+    .cv-wrap {
+        padding: 96px 12px 40px;
+    }
+
+    .cv-page {
+        padding: 24px 20px;
+    }
+
+    .cv-header h1 {
+        font-size: 22px;
+    }
+
+}

@@ -236,3 +236,40 @@
     background: var(--cgt-teal-soft);
     border-color: var(--cgt-teal);
 }
+
+/* --- Móvil --- */
+
+@media (max-width: 640px) {
+
+    .jobs-table {
+        padding: 16px;
+    }
+
+    .jobs-header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .jobs-header h2 {
+        font-size: 18px;
+    }
+
+    .job-row {
+        padding: 14px;
+    }
+
+    .job-main {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .job-data {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px 10px;
+    }
+
+    .job-data button {
+        grid-column: 1 / -1;
+    }
+
+}

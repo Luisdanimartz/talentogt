@@ -31,7 +31,10 @@ import {
     ROLE_LABELS,
 } from "../../services/teamService";
 
-import { updateCompanyLogo } from "../../services/companyService";
+import {
+    updateCompanyLogo,
+    updateCompanyName,
+} from "../../services/companyService";
 import { subirLogoEmpresa } from "../../services/storageService";
 
 import { useAuth } from "../../context/AuthContext";
@@ -66,6 +69,9 @@ function Settings() {
 
     const [subiendoLogo, setSubiendoLogo] = useState(false);
 
+    const [nombreEditado, setNombreEditado] = useState("");
+    const [guardandoNombre, setGuardandoNombre] = useState(false);
+
     useEffect(() => {
 
         loadData();
@@ -85,6 +91,7 @@ function Settings() {
 
         setCompany(companyData);
         setMyRole(role);
+        setNombreEditado(companyData.company_name || "");
 
         const { data } = await getTeamMembers(companyData.id);
 
@@ -176,6 +183,41 @@ function Settings() {
 
     }
 
+    async function handleSaveName() {
+
+        const nombre = nombreEditado.trim();
+
+        if (!nombre) {
+            setMessage({
+                type: "error",
+                text: "El nombre de la empresa no puede quedar vacío.",
+            });
+            return;
+        }
+
+        if (nombre === company.company_name) return;
+
+        setGuardandoNombre(true);
+        setMessage(null);
+
+        const { data, error } = await updateCompanyName(company.id, nombre);
+
+        setGuardandoNombre(false);
+
+        if (error) {
+            setMessage({ type: "error", text: error.message });
+            return;
+        }
+
+        setCompany(data);
+
+        setMessage({
+            type: "success",
+            text: "Nombre de la empresa actualizado.",
+        });
+
+    }
+
     async function handleLogoChange(e) {
 
         const file = e.target.files?.[0];
@@ -255,6 +297,99 @@ function Settings() {
                                     {message.text}
                                 </Alert>
                             )}
+
+                            {/* ===== Nombre de la empresa ===== */}
+
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    p: 3,
+                                    mb: 3,
+                                    borderRadius: 3,
+                                    border: "1px solid #E6E8EC",
+                                }}
+                            >
+
+                                <Typography fontWeight="bold" mb={0.5}>
+                                    Nombre de tu empresa
+                                </Typography>
+
+                                <Typography
+                                    fontSize={13}
+                                    color="text.secondary"
+                                    mb={2}
+                                >
+                                    Es el nombre que ven los candidatos en
+                                    tus vacantes publicadas.
+                                </Typography>
+
+                                {soyDueno ? (
+
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            gap: 2,
+                                            flexWrap: "wrap",
+                                            alignItems: "center",
+                                        }}
+                                    >
+
+                                        <TextField
+                                            value={nombreEditado}
+                                            onChange={(e) =>
+                                                setNombreEditado(
+                                                    e.target.value
+                                                )
+                                            }
+                                            size="small"
+                                            sx={{ flex: 1, minWidth: 220 }}
+                                        />
+
+                                        <Button
+                                            variant="contained"
+                                            onClick={handleSaveName}
+                                            disabled={
+                                                guardandoNombre ||
+                                                !nombreEditado.trim() ||
+                                                nombreEditado.trim() ===
+                                                    company?.company_name
+                                            }
+                                            sx={{
+                                                background: "#0E8F73",
+                                                textTransform: "none",
+                                                fontWeight: 700,
+                                                height: 40,
+                                                "&:hover": {
+                                                    background: "#0C7A62",
+                                                },
+                                            }}
+                                        >
+
+                                            {guardandoNombre
+                                                ? "Guardando…"
+                                                : "Guardar"}
+
+                                        </Button>
+
+                                    </Box>
+
+                                ) : (
+
+                                    <Typography
+                                        fontSize={13}
+                                        color="text.secondary"
+                                    >
+                                        Solo el dueño de la cuenta puede
+                                        cambiar el nombre de la empresa.
+                                        Nombre actual:{" "}
+                                        <strong>
+                                            {company?.company_name}
+                                        </strong>
+                                    </Typography>
+
+                                )}
+
+                            </Paper>
 
                             {/* ===== Logo ===== */}
 
