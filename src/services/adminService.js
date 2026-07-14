@@ -150,6 +150,15 @@ export async function getCompanyPricingHistory(companyId) {
   });
 }
 
+/* Agrega (o resta, con numero negativo) creditos de desbloqueo
+   de busqueda de candidatos a una empresa. Devuelve el nuevo total. */
+export async function addUnlockCredits(companyId, amount) {
+  return await supabase.rpc("admin_add_unlock_credits", {
+    p_company_id: companyId,
+    p_amount: amount,
+  });
+}
+
 /* ===== Acciones sobre empresas ===== */
 
 export async function setCompanyStatus(companyId, status) {

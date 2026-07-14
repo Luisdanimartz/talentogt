@@ -28,6 +28,7 @@ const CANDIDATE_COLUMNS = `
   linkedin,
   availability,
   expected_salary,
+  visible_en_busqueda,
   created_at,
   updated_at,
   candidate_education ( id, level, institution, graduation_year ),
@@ -91,6 +92,7 @@ export async function saveCandidateProfile(form, educationList = [], experienceL
     linkedin: form.linkedin || null,
     availability: form.availability || null,
     expected_salary: form.expected_salary || null,
+    visible_en_busqueda: !!form.visible_en_busqueda,
 
     /*
       Columnas "resumen" (compatibilidad con el motor de

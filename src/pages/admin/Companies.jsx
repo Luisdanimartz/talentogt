@@ -33,6 +33,7 @@ import {
     savePricingPlan,
     assignPlanToCompany,
     grantFreePosts,
+    addUnlockCredits,
     getCompanyPricingHistory,
 } from "../../services/adminService";
 
@@ -70,6 +71,7 @@ function Companies() {
 
     const [gratisCantidad, setGratisCantidad] = useState(1);
     const [gratisNota, setGratisNota] = useState("");
+    const [creditosCantidad, setCreditosCantidad] = useState(5);
 
     useEffect(() => {
 
@@ -225,6 +227,31 @@ function Companies() {
 
         const { data } = await getCompanyPricingHistory(seleccionada.id);
         setHistorial(data || []);
+
+    }
+
+    async function darCreditosBusqueda() {
+
+        if (!seleccionada || !creditosCantidad) return;
+
+        const { data, error } = await addUnlockCredits(
+            seleccionada.id,
+            Number(creditosCantidad)
+        );
+
+        if (error) { setError(error.message); return; }
+
+        setSeleccionada((prev) =>
+            prev ? { ...prev, unlock_credits: data } : prev
+        );
+
+        setCompanies((prev) =>
+            prev.map((c) =>
+                c.id === seleccionada.id
+                    ? { ...c, unlock_credits: data }
+                    : c
+            )
+        );
 
     }
 
@@ -511,6 +538,32 @@ function Companies() {
                                             onChange={(e) => setGratisNota(e.target.value)}
                                             sx={{ width: "100%", mb: 2 }}
                                         />
+
+                                        <Typography fontSize={13} color="text.secondary" mb={1}>
+                                            Créditos de búsqueda de candidatos
+                                            (tiene {seleccionada.unlock_credits ?? 0}):
+                                        </Typography>
+
+                                        <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+
+                                            <TextField
+                                                size="small"
+                                                type="number"
+                                                value={creditosCantidad}
+                                                onChange={(e) => setCreditosCantidad(e.target.value)}
+                                                sx={{ width: 90 }}
+                                            />
+
+                                            <Button
+                                                size="small"
+                                                variant="contained"
+                                                onClick={darCreditosBusqueda}
+                                                sx={{ textTransform: "none", background: "#C98A2C" }}
+                                            >
+                                                Agregar créditos
+                                            </Button>
+
+                                        </Box>
 
                                         <Typography fontSize={13} fontWeight={600} color="#0B1F3A" mb={1}>
                                             Historial

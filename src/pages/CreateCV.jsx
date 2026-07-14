@@ -15,6 +15,8 @@ import {
   Alert,
   Chip,
   InputAdornment,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 
 import {
@@ -78,6 +80,7 @@ const initialForm = {
   linkedin: "",
   availability: "",
   expected_salary: "",
+  visible_en_busqueda: false,
 };
 
 const MESES = [
@@ -707,6 +710,37 @@ function CreateCV() {
           </Grid>
 
         </Grid>
+
+        <Divider sx={{ my: 5 }} />
+
+        <Typography variant="h6" fontWeight="bold" mb={1}>
+          Privacidad
+        </Typography>
+
+        <Typography color="text.secondary" mb={2}>
+          Además de las vacantes a las que aplicas, las empresas
+          pueden buscar candidatos directamente. Si activas esto,
+          tu perfil aparece en esas búsquedas (sin tu nombre ni
+          contacto) y solo si una empresa decide desbloquearlo,
+          ve tus datos completos.
+        </Typography>
+
+        <FormControlLabel
+          control={
+            <Switch
+              checked={!!form.visible_en_busqueda}
+              onChange={(e) =>
+                handleChange({
+                  target: {
+                    name: "visible_en_busqueda",
+                    value: e.target.checked,
+                  },
+                })
+              }
+            />
+          }
+          label="Aparecer en búsquedas de reclutadores"
+        />
 
         <Divider sx={{ my: 5 }} />
 

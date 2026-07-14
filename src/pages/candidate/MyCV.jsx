@@ -44,6 +44,7 @@ function MyCV() {
 
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [plantilla, setPlantilla] = useState("clasico");
 
     useEffect(() => {
 
@@ -158,6 +159,26 @@ function MyCV() {
                     ← Volver a mi panel
                 </button>
 
+                <div className="cv-template-switch">
+
+                    <button
+                        type="button"
+                        className={plantilla === "clasico" ? "active" : ""}
+                        onClick={() => setPlantilla("clasico")}
+                    >
+                        Clásico
+                    </button>
+
+                    <button
+                        type="button"
+                        className={plantilla === "impacto" ? "active" : ""}
+                        onClick={() => setPlantilla("impacto")}
+                    >
+                        Impacto
+                    </button>
+
+                </div>
+
                 <div>
 
                     <button
@@ -179,11 +200,23 @@ function MyCV() {
             </div>
 
             <p className="cv-hint">
-                Al presionar "Descargar PDF", elige la impresora
-                <strong> "Guardar como PDF"</strong>. Formato amigable
-                con ATS: úsalo para otras plazas o llévalo a tu
-                entrevista.
+                {plantilla === "clasico" ? (
+                    <>
+                        Al presionar "Descargar PDF", elige la impresora
+                        <strong> "Guardar como PDF"</strong>. Formato amigable
+                        con ATS: úsalo para otras plazas o llévalo a tu
+                        entrevista.
+                    </>
+                ) : (
+                    <>
+                        Pensado para que un reclutador decida en segundos,
+                        sin perder el formato de texto real que leen los
+                        sistemas de reclutamiento (ATS).
+                    </>
+                )}
             </p>
+
+            {plantilla === "clasico" ? (
 
             <article className="cv-page">
 
@@ -344,6 +377,171 @@ function MyCV() {
                 </footer>
 
             </article>
+
+            ) : (
+
+            <article className="cv-page cv-impact">
+
+                <header className="cv-impact-header">
+
+                    <div className="cv-impact-avatar">
+                        {(nombre || "?").trim().charAt(0).toUpperCase()}
+                    </div>
+
+                    <div className="cv-impact-headtext">
+
+                        <h1>{nombre}</h1>
+
+                        {profile.profession && (
+                            <p className="cv-impact-profession">
+                                {profile.profession}
+                            </p>
+                        )}
+
+                        <p className="cv-impact-contact">
+                            {[...contacto, direccion ? `🏠 ${direccion}` : null]
+                                .filter(Boolean)
+                                .join("   ")}
+                        </p>
+
+                        {(profile.linkedin || profile.availability) && (
+                            <p className="cv-impact-contact">
+                                {[profile.linkedin, profile.availability]
+                                    .filter(Boolean)
+                                    .join("   ")}
+                            </p>
+                        )}
+
+                    </div>
+
+                </header>
+
+                {stats.length > 1 && (
+
+                    <div className="cv-impact-stats">
+
+                        {stats.map((stat, i) => (
+                            <div key={i} className="cv-impact-stat">
+                                <strong>{stat.valor}</strong>
+                                <span>{stat.texto}</span>
+                            </div>
+                        ))}
+
+                    </div>
+
+                )}
+
+                {habilidades.length > 0 && (
+
+                    <div className="cv-impact-tags">
+                        {habilidades.map((skill) => (
+                            <span key={skill}>{skill}</span>
+                        ))}
+                    </div>
+
+                )}
+
+                {profile.summary && (
+
+                    <section className="cv-impact-section">
+
+                        <h2>Perfil profesional</h2>
+
+                        <p className="cv-summary">{profile.summary}</p>
+
+                    </section>
+
+                )}
+
+                {experiencia.length > 0 && (
+
+                    <section className="cv-impact-section">
+
+                        <h2>Experiencia profesional</h2>
+
+                        <div className="cv-impact-timeline">
+
+                            {experiencia.map((exp, i) => (
+
+                                <div key={i} className="cv-impact-timeline-item">
+
+                                    <strong>
+                                        {[exp.job_title, exp.company]
+                                            .filter(Boolean)
+                                            .join(" — ")}
+                                    </strong>
+
+                                    <span>
+                                        {[exp.period, duracionHumana(exp.years)]
+                                            .filter(Boolean)
+                                            .join(" · ")}
+                                    </span>
+
+                                    {exp.description && (
+                                        <ul className="cv-bullets">
+                                            {exp.description
+                                                .split("\n")
+                                                .map((linea) => sinVineta(linea))
+                                                .filter(Boolean)
+                                                .map((logro, j) => (
+                                                    <li key={j}>{logro}</li>
+                                                ))}
+                                        </ul>
+                                    )}
+
+                                    {exp.reference_phone && (
+                                        <p className="cv-reference">
+                                            Referencia laboral: {exp.reference_phone}
+                                        </p>
+                                    )}
+
+                                </div>
+
+                            ))}
+
+                        </div>
+
+                    </section>
+
+                )}
+
+                {formacion.length > 0 && (
+
+                    <section className="cv-impact-section">
+
+                        <h2>Formación académica</h2>
+
+                        <div className="cv-impact-timeline">
+
+                            {formacion.map((edu, i) => (
+
+                                <div key={i} className="cv-impact-timeline-item">
+
+                                    <strong>{edu.level}</strong>
+
+                                    <span>
+                                        {[edu.institution, edu.graduation_year]
+                                            .filter(Boolean)
+                                            .join(" · ")}
+                                    </span>
+
+                                </div>
+
+                            ))}
+
+                        </div>
+
+                    </section>
+
+                )}
+
+                <footer className="cv-footer">
+                    CV generado con ChanceGT — chancegt.com
+                </footer>
+
+            </article>
+
+            )}
 
         </div>
 

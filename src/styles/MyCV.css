@@ -190,6 +190,196 @@
     font-style: italic;
 }
 
+/* --- Selector de plantilla (Clasico / Impacto) --- */
+
+.cv-template-switch {
+    display: flex;
+    border: 1px solid #D5D9E0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.cv-template-switch button {
+    border: none;
+    background: #FFFFFF;
+    color: #4A5568;
+    padding: 9px 18px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cv-template-switch button.active {
+    background: #0E8F73;
+    color: #FFFFFF;
+}
+
+/* =========================================================
+   Plantilla "Impacto"
+   Misma informacion, mismo orden de lectura (una columna,
+   texto real, sin imagenes) para no romper ningun ATS —
+   solo con mas peso visual para que un reclutador decida
+   rapido.
+========================================================= */
+
+.cv-impact {
+    padding: 0;
+    overflow: hidden;
+}
+
+.cv-impact-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: #0B1F3A;
+    color: #FFFFFF;
+    padding: 36px 44px;
+}
+
+.cv-impact-avatar {
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #0E8F73;
+    color: #FFFFFF;
+    font-size: 26px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cv-impact-headtext h1 {
+    margin: 0 0 4px;
+    font-size: 26px;
+    font-weight: 800;
+    color: #FFFFFF;
+}
+
+.cv-impact-profession {
+    margin: 0 0 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #6FE3C4;
+}
+
+.cv-impact-contact {
+    margin: 0;
+    font-size: 12.5px;
+    color: #CBD5E1;
+}
+
+.cv-impact-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 1px;
+    background: #E6E8EC;
+}
+
+.cv-impact-stat {
+    background: #F7F9FC;
+    padding: 16px 12px;
+    text-align: center;
+}
+
+.cv-impact-stat strong {
+    display: block;
+    font-size: 20px;
+    font-weight: 800;
+    color: #0B1F3A;
+}
+
+.cv-impact-stat span {
+    font-size: 11px;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.cv-impact-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 20px 44px 0;
+}
+
+.cv-impact-tags span {
+    background: #E4F5F0;
+    color: #0E8F73;
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.cv-impact-section {
+    padding: 22px 44px 0;
+}
+
+.cv-impact-section:last-of-type {
+    padding-bottom: 22px;
+}
+
+.cv-impact-section h2 {
+    font-size: 13px;
+    font-weight: 800;
+    color: #0B1F3A;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #C98A2C;
+    display: inline-block;
+}
+
+.cv-impact-timeline-item {
+    position: relative;
+    padding-left: 18px;
+    border-left: 2px solid #E4F5F0;
+    margin-bottom: 18px;
+}
+
+.cv-impact-timeline-item::before {
+    content: "";
+    position: absolute;
+    left: -5px;
+    top: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #0E8F73;
+}
+
+.cv-impact-timeline-item strong {
+    display: block;
+    font-size: 14px;
+    color: #0B1F3A;
+}
+
+.cv-impact-timeline-item span {
+    display: block;
+    font-size: 12px;
+    color: #64748B;
+    margin-bottom: 6px;
+}
+
+@media (max-width: 480px) {
+
+    .cv-impact-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 28px 20px;
+    }
+
+    .cv-impact-tags,
+    .cv-impact-section {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+}
+
 .cv-footer {
     margin-top: 26px;
     padding-top: 10px;
@@ -219,7 +409,16 @@
         box-shadow: none;
         border-radius: 0;
         max-width: none;
+    }
+
+    .cv-page:not(.cv-impact) {
         padding: 10mm 14mm;
+    }
+
+    .cv-impact,
+    .cv-impact * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     @page {

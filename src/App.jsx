@@ -16,6 +16,7 @@ import EditJob from "./pages/company/EditJob";
 import RecruiterDashboard from "./pages/recruiter/RecruiterDashboard";
 import Applicants from "./pages/company/Applicants";
 import CandidateCV from "./pages/company/CandidateCV";
+import SearchCandidates from "./pages/company/SearchCandidates";
 import Interviews from "./pages/company/Interviews";
 import Reports from "./pages/company/Reports";
 import Settings from "./pages/company/Settings";
@@ -140,6 +141,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["empresa"]}>
               <CandidateCV />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/empresa/buscar-candidatos"
+          element={
+            <ProtectedRoute allowedRoles={["empresa"]}>
+              <SearchCandidates />
             </ProtectedRoute>
           }
         />
