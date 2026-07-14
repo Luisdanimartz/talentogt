@@ -1,23 +1,23 @@
 const footerLinks = {
   candidates: [
-    { name: "Buscar empleo", href: "#" },
-    { name: "Crear perfil", href: "#" },
-    { name: "Crear CV", href: "#" },
-    { name: "Mis postulaciones", href: "#" }
+    { name: "Buscar empleo", href: "/vacantes" },
+    { name: "Crear perfil", href: "/register?tipo=candidato" },
+    { name: "Crear CV", href: "/candidato/crear-cv" },
+    { name: "Mis postulaciones", href: "/candidato/dashboard" }
   ],
 
   companies: [
-    { name: "Publicar vacante", href: "#" },
-    { name: "Buscar talento", href: "#" },
-    { name: "Planes", href: "#" },
-    { name: "Panel empresarial", href: "#" }
+    { name: "Publicar vacante", href: "/register?tipo=empresa" },
+    { name: "Buscar talento", href: "/empresa/buscar-candidatos" },
+    { name: "Planes", href: "/planes" },
+    { name: "Panel empresarial", href: "/empresa/dashboard" }
   ],
 
   legal: [
-    { name: "Política de privacidad", href: "#" },
-    { name: "Términos y condiciones", href: "#" },
-    { name: "Cookies", href: "#" },
-    { name: "Contacto", href: "#" }
+    { name: "Política de privacidad", href: "/privacidad" },
+    { name: "Términos y condiciones", href: "/terminos" },
+    { name: "Cookies", href: "/cookies" },
+    { name: "Contacto", href: "/contacto" }
   ]
 };
 

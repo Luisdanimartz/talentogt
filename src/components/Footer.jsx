@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "../styles/Footer.css";
 import footerLinks from "../data/footerLinks";
 
@@ -30,9 +31,9 @@ function Footer() {
           <h3>Candidatos</h3>
 
           {footerLinks.candidates.map((item) => (
-            <a key={item.name} href={item.href}>
+            <Link key={item.name} to={item.href}>
               {item.name}
-            </a>
+            </Link>
           ))}
 
         </div>
@@ -44,9 +45,9 @@ function Footer() {
           <h3>Empresas</h3>
 
           {footerLinks.companies.map((item) => (
-            <a key={item.name} href={item.href}>
+            <Link key={item.name} to={item.href}>
               {item.name}
-            </a>
+            </Link>
           ))}
 
         </div>
@@ -58,9 +59,9 @@ function Footer() {
           <h3>Legal</h3>
 
           {footerLinks.legal.map((item) => (
-            <a key={item.name} href={item.href}>
+            <Link key={item.name} to={item.href}>
               {item.name}
-            </a>
+            </Link>
           ))}
 
         </div>

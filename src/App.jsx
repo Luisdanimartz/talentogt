@@ -8,6 +8,11 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import CookiePolicy from "./pages/CookiePolicy";
+import Pricing from "./pages/Pricing";
+import Contact from "./pages/Contact";
 
 import CreateProfile from "./pages/company/CreateProfile";
 import CreateJob from "./pages/company/CreateJob";
@@ -76,6 +81,31 @@ function App() {
         <Route
           path="/vacantes/:id"
           element={<JobDetail />}
+        />
+
+        <Route
+          path="/privacidad"
+          element={<PrivacyPolicy />}
+        />
+
+        <Route
+          path="/terminos"
+          element={<TermsOfService />}
+        />
+
+        <Route
+          path="/cookies"
+          element={<CookiePolicy />}
+        />
+
+        <Route
+          path="/planes"
+          element={<Pricing />}
+        />
+
+        <Route
+          path="/contacto"
+          element={<Contact />}
         />
 
         {/* CANDIDATO */}
