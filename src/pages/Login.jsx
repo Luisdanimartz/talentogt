@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { handlePostLoginRedirect } from "../flows/handlePostLoginRedirect";
 import { loginUser } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 
 import {
   Box,
@@ -18,8 +19,23 @@ function Login() {
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { user, loading: authLoading } = useAuth();
 
   const tipo = searchParams.get("tipo");
+
+  /* Ya tiene sesión iniciada: no mostrar el formulario de
+     login otra vez, mandarlo directo a su panel. */
+  useEffect(() => {
+
+    if (!authLoading && user) {
+      handlePostLoginRedirect(user, navigate).catch(() => {});
+    }
+
+  }, [authLoading, user, navigate]);
+
+  if (authLoading || user) {
+    return null;
+  }
 
   const TEXTOS =
     tipo === "empresa"
