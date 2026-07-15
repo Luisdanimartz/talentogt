@@ -52,6 +52,9 @@ function CompanyResponseBadge({ companyId, companyName }) {
     const responded = Number(stats.responded) || 0;
     const porcentaje = Math.round((responded / total) * 100);
     const estrellas = Math.max(1, Math.round((responded / total) * 5));
+    const diasPromedio = stats.avg_response_days !== null && stats.avg_response_days !== undefined
+        ? Number(stats.avg_response_days)
+        : null;
 
     return (
 
@@ -68,6 +71,9 @@ function CompanyResponseBadge({ companyId, companyName }) {
             <span className="response-text">
                 {companyName || "Esta empresa"} responde al{" "}
                 {porcentaje}% de sus candidatos
+                {diasPromedio !== null && (
+                    <>, en promedio en {diasPromedio === 1 ? "1 día" : `${diasPromedio} días`}</>
+                )}
             </span>
 
         </div>

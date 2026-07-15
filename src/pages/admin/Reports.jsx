@@ -21,6 +21,7 @@ import {
     getAdminHiringFunnel,
     getAdminTopCompanies,
     getAdminCandidatesByDepartment,
+    getAdminPendingResponses,
 } from "../../services/adminService";
 
 /*
@@ -47,6 +48,7 @@ function Reports() {
     const [funnel, setFunnel] = useState(null);
     const [topEmpresas, setTopEmpresas] = useState([]);
     const [porDepartamento, setPorDepartamento] = useState([]);
+    const [pendientes, setPendientes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -56,10 +58,11 @@ function Reports() {
             getAdminHiringFunnel(),
             getAdminTopCompanies(10),
             getAdminCandidatesByDepartment(),
-        ]).then(([funnelRes, topRes, deptoRes]) => {
+            getAdminPendingResponses(),
+        ]).then(([funnelRes, topRes, deptoRes, pendientesRes]) => {
 
             const primerError =
-                funnelRes.error || topRes.error || deptoRes.error;
+                funnelRes.error || topRes.error || deptoRes.error || pendientesRes.error;
 
             if (primerError) {
                 setError(primerError.message);
@@ -68,6 +71,7 @@ function Reports() {
             setFunnel(funnelRes.data || null);
             setTopEmpresas(topRes.data || []);
             setPorDepartamento(deptoRes.data || []);
+            setPendientes(pendientesRes.data || []);
 
             setLoading(false);
 
@@ -161,6 +165,73 @@ function Reports() {
 
                                         })}
 
+                                    </Box>
+                                )}
+
+                            </Paper>
+
+                            {/* Candidatos sin respuesta - por empresa y vacante */}
+
+                            <Paper
+                                elevation={0}
+                                sx={{ p: 3, mb: 4, borderRadius: 3, border: "1px solid #E6E8EC" }}
+                            >
+
+                                <Typography variant="h6" fontWeight="bold" color="#0B1F3A" mb={0.5}>
+                                    Candidatos sin respuesta, por empresa y vacante
+                                </Typography>
+
+                                <Typography color="text.secondary" fontSize={13.5} mb={2}>
+                                    Ordenado de peor a mejor: arriba las vacantes con más
+                                    candidatos pendientes de respuesta.
+                                </Typography>
+
+                                {pendientes.length === 0 ? (
+                                    <Typography color="text.secondary" fontSize={14}>
+                                        Todavía no hay vacantes con postulaciones registradas.
+                                    </Typography>
+                                ) : (
+                                    <Box sx={{ overflowX: "auto" }}>
+                                        <Table size="small">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell><strong>Empresa</strong></TableCell>
+                                                    <TableCell><strong>Vacante</strong></TableCell>
+                                                    <TableCell align="right"><strong>Postulados</strong></TableCell>
+                                                    <TableCell align="right"><strong>Sin responder</strong></TableCell>
+                                                    <TableCell align="right"><strong>% Respuesta</strong></TableCell>
+                                                    <TableCell align="right"><strong>Días (más antigua)</strong></TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {pendientes.map((p) => {
+
+                                                    const critico = p.pendientes > 0 && p.dias_pendiente_mas_antiguo >= 5;
+
+                                                    return (
+                                                        <TableRow key={p.job_id}>
+                                                            <TableCell>{p.company_name}</TableCell>
+                                                            <TableCell>{p.job_title}</TableCell>
+                                                            <TableCell align="right">{p.total_postulaciones}</TableCell>
+                                                            <TableCell
+                                                                align="right"
+                                                                sx={{ fontWeight: 600, color: critico ? "#C0392B" : "inherit" }}
+                                                            >
+                                                                {p.pendientes}
+                                                            </TableCell>
+                                                            <TableCell align="right">{p.pct_respuesta}%</TableCell>
+                                                            <TableCell
+                                                                align="right"
+                                                                sx={{ color: critico ? "#C0392B" : "inherit" }}
+                                                            >
+                                                                {p.pendientes > 0 ? p.dias_pendiente_mas_antiguo : "—"}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    );
+
+                                                })}
+                                            </TableBody>
+                                        </Table>
                                     </Box>
                                 )}
 
