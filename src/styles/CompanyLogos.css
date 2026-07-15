@@ -66,25 +66,17 @@
 
 .logos-track img{
 
-    height:46px;
+    height:84px;
 
     width:auto;
 
     object-fit:contain;
-
-    filter:grayscale(100%);
-
-    opacity:.70;
 
     transition:.30s;
 
 }
 
 .logos-track img:hover{
-
-    filter:none;
-
-    opacity:1;
 
     transform:scale(1.08);
 
@@ -126,7 +118,7 @@
 
 .logos-track img{
 
-    height:34px;
+    height:60px;
 
 }
 
