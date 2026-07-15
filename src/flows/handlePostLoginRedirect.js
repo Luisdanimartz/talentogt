@@ -2,7 +2,9 @@ import { companyProfileExists } from "../services/companyService";
 import { getMyCompanyContext } from "../services/teamService";
 
 export async function handlePostLoginRedirect(user, navigate) {
-  const role = user?.user_metadata?.role;
+  // app_metadata es la fuente segura del rol (no editable por el
+  // usuario). Ver database/031_seguridad_roles_app_metadata.sql.
+  const role = user?.app_metadata?.role;
 
   if (role === "admin") {
     navigate("/admin/dashboard");

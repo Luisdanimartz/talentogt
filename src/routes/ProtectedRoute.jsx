@@ -13,7 +13,9 @@ function ProtectedRoute({ children, allowedRoles }) {
     return <Navigate to="/login" replace />;
   }
 
-  const role = user?.user_metadata?.role;
+  // app_metadata es la fuente segura del rol (no editable por el
+  // usuario). Ver database/031_seguridad_roles_app_metadata.sql.
+  const role = user?.app_metadata?.role;
 
   if (allowedRoles && !allowedRoles.includes(role)) {
     // El usuario está logueado pero no tiene permiso para esta ruta.
