@@ -35,6 +35,8 @@ import {
     grantFreePosts,
     addUnlockCredits,
     getCompanyPricingHistory,
+    getCompanyUsage,
+    getUpcomingPlanExpirations,
 } from "../../services/adminService";
 
 const PLAN_VACIO = {
@@ -43,6 +45,7 @@ const PLAN_VACIO = {
     price: "",
     duration_days: 30,
     job_limit: "",
+    seat_limit: "",
     is_active: true,
 };
 
@@ -72,13 +75,26 @@ function Companies() {
     const [gratisCantidad, setGratisCantidad] = useState(1);
     const [gratisNota, setGratisNota] = useState("");
     const [creditosCantidad, setCreditosCantidad] = useState(5);
+    const [creditosMsg, setCreditosMsg] = useState(null);
+    const [dandoCreditos, setDandoCreditos] = useState(false);
+    const [uso, setUso] = useState(null);
+    const [vencimientos, setVencimientos] = useState([]);
 
     useEffect(() => {
 
         cargar();
         cargarPlanes();
+        cargarVencimientos();
 
     }, []);
+
+    async function cargarVencimientos() {
+
+        const { data } = await getUpcomingPlanExpirations(14);
+
+        setVencimientos(data || []);
+
+    }
 
     async function cargar() {
 
@@ -91,6 +107,20 @@ function Companies() {
 
         setCompanies(data || []);
         setLoading(false);
+
+    }
+
+    async function refrescarPlanVigente(companyId) {
+
+        const { data } = await getAdminCompanies();
+
+        setCompanies(data || []);
+
+        const actualizada = (data || []).find((c) => c.id === companyId);
+
+        if (actualizada) {
+            setSeleccionada(actualizada);
+        }
 
     }
 
@@ -109,12 +139,17 @@ function Companies() {
         setSeleccionada(company);
         setGratisCantidad(1);
         setGratisNota("");
+        setCreditosMsg(null);
 
         const { data, error } = await getCompanyPricingHistory(company.id);
 
         if (error) setError(error.message);
 
         setHistorial(data || []);
+
+        const { data: usoData } = await getCompanyUsage(company.id);
+
+        setUso(usoData);
 
     }
 
@@ -208,6 +243,11 @@ function Companies() {
         const { data } = await getCompanyPricingHistory(seleccionada.id);
         setHistorial(data || []);
 
+        const { data: usoData } = await getCompanyUsage(seleccionada.id);
+        setUso(usoData);
+
+        await refrescarPlanVigente(seleccionada.id);
+
     }
 
     async function darPublicacionesGratis() {
@@ -228,30 +268,67 @@ function Companies() {
         const { data } = await getCompanyPricingHistory(seleccionada.id);
         setHistorial(data || []);
 
+        const { data: usoData } = await getCompanyUsage(seleccionada.id);
+        setUso(usoData);
+
+        await refrescarPlanVigente(seleccionada.id);
+
     }
 
     async function darCreditosBusqueda() {
 
-        if (!seleccionada || !creditosCantidad) return;
+        if (!seleccionada) return;
 
-        const { data, error } = await addUnlockCredits(
-            seleccionada.id,
-            Number(creditosCantidad)
-        );
+        const cantidad = Number(creditosCantidad);
 
-        if (error) { setError(error.message); return; }
+        if (!cantidad || cantidad <= 0) {
+            setCreditosMsg("Ingresa una cantidad mayor a 0.");
+            return;
+        }
 
-        setSeleccionada((prev) =>
-            prev ? { ...prev, unlock_credits: data } : prev
-        );
+        setCreditosMsg(null);
+        setDandoCreditos(true);
 
-        setCompanies((prev) =>
-            prev.map((c) =>
-                c.id === seleccionada.id
-                    ? { ...c, unlock_credits: data }
-                    : c
-            )
-        );
+        try {
+
+            const { data, error } = await addUnlockCredits(
+                seleccionada.id,
+                cantidad
+            );
+
+            if (error) {
+                setCreditosMsg(error.message);
+                return;
+            }
+
+            setSeleccionada((prev) =>
+                prev ? { ...prev, unlock_credits: data } : prev
+            );
+
+            setCompanies((prev) =>
+                prev.map((c) =>
+                    c.id === seleccionada.id
+                        ? { ...c, unlock_credits: data }
+                        : c
+                )
+            );
+
+            const { data: historialNuevo } =
+                await getCompanyPricingHistory(seleccionada.id);
+
+            setHistorial(historialNuevo || []);
+
+            const { data: usoNuevo } = await getCompanyUsage(seleccionada.id);
+            setUso(usoNuevo);
+
+            setCreditosMsg(`Listo, ahora tiene ${data} créditos.`);
+
+        } catch (e) {
+            console.error("Error agregando créditos:", e);
+            setCreditosMsg("Ocurrió un error inesperado. Intenta de nuevo.");
+        } finally {
+            setDandoCreditos(false);
+        }
 
     }
 
@@ -294,6 +371,27 @@ function Companies() {
                         </Alert>
                     )}
 
+                    {vencimientos.length > 0 && (
+                        <Alert severity="warning" sx={{ mb: 3 }}>
+                            <strong>
+                                {vencimientos.length}{" "}
+                                {vencimientos.length === 1
+                                    ? "plan vence"
+                                    : "planes vencen"}{" "}
+                                en los próximos 14 días:
+                            </strong>{" "}
+                            {vencimientos.map((v, i) => (
+                                <span key={v.company_id}>
+                                    {i > 0 && ", "}
+                                    {v.company_name} ({v.plan_name},{" "}
+                                    {v.dias_restantes === 0
+                                        ? "vence hoy"
+                                        : `${v.dias_restantes}d`})
+                                </span>
+                            ))}
+                        </Alert>
+                    )}
+
                     <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start", flexWrap: "wrap" }}>
 
                         {/* ===== Columna izquierda: lista ===== */}
@@ -323,9 +421,10 @@ function Companies() {
                                             <TableRow>
                                                 <TableCell><strong>Empresa</strong></TableCell>
                                                 <TableCell><strong>Vacantes</strong></TableCell>
-                                                <TableCell><strong>Postulaciones</strong></TableCell>
+                                                <TableCell><strong>Postulac.</strong></TableCell>
                                                 <TableCell><strong>Estado</strong></TableCell>
-                                                <TableCell><strong>Plan</strong></TableCell>
+                                                <TableCell><strong>Tarifa</strong></TableCell>
+                                                <TableCell><strong>Vence</strong></TableCell>
                                                 <TableCell><strong>Colaboradora</strong></TableCell>
                                                 <TableCell align="center"><strong>Acciones</strong></TableCell>
                                             </TableRow>
@@ -345,6 +444,22 @@ function Companies() {
 
                                                     <TableCell>
                                                         <strong>{c.company_name}</strong>
+                                                        {c.plan === "vip" && (
+                                                            <span
+                                                                title="Destacada (VIP)"
+                                                                style={{
+                                                                    marginLeft: 6,
+                                                                    fontSize: 11,
+                                                                    fontWeight: 700,
+                                                                    color: "#8A6100",
+                                                                    background: "#FFF3D6",
+                                                                    padding: "1px 6px",
+                                                                    borderRadius: 999,
+                                                                }}
+                                                            >
+                                                                VIP
+                                                            </span>
+                                                        )}
                                                         <br />
                                                         <Typography fontSize={12} color="text.secondary">
                                                             {c.nit} · {c.email}
@@ -363,15 +478,29 @@ function Companies() {
                                                     </TableCell>
 
                                                     <TableCell>
-                                                        <Chip
-                                                            size="small"
-                                                            label={c.plan === "vip" ? "VIP" : "Gratis"}
-                                                            sx={
-                                                                c.plan === "vip"
-                                                                    ? { background: "#FFF3D6", color: "#8A6100" }
-                                                                    : undefined
-                                                            }
-                                                        />
+                                                        <Typography fontSize={13}>
+                                                            {c.active_plan_name || "Sin plan asignado"}
+                                                        </Typography>
+                                                    </TableCell>
+
+                                                    <TableCell>
+                                                        {c.plan_expires_at ? (
+                                                            <Typography
+                                                                fontSize={12.5}
+                                                                fontWeight={600}
+                                                                color={c.dias_para_vencer <= 3 ? "#A32D2D" : "#854F0B"}
+                                                            >
+                                                                {fechaCorta(c.plan_expires_at)}
+                                                                <br />
+                                                                <span style={{ fontWeight: 400 }}>
+                                                                    {c.dias_para_vencer === 0
+                                                                        ? "vence hoy"
+                                                                        : `${c.dias_para_vencer}d restantes`}
+                                                                </span>
+                                                            </Typography>
+                                                        ) : (
+                                                            <Typography fontSize={12.5} color="text.secondary">—</Typography>
+                                                        )}
                                                     </TableCell>
 
                                                     <TableCell>
@@ -478,6 +607,17 @@ function Companies() {
 
                                         </Box>
 
+                                        <Chip
+                                            size="small"
+                                            label={`Plan actual: ${seleccionada.active_plan_name || "Sin plan asignado"}`}
+                                            sx={{
+                                                mb: 1.5,
+                                                background: "#E4F5F0",
+                                                color: "#0E8F73",
+                                                fontWeight: 600,
+                                            }}
+                                        />
+
                                         <Typography fontSize={13} color="text.secondary" mb={2}>
                                             Asignar tarifa:
                                         </Typography>
@@ -539,12 +679,89 @@ function Companies() {
                                             sx={{ width: "100%", mb: 2 }}
                                         />
 
+                                        {uso && (
+
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    gap: 2,
+                                                    flexWrap: "wrap",
+                                                    mb: 2,
+                                                    p: 1.2,
+                                                    background: "#FFFFFF",
+                                                    borderRadius: 2,
+                                                    border: "1px solid #E6E8EC",
+                                                }}
+                                            >
+
+                                                <Typography fontSize={12.5} color="text.secondary">
+                                                    Vacantes:{" "}
+                                                    <strong style={{ color: "#0B1F3A" }}>
+                                                        {uso.vacantes_activas}
+                                                    </strong>
+                                                    {" / "}
+                                                    {uso.job_limit === null
+                                                        ? "ilimitadas"
+                                                        : uso.job_limit}
+                                                    {uso.job_limit !== null && (
+                                                        <span style={{ color: "#0E8F73" }}>
+                                                            {" "}({uso.vacantes_disponibles} disponibles)
+                                                        </span>
+                                                    )}
+                                                </Typography>
+
+                                                <Typography fontSize={12.5} color="text.secondary">
+                                                    Publicaciones gratis acumuladas:{" "}
+                                                    <strong style={{ color: "#0B1F3A" }}>
+                                                        {uso.publicaciones_gratis_acumuladas}
+                                                    </strong>
+                                                </Typography>
+
+                                                <Typography fontSize={12.5} color="text.secondary">
+                                                    Créditos usados:{" "}
+                                                    <strong style={{ color: "#0B1F3A" }}>
+                                                        {uso.creditos_usados}
+                                                    </strong>
+                                                </Typography>
+
+                                            </Box>
+
+                                        )}
+
+                                        {uso && uso.plan_expires_at && (
+
+                                            <Box
+                                                sx={{
+                                                    mb: 2,
+                                                    p: 1.2,
+                                                    background: uso.dias_para_vencer <= 3
+                                                        ? "#FCEBEB"
+                                                        : "#FAEEDA",
+                                                    borderRadius: 2,
+                                                }}
+                                            >
+
+                                                <Typography
+                                                    fontSize={12.5}
+                                                    fontWeight={600}
+                                                    color={uso.dias_para_vencer <= 3 ? "#A32D2D" : "#854F0B"}
+                                                >
+                                                    {uso.dias_para_vencer === 0
+                                                        ? "Su plan vence hoy"
+                                                        : `Su plan vence en ${uso.dias_para_vencer} día${uso.dias_para_vencer === 1 ? "" : "s"}`}
+                                                    {" "}({fechaCorta(uso.plan_expires_at)})
+                                                </Typography>
+
+                                            </Box>
+
+                                        )}
+
                                         <Typography fontSize={13} color="text.secondary" mb={1}>
                                             Créditos de búsqueda de candidatos
                                             (tiene {seleccionada.unlock_credits ?? 0}):
                                         </Typography>
 
-                                        <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+                                        <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
 
                                             <TextField
                                                 size="small"
@@ -558,12 +775,23 @@ function Companies() {
                                                 size="small"
                                                 variant="contained"
                                                 onClick={darCreditosBusqueda}
+                                                disabled={dandoCreditos}
                                                 sx={{ textTransform: "none", background: "#C98A2C" }}
                                             >
-                                                Agregar créditos
+                                                {dandoCreditos ? "Agregando…" : "Agregar créditos"}
                                             </Button>
 
                                         </Box>
+
+                                        {creditosMsg && (
+                                            <Typography
+                                                fontSize={12.5}
+                                                color={creditosMsg.startsWith("Listo") ? "#0E8F73" : "error"}
+                                                mb={2}
+                                            >
+                                                {creditosMsg}
+                                            </Typography>
+                                        )}
 
                                         <Typography fontSize={13} fontWeight={600} color="#0B1F3A" mb={1}>
                                             Historial
@@ -577,13 +805,16 @@ function Companies() {
                                             historial.map((h) => (
                                                 <Box key={h.id} sx={{ fontSize: 12.5, mb: 1, pb: 1, borderBottom: "1px solid #F0F2F6" }}>
                                                     <strong>
-                                                        {h.plan_name || `${h.free_posts_granted} publicación(es) gratis`}
+                                                        {h.plan_name
+                                                            || (h.free_posts_granted
+                                                                ? `${h.free_posts_granted} publicación(es) gratis`
+                                                                : h.notes || "Movimiento")}
                                                     </strong>
                                                     <br />
                                                     <span style={{ color: "#64748B" }}>
                                                         {fechaCorta(h.started_at)}
-                                                        {h.expires_at && ` → ${fechaCorta(h.expires_at)}`}
-                                                        {h.notes && ` · ${h.notes}`}
+                                                        {h.expires_at && (h.plan_name || h.free_posts_granted > 0) && ` → ${fechaCorta(h.expires_at)}`}
+                                                        {h.notes && (h.plan_name || h.free_posts_granted) && ` · ${h.notes}`}
                                                     </span>
                                                 </Box>
                                             ))
@@ -661,6 +892,14 @@ function Companies() {
                                             onChange={(e) => setPlanForm({ ...planForm, job_limit: e.target.value })}
                                         />
 
+                                        <TextField
+                                            size="small"
+                                            label="Límite de usuarios de equipo (vacío = ilimitado)"
+                                            type="number"
+                                            value={planForm.seat_limit}
+                                            onChange={(e) => setPlanForm({ ...planForm, seat_limit: e.target.value })}
+                                        />
+
                                         <Box sx={{ display: "flex", gap: 1 }}>
                                             <Button
                                                 size="small"
@@ -703,6 +942,8 @@ function Companies() {
                                             <Typography fontSize={12} color="text.secondary">
                                                 Q{p.price} · {p.duration_days}d ·{" "}
                                                 {p.job_limit ? `${p.job_limit} publicaciones` : "ilimitado"}
+                                                {" · "}
+                                                {p.seat_limit ? `${p.seat_limit} usuarios` : "usuarios ilimitados"}
                                             </Typography>
                                         </Box>
 

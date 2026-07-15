@@ -6,6 +6,8 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -71,6 +73,16 @@ function App() {
         <Route
           path="/register"
           element={<Register />}
+        />
+
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
+
+        <Route
+          path="/reset-password"
+          element={<ResetPassword />}
         />
 
         <Route

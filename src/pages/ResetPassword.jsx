@@ -11,38 +11,48 @@ import {
   Alert,
 } from "@mui/material";
 
-import { sendPasswordReset } from "../services/authService";
+import { updatePassword } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 
-function ForgotPassword() {
+function ResetPassword() {
 
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
 
-  const [email, setEmail] = useState("");
-  const [enviando, setEnviando] = useState(false);
-  const [enviado, setEnviado] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmar, setConfirmar] = useState("");
+  const [guardando, setGuardando] = useState(false);
+  const [listo, setListo] = useState(false);
   const [error, setError] = useState(null);
 
   async function handleSubmit() {
 
     setError(null);
 
-    if (!email.trim()) {
-      setError("Ingresa tu correo electrónico.");
+    if (password.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres.");
       return;
     }
 
-    setEnviando(true);
-
-    const { error: sendError } = await sendPasswordReset(email.trim());
-
-    setEnviando(false);
-
-    if (sendError) {
-      setError(sendError.message);
+    if (password !== confirmar) {
+      setError("Las contraseñas no coinciden.");
       return;
     }
 
-    setEnviado(true);
+    setGuardando(true);
+
+    const { error: updateError } = await updatePassword(password);
+
+    setGuardando(false);
+
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+
+    setListo(true);
+
+    setTimeout(() => navigate("/login"), 2500);
 
   }
 
@@ -71,8 +81,6 @@ function ForgotPassword() {
 
         <Grid container>
 
-          {/* PANEL IZQUIERDO */}
-
           <Grid
             item
             xs={12}
@@ -94,46 +102,63 @@ function ForgotPassword() {
               </Typography>
 
               <Typography variant="h5" mb={2}>
-                Recupera tu acceso.
+                Ya casi terminas.
               </Typography>
 
               <Typography>
-                Ingresa el correo electrónico con el que creaste tu cuenta y
-                te enviaremos las instrucciones para restablecer tu contraseña.
+                Crea una contraseña nueva para tu cuenta.
               </Typography>
 
             </Box>
 
           </Grid>
 
-          {/* PANEL DERECHO */}
-
           <Grid item xs={12} md={7}>
 
             <Box sx={{ p: 6 }}>
 
-              {enviado ? (
+              {authLoading ? (
+
+                <Typography color="text.secondary">
+                  Verificando el enlace…
+                </Typography>
+
+              ) : !user ? (
 
                 <>
 
                   <Typography variant="h4" fontWeight="bold" mb={1}>
-                    Revisa tu correo
+                    Enlace vencido o inválido
                   </Typography>
 
                   <Typography color="text.secondary" mb={4}>
-                    Si <strong>{email}</strong> tiene una cuenta en
-                    ChanceGT, te llegará un enlace para crear una
-                    contraseña nueva. Revisa también tu carpeta de spam.
+                    Este enlace ya expiró o ya se usó. Solicita uno
+                    nuevo para restablecer tu contraseña.
                   </Typography>
 
                   <Button
                     fullWidth
                     variant="contained"
                     size="large"
-                    onClick={() => navigate("/login")}
+                    onClick={() => navigate("/forgot-password")}
                   >
-                    Volver a iniciar sesión
+                    Solicitar un enlace nuevo
                   </Button>
+
+                </>
+
+              ) : listo ? (
+
+                <>
+
+                  <Typography variant="h4" fontWeight="bold" mb={1}>
+                    ¡Listo! ✓
+                  </Typography>
+
+                  <Typography color="text.secondary">
+                    Tu contraseña se actualizó. Te llevamos a iniciar
+                    sesión en un momento…
+                  </Typography>
 
                 </>
 
@@ -142,12 +167,11 @@ function ForgotPassword() {
                 <>
 
                   <Typography variant="h4" fontWeight="bold" mb={1}>
-                    Recuperar contraseña
+                    Crea tu nueva contraseña
                   </Typography>
 
                   <Typography color="text.secondary" mb={4}>
-                    Introduce tu correo electrónico y te mandamos un
-                    enlace para crear una contraseña nueva.
+                    Debe tener al menos 6 caracteres.
                   </Typography>
 
                   {error && (
@@ -157,27 +181,34 @@ function ForgotPassword() {
                   )}
 
                   <TextField
-                    label="Correo electrónico"
+                    label="Contraseña nueva"
+                    type="password"
                     fullWidth
                     margin="normal"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    autoComplete="email"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="new-password"
+                  />
+
+                  <TextField
+                    label="Confirmar contraseña"
+                    type="password"
+                    fullWidth
+                    margin="normal"
+                    value={confirmar}
+                    onChange={(e) => setConfirmar(e.target.value)}
+                    autoComplete="new-password"
                   />
 
                   <Button
                     variant="contained"
                     fullWidth
                     size="large"
-                    sx={{ mt: 3, mb: 2 }}
+                    sx={{ mt: 3 }}
                     onClick={handleSubmit}
-                    disabled={enviando}
+                    disabled={guardando}
                   >
-                    {enviando ? "Enviando…" : "Enviar instrucciones"}
-                  </Button>
-
-                  <Button fullWidth onClick={() => navigate("/login")}>
-                    Volver al inicio de sesión
+                    {guardando ? "Guardando…" : "Guardar contraseña"}
                   </Button>
 
                 </>
@@ -198,4 +229,4 @@ function ForgotPassword() {
 
 }
 
-export default ForgotPassword;
+export default ResetPassword;

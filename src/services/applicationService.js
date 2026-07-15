@@ -107,3 +107,46 @@ export async function updateApplicationStatus(applicationId, status) {
   return result;
 
 }
+
+/*
+  Finaliza el proceso de una vacante: a todos los candidatos que
+  seguian en proceso (no contratados, no ya descartados) se les
+  marca "No seleccionado" — esto dispara automaticamente el
+  correo de aviso, reusando el mismo sistema de notificaciones
+  que ya existe (no hace falta nada nuevo ahi).
+*/
+export async function finalizeJobApplications(jobId) {
+
+  const { data: pendientes, error: fetchError } = await supabase
+    .from("applications")
+    .select("id")
+    .eq("job_id", jobId)
+    .not("current_status", "in", "(hired,rejected)");
+
+  if (fetchError) {
+    return { data: null, error: fetchError, notificados: 0 };
+  }
+
+  const lista = pendientes || [];
+
+  if (lista.length === 0) {
+    return { data: [], error: null, notificados: 0 };
+  }
+
+  const resultados = await Promise.all(
+    lista.map((app) => updateApplicationStatus(app.id, "rejected"))
+  );
+
+  const fallidos = resultados.filter((r) => r.error);
+
+  if (fallidos.length > 0) {
+    return {
+      data: resultados,
+      error: fallidos[0].error,
+      notificados: lista.length - fallidos.length,
+    };
+  }
+
+  return { data: resultados, error: null, notificados: lista.length };
+
+}

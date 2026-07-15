@@ -11,6 +11,8 @@ import {
   updateJob,
 } from "../../services/jobService";
 
+import { finalizeJobApplications } from "../../services/applicationService";
+
 import {
   getDepartments,
   getMunicipalitiesByDepartment,
@@ -32,6 +34,7 @@ function EditJob() {
   const [municipalities, setMunicipalities] = useState([]);
 
   const [loading, setLoading] = useState(false);
+  const [finalizing, setFinalizing] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
@@ -142,6 +145,48 @@ function EditJob() {
 
   }
 
+  async function handleFinalize() {
+
+    const seguro = window.confirm(
+      `¿Finalizar el proceso de "${form.title}"? La vacante se cerrará y ` +
+      `todos los candidatos que sigan en proceso (sin contratar) recibirán ` +
+      `automáticamente un correo avisando que no fueron seleccionados.`
+    );
+
+    if (!seguro) return;
+
+    setFinalizing(true);
+
+    const { error: closeError } = await updateJob(id, { status: "closed" });
+
+    if (closeError) {
+      setFinalizing(false);
+      alert(closeError.message);
+      return;
+    }
+
+    const { error: notifyError, notificados } =
+      await finalizeJobApplications(id);
+
+    setFinalizing(false);
+
+    if (notifyError) {
+      alert(
+        "La vacante se cerró, pero hubo un problema avisando a algunos " +
+        "candidatos: " + notifyError.message
+      );
+    } else {
+      alert(
+        notificados > 0
+          ? `Proceso finalizado. Se avisó a ${notificados} candidato${notificados === 1 ? "" : "s"} que no fue${notificados === 1 ? "" : "n"} seleccionado${notificados === 1 ? "" : "s"}.`
+          : "Proceso finalizado. No había candidatos pendientes por avisar."
+      );
+    }
+
+    navigate("/empresa/dashboard");
+
+  }
+
   if (notFound) {
     return <p style={{ textAlign: "center", marginTop: 40 }}>Vacante no encontrada.</p>;
   }
@@ -173,6 +218,10 @@ function EditJob() {
       onChange={handleChange}
 
       onSubmit={handleSubmit}
+
+      onFinalize={handleFinalize}
+
+      finalizing={finalizing}
 
     />
 

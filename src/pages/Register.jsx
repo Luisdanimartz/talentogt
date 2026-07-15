@@ -28,6 +28,17 @@ function Register() {
   const tipo = searchParams.get("tipo");
   const esEmpresa = tipo === "empresa";
 
+  const [form, setForm] = useState({
+    names: "",
+    lastname: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    accountType: esEmpresa ? "empresa" : tipo === "candidato" ? "candidato" : "",
+  });
+
+  const [errors, setErrors] = useState({});
+
   /* Ya tiene sesión iniciada: no mostrar el formulario de
      registro otra vez, mandarlo directo a su panel. */
   useEffect(() => {
@@ -63,17 +74,6 @@ function Register() {
             "Crea tu cuenta gratis, ya sea que busques empleo o busques " +
             "talento para tu empresa.",
         };
-
-  const [form, setForm] = useState({
-    names: "",
-    lastname: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    accountType: esEmpresa ? "empresa" : tipo === "candidato" ? "candidato" : "",
-  });
-
-  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     setForm({

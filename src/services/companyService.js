@@ -121,9 +121,18 @@ export async function updateCompanyName(profileId, companyName) {
 }
 
 /*
-  Busqueda ANONIMA de candidatos (sin nombre ni telefono).
-  Solo candidatos que activaron "visible en busquedas".
+  Trae el plan vigente de la empresa y cuanto de su cupo
+  (vacantes/usuarios) ya esta usando.
 */
+export async function getMyCompanyPlan(companyId) {
+  const { data, error } = await supabase.rpc("get_my_company_plan", {
+    p_company_id: companyId,
+  });
+
+  if (error) return { data: null, error };
+
+  return { data: data?.[0] || null, error: null };
+}
 export async function searchCandidates(companyId, filters = {}) {
   return await supabase.rpc("search_candidates", {
     p_company_id: companyId,

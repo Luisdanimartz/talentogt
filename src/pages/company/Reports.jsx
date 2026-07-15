@@ -13,7 +13,13 @@ import {
     Select,
     Typography,
 } from "@mui/material";
-import { Download as DownloadIcon } from "@mui/icons-material";
+import {
+    Download as DownloadIcon,
+    GroupsOutlined as GroupsIcon,
+    TrendingUpOutlined as TrendingUpIcon,
+    BoltOutlined as BoltIcon,
+    EventAvailableOutlined as EventAvailableIcon,
+} from "@mui/icons-material";
 
 import RecruiterSidebar from "../../components/recruiter/layout/RecruiterSidebar";
 
@@ -31,8 +37,8 @@ import { getHiringFunnel, getJobsReport } from "../../services/reportService";
 
 const ETAPAS = [
     { key: "total_postulaciones", label: "Postulados", color: "#94A3B8" },
-    { key: "en_revision", label: "En revisión", color: "#D9A441" },
-    { key: "en_entrevista", label: "Entrevista", color: "#1A4B9B" },
+    { key: "en_revision", label: "En revisión", color: "#C98A2C" },
+    { key: "en_entrevista", label: "Entrevista", color: "#0B1F3A" },
     { key: "contratados", label: "Contratados", color: "#0E8F73" },
 ];
 
@@ -95,7 +101,9 @@ function porcentaje(parte, total) {
 
 }
 
-function KpiCard({ titulo, valor, nota }) {
+/* ===== KPI con ícono y acento de color ===== */
+
+function KpiCard({ titulo, valor, nota, icon: Icon, accent }) {
 
     return (
 
@@ -107,27 +115,49 @@ function KpiCard({ titulo, valor, nota }) {
                 border: "1px solid #E6E8EC",
                 flex: "1 1 220px",
                 minWidth: 220,
+                display: "flex",
+                gap: 1.5,
+                alignItems: "flex-start",
             }}
         >
 
-            <Typography fontSize={13} color="text.secondary" fontWeight={600}>
-                {titulo}
-            </Typography>
-
-            <Typography
-                fontSize={28}
-                fontWeight={800}
-                color="#0B1F3A"
-                sx={{ mt: 0.5 }}
+            <Box
+                sx={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 2,
+                    background: `${accent}1A`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                }}
             >
-                {valor}
-            </Typography>
+                <Icon sx={{ fontSize: 20, color: accent }} />
+            </Box>
 
-            {nota && (
-                <Typography fontSize={12.5} color="text.secondary" sx={{ mt: 0.5 }}>
-                    {nota}
+            <Box sx={{ minWidth: 0 }}>
+
+                <Typography fontSize={13} color="text.secondary" fontWeight={600}>
+                    {titulo}
                 </Typography>
-            )}
+
+                <Typography
+                    fontSize={26}
+                    fontWeight={800}
+                    color="#0B1F3A"
+                    sx={{ mt: 0.2, lineHeight: 1.2 }}
+                >
+                    {valor}
+                </Typography>
+
+                {nota && (
+                    <Typography fontSize={12} color="text.secondary" sx={{ mt: 0.3 }}>
+                        {nota}
+                    </Typography>
+                )}
+
+            </Box>
 
         </Paper>
 
@@ -135,7 +165,9 @@ function KpiCard({ titulo, valor, nota }) {
 
 }
 
-function Embudo({ datos }) {
+/* ===== Embudo visual: barras que se van angostando ===== */
+
+function FunnelChart({ datos }) {
 
     const total = datos?.total_postulaciones || 0;
 
@@ -148,56 +180,166 @@ function Embudo({ datos }) {
         );
     }
 
+    const filas = ETAPAS.map((etapa) => ({
+        ...etapa,
+        valor: Number(datos?.[etapa.key] || 0),
+        pct: porcentaje(Number(datos?.[etapa.key] || 0), total),
+    }));
+
+    const anchoMin = 26; // % del ancho total para la etapa mas angosta
+
     return (
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Box>
 
-            {ETAPAS.map((etapa) => {
+            <Box sx={{ display: "flex", flexDirection: "column", gap: "2px" }}>
 
-                const valor = Number(datos?.[etapa.key] || 0);
-                const pct = porcentaje(valor, total);
+                {filas.map((fila, i) => {
+
+                    const anchoPct = Math.max(anchoMin, fila.pct);
+                    const caidaVsAnterior =
+                        i > 0 && filas[i - 1].valor > 0
+                            ? Math.round(
+                                  ((filas[i - 1].valor - fila.valor) / filas[i - 1].valor) * 100
+                              )
+                            : null;
+
+                    return (
+
+                        <Box key={fila.key}>
+
+                            {caidaVsAnterior !== null && caidaVsAnterior > 0 && (
+                                <Typography
+                                    align="center"
+                                    fontSize={11}
+                                    color="text.secondary"
+                                    sx={{ py: 0.3 }}
+                                >
+                                    ↓ {caidaVsAnterior}% no continuó
+                                </Typography>
+                            )}
+
+                            <Box
+                                sx={{
+                                    width: `${anchoPct}%`,
+                                    minWidth: 180,
+                                    mx: "auto",
+                                    background: fila.color,
+                                    borderRadius: 1.5,
+                                    py: 1.4,
+                                    px: 2,
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    transition: "width 0.4s ease",
+                                }}
+                            >
+
+                                <Typography fontSize={13.5} fontWeight={700} color="#fff">
+                                    {fila.label}
+                                </Typography>
+
+                                <Typography fontSize={13.5} fontWeight={700} color="#fff">
+                                    {fila.valor}
+                                    <span style={{ opacity: 0.75, fontWeight: 500 }}>
+                                        {" "}· {fila.pct}%
+                                    </span>
+                                </Typography>
+
+                            </Box>
+
+                        </Box>
+
+                    );
+
+                })}
+
+            </Box>
+
+            {Number(datos?.rechazados || 0) > 0 && (
+                <Typography fontSize={13} color="text.secondary" sx={{ mt: 2 }}>
+                    {datos.rechazados} postulación
+                    {datos.rechazados === 1 ? "" : "es"} marcada
+                    {datos.rechazados === 1 ? "" : "s"} como no seleccionada
+                    {datos.rechazados === 1 ? "" : "s"} en el camino.
+                </Typography>
+            )}
+
+        </Box>
+
+    );
+
+}
+
+/* ===== Barras horizontales comparando vacantes ===== */
+
+function VacancyBars({ vacantes }) {
+
+    const top = [...vacantes]
+        .sort((a, b) => (b.total_postulaciones || 0) - (a.total_postulaciones || 0))
+        .slice(0, 6);
+
+    const max = Math.max(1, ...top.map((v) => v.total_postulaciones || 0));
+
+    if (!top.length) return null;
+
+    return (
+
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1.6 }}>
+
+            {top.map((v) => {
+
+                const totalV = v.total_postulaciones || 0;
+                const segRevision = porcentaje(v.en_revision, totalV);
+                const segEntrevista = porcentaje(v.en_entrevista, totalV);
+                const segContratado = porcentaje(v.contratados, totalV);
+                const anchoBarra = totalV
+                    ? Math.max(6, (totalV / max) * 100)
+                    : 0;
 
                 return (
 
-                    <Box key={etapa.key}>
+                    <Box key={v.job_id}>
 
                         <Box
                             sx={{
                                 display: "flex",
                                 justifyContent: "space-between",
-                                mb: 0.5,
+                                mb: 0.4,
                             }}
                         >
-
-                            <Typography fontSize={14} fontWeight={600} color="#0B1F3A">
-                                {etapa.label}
+                            <Typography
+                                fontSize={13}
+                                fontWeight={600}
+                                color="#0B1F3A"
+                                sx={{
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                    maxWidth: 280,
+                                }}
+                            >
+                                {v.title}
                             </Typography>
 
-                            <Typography fontSize={14} color="text.secondary">
-                                {valor} · {pct}%
+                            <Typography fontSize={12.5} color="text.secondary">
+                                {totalV} postulados
                             </Typography>
-
                         </Box>
 
                         <Box
                             sx={{
-                                height: 12,
-                                borderRadius: 6,
-                                background: "#F0F2F6",
+                                width: `${anchoBarra}%`,
+                                height: 16,
+                                borderRadius: 1,
                                 overflow: "hidden",
+                                display: "flex",
+                                background: "#F0F2F6",
                             }}
                         >
-
-                            <Box
-                                sx={{
-                                    height: "100%",
-                                    width: `${pct}%`,
-                                    background: etapa.color,
-                                    borderRadius: 6,
-                                    transition: "width 0.4s ease",
-                                }}
-                            />
-
+                            <Box sx={{ width: `${segContratado}%`, background: "#0E8F73" }} />
+                            <Box sx={{ width: `${segEntrevista}%`, background: "#0B1F3A" }} />
+                            <Box sx={{ width: `${segRevision}%`, background: "#C98A2C" }} />
                         </Box>
 
                     </Box>
@@ -206,14 +348,22 @@ function Embudo({ datos }) {
 
             })}
 
-            {Number(datos?.rechazados || 0) > 0 && (
-                <Typography fontSize={13} color="text.secondary" sx={{ mt: 0.5 }}>
-                    {datos.rechazados} postulación
-                    {datos.rechazados === 1 ? "" : "es"} marcada
-                    {datos.rechazados === 1 ? "" : "s"} como no seleccionada
-                    {datos.rechazados === 1 ? "" : "s"} en el camino.
-                </Typography>
-            )}
+            <Box sx={{ display: "flex", gap: 2.5, mt: 0.5, flexWrap: "wrap" }}>
+
+                {[
+                    { color: "#0E8F73", label: "Contratados" },
+                    { color: "#0B1F3A", label: "Entrevista" },
+                    { color: "#C98A2C", label: "En revisión" },
+                ].map((leyenda) => (
+                    <Box key={leyenda.label} sx={{ display: "flex", alignItems: "center", gap: 0.7 }}>
+                        <Box sx={{ width: 9, height: 9, borderRadius: "2px", background: leyenda.color }} />
+                        <Typography fontSize={12} color="text.secondary">
+                            {leyenda.label}
+                        </Typography>
+                    </Box>
+                ))}
+
+            </Box>
 
         </Box>
 
@@ -546,24 +696,32 @@ function Reports() {
                                 <KpiCard
                                     titulo="Total de postulaciones"
                                     valor={totalPostulaciones}
+                                    icon={GroupsIcon}
+                                    accent="#0B1F3A"
                                 />
 
                                 <KpiCard
                                     titulo="Tasa de contratación"
                                     valor={`${tasaContratacion}%`}
                                     nota={`${contratados} de ${totalPostulaciones} postulaciones`}
+                                    icon={TrendingUpIcon}
+                                    accent="#0E8F73"
                                 />
 
                                 <KpiCard
                                     titulo="Primera respuesta"
                                     valor={horasBonito(funnel?.horas_respuesta_promedio)}
                                     nota="tiempo promedio en pasar del estado inicial"
+                                    icon={BoltIcon}
+                                    accent="#C98A2C"
                                 />
 
                                 <KpiCard
                                     titulo="Tiempo de contratación"
                                     valor={diasBonito(funnel?.dias_contratacion_promedio)}
                                     nota="desde que aplican hasta que se contratan"
+                                    icon={EventAvailableIcon}
+                                    accent="#1A4B9B"
                                 />
 
                             </Box>
@@ -589,11 +747,45 @@ function Reports() {
                                     Embudo de contratación
                                 </Typography>
 
-                                <Embudo datos={funnel} />
+                                <FunnelChart datos={funnel} />
 
                             </Paper>
 
-                            {/* Por vacante */}
+                            {/* Comparativa por vacante (visual) */}
+
+                            {jobs.length > 0 && (
+
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 3,
+                                        mb: 4,
+                                        borderRadius: 3,
+                                        border: "1px solid #E6E8EC",
+                                    }}
+                                >
+
+                                    <Typography
+                                        variant="h6"
+                                        fontWeight="bold"
+                                        color="#0B1F3A"
+                                        mb={0.5}
+                                    >
+                                        Vacantes con más movimiento
+                                    </Typography>
+
+                                    <Typography fontSize={13} color="text.secondary" mb={2.5}>
+                                        Las {Math.min(6, jobs.length)} vacantes con más
+                                        postulaciones, y en qué etapa está cada una.
+                                    </Typography>
+
+                                    <VacancyBars vacantes={jobs} />
+
+                                </Paper>
+
+                            )}
+
+                            {/* Tabla detallada por vacante */}
 
                             <Paper
                                 elevation={0}
@@ -610,7 +802,7 @@ function Reports() {
                                     color="#0B1F3A"
                                     mb={2}
                                 >
-                                    Por vacante
+                                    Detalle por vacante
                                 </Typography>
 
                                 <TablaVacantes vacantes={jobs} />

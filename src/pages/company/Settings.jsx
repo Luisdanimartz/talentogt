@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import "./../../styles/theme.css";
 import "./../../styles/recruiter/layout/RecruiterDashboard.css";
@@ -34,6 +35,7 @@ import {
 import {
     updateCompanyLogo,
     updateCompanyName,
+    getMyCompanyPlan,
 } from "../../services/companyService";
 import { subirLogoEmpresa } from "../../services/storageService";
 
@@ -55,6 +57,7 @@ const ROLE_HELP = {
 
 function Settings() {
 
+    const navigate = useNavigate();
     const { user } = useAuth();
 
     const [company, setCompany] = useState(null);
@@ -71,6 +74,8 @@ function Settings() {
 
     const [nombreEditado, setNombreEditado] = useState("");
     const [guardandoNombre, setGuardandoNombre] = useState(false);
+
+    const [plan, setPlan] = useState(null);
 
     useEffect(() => {
 
@@ -96,6 +101,10 @@ function Settings() {
         const { data } = await getTeamMembers(companyData.id);
 
         setMembers(data || []);
+
+        const { data: planData } = await getMyCompanyPlan(companyData.id);
+
+        setPlan(planData);
 
         setLoading(false);
 
@@ -296,6 +305,81 @@ function Settings() {
                                 >
                                     {message.text}
                                 </Alert>
+                            )}
+
+                            {/* ===== Tu plan ===== */}
+
+                            {plan && (
+
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 3,
+                                        mb: 3,
+                                        borderRadius: 3,
+                                        border: "1px solid #E6E8EC",
+                                    }}
+                                >
+
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "center",
+                                            flexWrap: "wrap",
+                                            gap: 1,
+                                            mb: 1.5,
+                                        }}
+                                    >
+
+                                        <Typography fontWeight="bold">
+                                            Tu plan: {plan.plan_name}
+                                        </Typography>
+
+                                        <Button
+                                            size="small"
+                                            onClick={() => navigate("/planes")}
+                                            sx={{ textTransform: "none" }}
+                                        >
+                                            Ver planes / ampliar
+                                        </Button>
+
+                                    </Box>
+
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            gap: 3,
+                                            flexWrap: "wrap",
+                                        }}
+                                    >
+
+                                        <Typography fontSize={13.5} color="text.secondary">
+                                            Vacantes:{" "}
+                                            <strong style={{ color: "#0B1F3A" }}>
+                                                {plan.vacantes_activas}
+                                            </strong>
+                                            {" / "}
+                                            {plan.job_limit === null
+                                                ? "ilimitadas"
+                                                : plan.job_limit}
+                                        </Typography>
+
+                                        <Typography fontSize={13.5} color="text.secondary">
+                                            Usuarios de equipo:{" "}
+                                            <strong style={{ color: "#0B1F3A" }}>
+                                                {plan.usuarios_actuales}
+                                            </strong>
+                                            {" / "}
+                                            {plan.seat_limit === null
+                                                ? "ilimitados"
+                                                : plan.seat_limit}
+                                        </Typography>
+
+                                    </Box>
+
+                                </Paper>
+
                             )}
 
                             {/* ===== Nombre de la empresa ===== */}

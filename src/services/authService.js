@@ -31,3 +31,16 @@ export async function loginUser(email, password) {
 export async function logoutUser() {
   return await supabase.auth.signOut();
 }
+
+/* Envia el correo con el enlace para restablecer la contraseña */
+export async function sendPasswordReset(email) {
+  return await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password`,
+  });
+}
+
+/* Se usa DESPUES de entrar desde el enlace del correo,
+   cuando ya existe una sesion de recuperacion valida */
+export async function updatePassword(newPassword) {
+  return await supabase.auth.updateUser({ password: newPassword });
+}

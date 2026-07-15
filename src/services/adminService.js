@@ -120,6 +120,7 @@ export async function savePricingPlan(plan) {
       p_duration_days: plan.duration_days,
       p_job_limit: plan.job_limit === "" ? null : plan.job_limit,
       p_is_active: plan.is_active,
+      p_seat_limit: plan.seat_limit === "" ? null : plan.seat_limit,
     })
     .single();
 }
@@ -147,6 +148,24 @@ export async function grantFreePosts(companyId, cantidad, notes) {
 export async function getCompanyPricingHistory(companyId) {
   return await supabase.rpc("admin_company_pricing_history", {
     p_company_id: companyId,
+  });
+}
+
+/* Uso real de una empresa: vacantes activas, creditos usados/disponibles */
+export async function getCompanyUsage(companyId) {
+  const { data, error } = await supabase.rpc("admin_company_usage", {
+    p_company_id: companyId,
+  });
+
+  if (error) return { data: null, error };
+
+  return { data: data?.[0] || null, error: null };
+}
+
+/* Planes de pago que vencen en los proximos N dias */
+export async function getUpcomingPlanExpirations(dias = 14) {
+  return await supabase.rpc("admin_upcoming_plan_expirations", {
+    p_dias: dias,
   });
 }
 

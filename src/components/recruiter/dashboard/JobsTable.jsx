@@ -12,6 +12,15 @@ const STATUS_LABELS = {
     closed: "Cerrada",
 };
 
+/* Días abierta sin cerrar antes de mostrar la alerta (mismo umbral que en Editar vacante) */
+const DIAS_ALERTA_ABIERTA = 21;
+
+function diasDesde(fechaIso) {
+    if (!fechaIso) return null;
+    const ms = Date.now() - new Date(fechaIso).getTime();
+    return Math.floor(ms / 86400000);
+}
+
 /* Cuántas vacantes se muestran antes del botón "Mostrar todas" */
 const VISIBLE_JOBS = 5;
 
@@ -113,6 +122,17 @@ function JobsTable({ jobs, loading, searching }) {
                         <h3>{job.title}</h3>
 
                         <StatusBadge status={job.status} />
+
+                        {job.status === "published" &&
+                            diasDesde(job.published_at) !== null &&
+                            diasDesde(job.published_at) >= DIAS_ALERTA_ABIERTA && (
+                                <span
+                                    className="job-stale-badge"
+                                    title="Lleva mucho tiempo sin cerrarse"
+                                >
+                                    ⚠ {diasDesde(job.published_at)}d sin cerrar
+                                </span>
+                            )}
 
                     </div>
 

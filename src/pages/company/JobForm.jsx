@@ -9,6 +9,7 @@ import {
   Paper,
   TextField,
   Typography,
+  Alert,
 } from "@mui/material";
 
 import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
@@ -24,6 +25,15 @@ import {
 } from "../../utils/bullets";
 
 const WORK_MODES = ["Presencial", "Remoto", "Híbrido"];
+
+/* Días abierta sin cerrar antes de mostrar la alerta */
+const DIAS_ALERTA_ABIERTA = 21;
+
+function diasDesde(fechaIso) {
+  if (!fechaIso) return null;
+  const ms = Date.now() - new Date(fechaIso).getTime();
+  return Math.floor(ms / 86400000);
+}
 
 const STATUS_OPTIONS = [
   { value: "draft", label: "Borrador" },
@@ -85,9 +95,18 @@ function JobForm({
   isEdit,
   onChange,
   onSubmit,
+  onFinalize,
+  finalizing,
 }) {
 
   const navigate = useNavigate();
+
+  const diasAbierta = isEdit ? diasDesde(form.published_at) : null;
+  const llevaMuchoTiempo =
+    isEdit &&
+    form.status === "published" &&
+    diasAbierta !== null &&
+    diasAbierta >= DIAS_ALERTA_ABIERTA;
 
   return (
 
@@ -137,6 +156,14 @@ function JobForm({
 
       {/* ===== Secciones ===== */}
       <Box sx={{ maxWidth: 900, mx: "auto", px: 3, mt: -4 }}>
+
+        {llevaMuchoTiempo && (
+          <Alert severity="warning" sx={{ mb: 3, borderRadius: 3 }}>
+            Esta vacante lleva <strong>{diasAbierta} días</strong> publicada
+            sin cerrarse. Revisa si ya tienes candidatos listos para avanzar,
+            o considera finalizar el proceso si ya se cubrió de otra forma.
+          </Alert>
+        )}
 
         <Paper elevation={0} sx={seccion}>
 
@@ -450,6 +477,24 @@ function JobForm({
           >
             Cancelar y volver
           </Button>
+
+          {isEdit && onFinalize && form.status !== "closed" && (
+            <Button
+              variant="outlined"
+              size="large"
+              onClick={onFinalize}
+              disabled={finalizing || loading}
+              sx={{
+                textTransform: "none",
+                fontWeight: 600,
+                color: "#A32D2D",
+                borderColor: "#F09595",
+                "&:hover": { borderColor: "#A32D2D", background: "#FCEBEB" },
+              }}
+            >
+              {finalizing ? "Finalizando…" : "Finalizar proceso"}
+            </Button>
+          )}
 
           <Button
             variant="contained"

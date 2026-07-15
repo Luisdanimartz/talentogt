@@ -23,6 +23,11 @@ function Login() {
 
   const tipo = searchParams.get("tipo");
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [errors, setErrors] = useState({});
+
   /* Ya tiene sesión iniciada: no mostrar el formulario de
      login otra vez, mandarlo directo a su panel. */
   useEffect(() => {
@@ -59,11 +64,6 @@ function Login() {
             "La plataforma donde candidatos y empresas de Guatemala se " +
             "encuentran, con seguimiento real durante todo el proceso.",
         };
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const [errors, setErrors] = useState({});
 
   const validate = () => {
 
