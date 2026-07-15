@@ -22,6 +22,7 @@ import {
     getAdminTopCompanies,
     getAdminCandidatesByDepartment,
     getAdminPendingResponses,
+    getAdminCompaniesWithoutJobs,
 } from "../../services/adminService";
 
 /*
@@ -49,6 +50,7 @@ function Reports() {
     const [topEmpresas, setTopEmpresas] = useState([]);
     const [porDepartamento, setPorDepartamento] = useState([]);
     const [pendientes, setPendientes] = useState([]);
+    const [sinPublicar, setSinPublicar] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -59,10 +61,12 @@ function Reports() {
             getAdminTopCompanies(10),
             getAdminCandidatesByDepartment(),
             getAdminPendingResponses(),
-        ]).then(([funnelRes, topRes, deptoRes, pendientesRes]) => {
+            getAdminCompaniesWithoutJobs(),
+        ]).then(([funnelRes, topRes, deptoRes, pendientesRes, sinPublicarRes]) => {
 
             const primerError =
-                funnelRes.error || topRes.error || deptoRes.error || pendientesRes.error;
+                funnelRes.error || topRes.error || deptoRes.error ||
+                pendientesRes.error || sinPublicarRes.error;
 
             if (primerError) {
                 setError(primerError.message);
@@ -72,6 +76,7 @@ function Reports() {
             setTopEmpresas(topRes.data || []);
             setPorDepartamento(deptoRes.data || []);
             setPendientes(pendientesRes.data || []);
+            setSinPublicar(sinPublicarRes.data || []);
 
             setLoading(false);
 
@@ -225,6 +230,69 @@ function Reports() {
                                                                 sx={{ color: critico ? "#C0392B" : "inherit" }}
                                                             >
                                                                 {p.pendientes > 0 ? p.dias_pendiente_mas_antiguo : "—"}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    );
+
+                                                })}
+                                            </TableBody>
+                                        </Table>
+                                    </Box>
+                                )}
+
+                            </Paper>
+
+                            {/* Empresas registradas sin ninguna vacante publicada */}
+
+                            <Paper
+                                elevation={0}
+                                sx={{ p: 3, mb: 4, borderRadius: 3, border: "1px solid #E6E8EC" }}
+                            >
+
+                                <Typography variant="h6" fontWeight="bold" color="#0B1F3A" mb={0.5}>
+                                    Empresas registradas sin ninguna vacante publicada
+                                </Typography>
+
+                                <Typography color="text.secondary" fontSize={13.5} mb={2}>
+                                    Ordenadas por antigüedad: arriba las que llevan más tiempo
+                                    registradas sin publicar nada.
+                                </Typography>
+
+                                {sinPublicar.length === 0 ? (
+                                    <Typography color="text.secondary" fontSize={14}>
+                                        Todas las empresas registradas ya publicaron al menos
+                                        una vacante.
+                                    </Typography>
+                                ) : (
+                                    <Box sx={{ overflowX: "auto" }}>
+                                        <Table size="small">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell><strong>Empresa</strong></TableCell>
+                                                    <TableCell><strong>Correo</strong></TableCell>
+                                                    <TableCell><strong>Departamento</strong></TableCell>
+                                                    <TableCell><strong>Plan</strong></TableCell>
+                                                    <TableCell><strong>Estado</strong></TableCell>
+                                                    <TableCell align="right"><strong>Días registrada</strong></TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {sinPublicar.map((e) => {
+
+                                                    const critico = e.dias_registrada >= 14;
+
+                                                    return (
+                                                        <TableRow key={e.id}>
+                                                            <TableCell>{e.company_name}</TableCell>
+                                                            <TableCell>{e.email}</TableCell>
+                                                            <TableCell>{e.department_name || "—"}</TableCell>
+                                                            <TableCell>{e.plan || "—"}</TableCell>
+                                                            <TableCell>{e.status}</TableCell>
+                                                            <TableCell
+                                                                align="right"
+                                                                sx={{ fontWeight: 600, color: critico ? "#C0392B" : "inherit" }}
+                                                            >
+                                                                {e.dias_registrada}
                                                             </TableCell>
                                                         </TableRow>
                                                     );

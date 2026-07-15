@@ -44,9 +44,15 @@ export async function getAdminCandidatesByDepartment() {
 
 /* Empresas/vacantes con candidatos SIN respuesta (current_status
    sigue en 'applied'), con dias desde la postulacion pendiente
-   mas antigua. Ver database/032_reporte_pendientes.sql */
+   mas antigua. Ver database/032_visibilidad_pendientes_y_tiempo_respuesta.sql */
 export async function getAdminPendingResponses() {
   return await supabase.rpc("admin_pending_responses");
+}
+
+/* Empresas registradas que nunca publicaron ninguna vacante.
+   Ver database/033_empresas_sin_publicar.sql */
+export async function getAdminCompaniesWithoutJobs() {
+  return await supabase.rpc("admin_companies_without_jobs");
 }
 
 export async function getAdminList() {
