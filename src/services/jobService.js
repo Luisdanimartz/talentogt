@@ -83,6 +83,10 @@ export async function getPublishedJobs() {
       published_at,
       department_id,
       category_id,
+      employment_type_id,
+      experience_level,
+      contract_type,
+      is_urgent,
       description,
       requirements,
       benefits,
@@ -98,6 +102,13 @@ export async function getCompanyResponseStats(companyId) {
   return await supabase.rpc("company_response_stats", {
     cid: companyId,
   });
+}
+
+/* Resumen de tiempo de respuesta de TODAS las empresas de una vez,
+   para poder ordenar el listado de vacantes por "responde más
+   rápido". Ver database/034_respuesta_publica_por_empresa.sql */
+export async function getPublicCompanyResponseSummary() {
+  return await supabase.rpc("public_company_response_summary");
 }
 
 /* Comparativa agregada de postulantes de una vacante (funcion 006) */

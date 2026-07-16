@@ -419,14 +419,24 @@ function Companies() {
 
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell><strong>Empresa</strong></TableCell>
-                                                <TableCell><strong>Vacantes</strong></TableCell>
-                                                <TableCell><strong>Postulac.</strong></TableCell>
-                                                <TableCell><strong>Estado</strong></TableCell>
-                                                <TableCell><strong>Tarifa</strong></TableCell>
-                                                <TableCell><strong>Vence</strong></TableCell>
-                                                <TableCell><strong>Colaboradora</strong></TableCell>
-                                                <TableCell align="center"><strong>Acciones</strong></TableCell>
+                                                <TableCell
+                                                    sx={{
+                                                        position: "sticky",
+                                                        top: 0,
+                                                        left: 0,
+                                                        zIndex: 3,
+                                                        backgroundColor: "#fff",
+                                                    }}
+                                                >
+                                                    <strong>Empresa</strong>
+                                                </TableCell>
+                                                <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Vacantes</strong></TableCell>
+                                                <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Postulac.</strong></TableCell>
+                                                <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Estado</strong></TableCell>
+                                                <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Tarifa</strong></TableCell>
+                                                <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Vence</strong></TableCell>
+                                                <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Colaboradora</strong></TableCell>
+                                                <TableCell align="center" sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Acciones</strong></TableCell>
                                             </TableRow>
                                         </TableHead>
 
@@ -442,7 +452,14 @@ function Companies() {
                                                     sx={{ cursor: "pointer" }}
                                                 >
 
-                                                    <TableCell>
+                                                    <TableCell
+                                                        sx={{
+                                                            position: "sticky",
+                                                            left: 0,
+                                                            zIndex: 1,
+                                                            backgroundColor: "inherit",
+                                                        }}
+                                                    >
                                                         <strong>{c.company_name}</strong>
                                                         {c.plan === "vip" && (
                                                             <span

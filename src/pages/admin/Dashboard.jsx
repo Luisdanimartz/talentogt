@@ -422,7 +422,8 @@ function Dashboard() {
                                 {topPlans.length === 0 ? (
                                     <Typography color="text.secondary" fontSize={13.5}>Todavía no se ha vendido ninguna tarifa.</Typography>
                                 ) : (
-                                    <Table size="small" sx={{ mb: 4 }}>
+                                    <Box sx={{ overflowX: "auto", mb: 4 }}>
+                                    <Table size="small">
                                         <TableHead>
                                             <TableRow>
                                                 <TableCell><strong>Tarifa</strong></TableCell>
@@ -440,12 +441,14 @@ function Dashboard() {
                                             ))}
                                         </TableBody>
                                     </Table>
+                                    </Box>
                                 )}
 
                                 <Typography fontSize={13.5} fontWeight={600} color="#0B1F3A" mb={1}>Facturación por empresa</Typography>
                                 {revenueByCompany.length === 0 ? (
                                     <Typography color="text.secondary" fontSize={13.5}>Todavía ninguna empresa ha pagado una tarifa.</Typography>
                                 ) : (
+                                    <Box sx={{ overflowX: "auto" }}>
                                     <Table size="small">
                                         <TableHead>
                                             <TableRow>
@@ -466,6 +469,7 @@ function Dashboard() {
                                             ))}
                                         </TableBody>
                                     </Table>
+                                    </Box>
                                 )}
 
                             </Paper>

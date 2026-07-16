@@ -120,11 +120,21 @@ function Jobs() {
 
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell><strong>Vacante</strong></TableCell>
-                                        <TableCell><strong>Empresa</strong></TableCell>
-                                        <TableCell><strong>Estado</strong></TableCell>
-                                        <TableCell><strong>Postulantes</strong></TableCell>
-                                        <TableCell align="center"><strong>Acciones</strong></TableCell>
+                                        <TableCell
+                                            sx={{
+                                                position: "sticky",
+                                                top: 0,
+                                                left: 0,
+                                                zIndex: 3,
+                                                backgroundColor: "#fff",
+                                            }}
+                                        >
+                                            <strong>Vacante</strong>
+                                        </TableCell>
+                                        <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Empresa</strong></TableCell>
+                                        <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Estado</strong></TableCell>
+                                        <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Postulantes</strong></TableCell>
+                                        <TableCell align="center" sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Acciones</strong></TableCell>
                                     </TableRow>
                                 </TableHead>
 
@@ -139,7 +149,16 @@ function Jobs() {
 
                                             <TableRow key={job.id}>
 
-                                                <TableCell>{job.title}</TableCell>
+                                                <TableCell
+                                                    sx={{
+                                                        position: "sticky",
+                                                        left: 0,
+                                                        zIndex: 1,
+                                                        backgroundColor: "inherit",
+                                                    }}
+                                                >
+                                                    {job.title}
+                                                </TableCell>
 
                                                 <TableCell>{job.company_name}</TableCell>
 

@@ -10,6 +10,8 @@ import {
   TextField,
   Typography,
   Alert,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 
 import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
@@ -25,6 +27,21 @@ import {
 } from "../../utils/bullets";
 
 const WORK_MODES = ["Presencial", "Remoto", "Híbrido"];
+
+const EXPERIENCE_OPTIONS = [
+  { value: "sin_experiencia", label: "Sin experiencia" },
+  { value: "1", label: "1 año" },
+  { value: "2", label: "2 años" },
+  { value: "3", label: "3 años" },
+  { value: "4", label: "4 años" },
+  { value: "5_10", label: "5 a 10 años" },
+  { value: "mas_10", label: "Más de 10 años" },
+];
+
+const CONTRACT_OPTIONS = [
+  { value: "indefinido", label: "Tiempo indefinido" },
+  { value: "determinado", label: "Tiempo determinado" },
+];
 
 /* Días abierta sin cerrar antes de mostrar la alerta */
 const DIAS_ALERTA_ABIERTA = 21;
@@ -248,6 +265,56 @@ function JobForm({
                   </MenuItem>
                 ))}
               </TextField>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                select
+                fullWidth
+                label="Experiencia requerida"
+                name="experience_level"
+                value={form.experience_level || ""}
+                onChange={onChange}
+              >
+                {EXPERIENCE_OPTIONS.map((item) => (
+                  <MenuItem key={item.value} value={item.value}>
+                    {item.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                select
+                fullWidth
+                label="Tipo de contrato"
+                name="contract_type"
+                value={form.contract_type || ""}
+                onChange={onChange}
+              >
+                {CONTRACT_OPTIONS.map((item) => (
+                  <MenuItem key={item.value} value={item.value}>
+                    {item.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} md={6} sx={{ display: "flex", alignItems: "center" }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={!!form.is_urgent}
+                    onChange={(e) =>
+                      onChange({
+                        target: { name: "is_urgent", value: e.target.checked },
+                      })
+                    }
+                  />
+                }
+                label="Marcar como urgente (aparece destacada para los candidatos)"
+              />
             </Grid>
 
           </Grid>

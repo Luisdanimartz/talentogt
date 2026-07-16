@@ -138,6 +138,36 @@
     margin-bottom: 8px;
 }
 
+.job-item-urgent {
+    display: inline-block;
+    background: #FDEAEA;
+    color: #C0392B;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 11.5px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    margin-left: 6px;
+}
+
+.jobs-filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13.5px;
+    color: var(--cgt-ink);
+    background: var(--cgt-surface);
+    border: 1px solid var(--cgt-border);
+    border-radius: 10px;
+    padding: 0 12px;
+    cursor: pointer;
+}
+
+.jobs-filter-checkbox input {
+    accent-color: var(--cgt-teal);
+    cursor: pointer;
+}
+
 .job-item-match {
     display: inline-block;
     margin-top: 10px;
@@ -385,8 +415,34 @@
 
 @media (max-width: 900px) {
 
+    /*
+      El buscador + filtros se queda pegado arriba mientras bajas la
+      lista (como en Computrabajo) - antes se perdia de vista al
+      hacer scroll. jobs-hero es hijo directo de jobs-wrap, que
+      abarca toda la pagina, asi que se mantiene pegado durante
+      todo el scroll de la lista, no solo al inicio.
+    */
+    .jobs-hero {
+        position: sticky;
+        top: 82px; /* debajo del navbar fijo */
+        z-index: 20;
+        padding: 14px 16px 16px;
+        box-shadow: 0 8px 20px rgba(11, 31, 58, 0.2);
+    }
+
+    .jobs-hero h1 {
+        font-size: 19px;
+    }
+
+    .jobs-hero p {
+        font-size: 13px;
+        margin: 4px 0 12px;
+    }
+
     .jobs-filters {
         grid-template-columns: 1fr 1fr;
+        max-height: 46vh;
+        overflow-y: auto;
     }
 
     .jobs-filters input {
@@ -395,6 +451,7 @@
 
     .jobs-split {
         grid-template-columns: 1fr;
+        margin-top: 0;
     }
 
     .jobs-list,
