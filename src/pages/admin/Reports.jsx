@@ -23,6 +23,10 @@ import {
     getAdminCandidatesByDepartment,
     getAdminPendingResponses,
     getAdminCompaniesWithoutJobs,
+    getAdminCompaniesByLocation,
+    getAdminCandidatesByLocation,
+    getAdminCandidatesByAge,
+    getAdminCandidatesByGender,
 } from "../../services/adminService";
 
 /*
@@ -39,6 +43,14 @@ const ETAPAS = [
     { key: "contratados", label: "Contratados", color: "#0E8F73" },
 ];
 
+const GENERO_LABELS = {
+    masculino: "Masculino",
+    femenino: "Femenino",
+    otro: "Otro",
+    prefiero_no_decir: "Prefiero no decir",
+    "Sin dato": "Sin dato",
+};
+
 function porcentaje(parte, total) {
     if (!total) return 0;
     return Math.round((parte / total) * 100);
@@ -51,6 +63,10 @@ function Reports() {
     const [porDepartamento, setPorDepartamento] = useState([]);
     const [pendientes, setPendientes] = useState([]);
     const [sinPublicar, setSinPublicar] = useState([]);
+    const [empresasPorUbicacion, setEmpresasPorUbicacion] = useState([]);
+    const [candidatosPorUbicacion, setCandidatosPorUbicacion] = useState([]);
+    const [candidatosPorEdad, setCandidatosPorEdad] = useState([]);
+    const [candidatosPorGenero, setCandidatosPorGenero] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -62,11 +78,21 @@ function Reports() {
             getAdminCandidatesByDepartment(),
             getAdminPendingResponses(),
             getAdminCompaniesWithoutJobs(),
-        ]).then(([funnelRes, topRes, deptoRes, pendientesRes, sinPublicarRes]) => {
+            getAdminCompaniesByLocation(),
+            getAdminCandidatesByLocation(),
+            getAdminCandidatesByAge(),
+            getAdminCandidatesByGender(),
+        ]).then(([
+            funnelRes, topRes, deptoRes, pendientesRes, sinPublicarRes,
+            empresasUbicacionRes, candidatosUbicacionRes, candidatosEdadRes,
+            candidatosGeneroRes,
+        ]) => {
 
             const primerError =
                 funnelRes.error || topRes.error || deptoRes.error ||
-                pendientesRes.error || sinPublicarRes.error;
+                pendientesRes.error || sinPublicarRes.error ||
+                empresasUbicacionRes.error || candidatosUbicacionRes.error ||
+                candidatosEdadRes.error || candidatosGeneroRes.error;
 
             if (primerError) {
                 setError(primerError.message);
@@ -77,6 +103,10 @@ function Reports() {
             setPorDepartamento(deptoRes.data || []);
             setPendientes(pendientesRes.data || []);
             setSinPublicar(sinPublicarRes.data || []);
+            setEmpresasPorUbicacion(empresasUbicacionRes.data || []);
+            setCandidatosPorUbicacion(candidatosUbicacionRes.data || []);
+            setCandidatosPorEdad(candidatosEdadRes.data || []);
+            setCandidatosPorGenero(candidatosGeneroRes.data || []);
 
             setLoading(false);
 
@@ -391,6 +421,160 @@ function Reports() {
 
                                     </Box>
                                 )}
+
+                            </Paper>
+
+                            {/* Empresas por departamento y municipio */}
+
+                            <Paper
+                                elevation={0}
+                                sx={{ p: 3, mb: 4, borderRadius: 3, border: "1px solid #E6E8EC" }}
+                            >
+
+                                <Typography variant="h6" fontWeight="bold" color="#0B1F3A" mb={2}>
+                                    Empresas por departamento y municipio
+                                </Typography>
+
+                                {empresasPorUbicacion.length === 0 ? (
+                                    <Typography color="text.secondary" fontSize={14}>
+                                        Todavía no hay empresas registradas.
+                                    </Typography>
+                                ) : (
+                                    <Box sx={{ overflowX: "auto" }}>
+                                        <Table size="small">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell><strong>Departamento</strong></TableCell>
+                                                    <TableCell><strong>Municipio</strong></TableCell>
+                                                    <TableCell align="right"><strong>Empresas</strong></TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {empresasPorUbicacion.map((e, i) => (
+                                                    <TableRow key={i}>
+                                                        <TableCell>{e.department_name}</TableCell>
+                                                        <TableCell>{e.municipality_name}</TableCell>
+                                                        <TableCell align="right">{e.total}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </Box>
+                                )}
+
+                            </Paper>
+
+                            {/* Candidatos por departamento y municipio */}
+
+                            <Paper
+                                elevation={0}
+                                sx={{ p: 3, mb: 4, borderRadius: 3, border: "1px solid #E6E8EC" }}
+                            >
+
+                                <Typography variant="h6" fontWeight="bold" color="#0B1F3A" mb={0.5}>
+                                    Candidatos por departamento y municipio
+                                </Typography>
+
+                                <Typography color="text.secondary" fontSize={13} mb={2}>
+                                    El candidato escribe su ubicación como texto libre al crear
+                                    su CV, así que variaciones de mayúsculas o tildes pueden
+                                    aparecer como filas separadas.
+                                </Typography>
+
+                                {candidatosPorUbicacion.length === 0 ? (
+                                    <Typography color="text.secondary" fontSize={14}>
+                                        Todavía no hay candidatos registrados.
+                                    </Typography>
+                                ) : (
+                                    <Box sx={{ overflowX: "auto" }}>
+                                        <Table size="small">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell><strong>Departamento</strong></TableCell>
+                                                    <TableCell><strong>Municipio</strong></TableCell>
+                                                    <TableCell align="right"><strong>Candidatos</strong></TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {candidatosPorUbicacion.map((c, i) => (
+                                                    <TableRow key={i}>
+                                                        <TableCell>{c.department_name}</TableCell>
+                                                        <TableCell>{c.municipality_name}</TableCell>
+                                                        <TableCell align="right">{c.total}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </Box>
+                                )}
+
+                            </Paper>
+
+                            {/* Candidatos por edad y género */}
+
+                            <Paper
+                                elevation={0}
+                                sx={{ p: 3, mb: 4, borderRadius: 3, border: "1px solid #E6E8EC" }}
+                            >
+
+                                <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 4 }}>
+
+                                    <Box>
+
+                                        <Typography variant="h6" fontWeight="bold" color="#0B1F3A" mb={2}>
+                                            Candidatos por edad
+                                        </Typography>
+
+                                        <Table size="small">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell><strong>Rango</strong></TableCell>
+                                                    <TableCell align="right"><strong>Candidatos</strong></TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {candidatosPorEdad.map((r) => (
+                                                    <TableRow key={r.rango}>
+                                                        <TableCell>{r.rango}</TableCell>
+                                                        <TableCell align="right">{r.total}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+
+                                    </Box>
+
+                                    <Box>
+
+                                        <Typography variant="h6" fontWeight="bold" color="#0B1F3A" mb={0.5}>
+                                            Candidatos por género
+                                        </Typography>
+
+                                        <Typography color="text.secondary" fontSize={13} mb={1.5}>
+                                            Dato nuevo: solo lo tienen los candidatos que se
+                                            registraron o actualizaron su CV después de este cambio.
+                                        </Typography>
+
+                                        <Table size="small">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell><strong>Género</strong></TableCell>
+                                                    <TableCell align="right"><strong>Candidatos</strong></TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {candidatosPorGenero.map((g) => (
+                                                    <TableRow key={g.gender}>
+                                                        <TableCell>{GENERO_LABELS[g.gender] || g.gender}</TableCell>
+                                                        <TableCell align="right">{g.total}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+
+                                    </Box>
+
+                                </Box>
 
                             </Paper>
 

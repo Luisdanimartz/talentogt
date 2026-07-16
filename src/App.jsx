@@ -17,6 +17,7 @@ import Pricing from "./pages/Pricing";
 import Contact from "./pages/Contact";
 
 import CreateProfile from "./pages/company/CreateProfile";
+import EditProfile from "./pages/company/EditProfile";
 import CreateJob from "./pages/company/CreateJob";
 import EditJob from "./pages/company/EditJob";
 
@@ -228,6 +229,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["empresa"]}>
               <CreateProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/empresa/perfil"
+          element={
+            <ProtectedRoute allowedRoles={["empresa"]}>
+              <EditProfile />
             </ProtectedRoute>
           }
         />

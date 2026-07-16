@@ -8,6 +8,8 @@ import {
   Typography,
 } from "@mui/material";
 
+import { toTitleCase } from "../../utils/textFormat";
+
 function CompanyProfileForm({
   form,
   departments = [],
@@ -16,6 +18,9 @@ function CompanyProfileForm({
   loading = false,
   onChange,
   onSubmit,
+  title = "Perfil de Empresa",
+  subtitle = "Completa la información de tu empresa para continuar.",
+  submitLabel = "Guardar Perfil",
 }) {
   return (
     <Box>
@@ -24,14 +29,14 @@ function CompanyProfileForm({
         fontWeight="bold"
         mb={1}
       >
-        Perfil de Empresa
+        {title}
       </Typography>
 
       <Typography
         color="text.secondary"
         mb={4}
       >
-        Completa la información de tu empresa para continuar.
+        {subtitle}
       </Typography>
 
       <Grid container spacing={3}>
@@ -131,7 +136,7 @@ function CompanyProfileForm({
                 key={municipality.id}
                 value={municipality.id}
               >
-                {municipality.name}
+                {toTitleCase(municipality.name)}
               </MenuItem>
             ))}
           </TextField>
@@ -184,7 +189,7 @@ function CompanyProfileForm({
           disabled={loading}
           onClick={onSubmit}
         >
-          Guardar Perfil
+          {submitLabel}
         </Button>
       </Box>
     </Box>

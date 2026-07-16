@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import "../../styles/theme.css";
 import "../../styles/MyCV.css";
 
+import { toTitleCase } from "../../utils/textFormat";
+
 import { getCurrentCandidateProfile } from "../../services/candidateService";
 import { useAuth } from "../../context/AuthContext";
 import { sinVineta, duracionEnMeses } from "../../utils/bullets";
@@ -109,7 +111,7 @@ function MyCV() {
         profile.phone ? `📞 ${profile.phone}` : null,
         user?.email ? `✉ ${user.email}` : null,
         [profile.municipality, profile.department].filter(Boolean).length
-            ? `📍 ${[profile.municipality, profile.department].filter(Boolean).join(", ")}`
+            ? `📍 ${[profile.municipality, profile.department].filter(Boolean).map(toTitleCase).join(", ")}`
             : null,
     ].filter(Boolean);
 

@@ -307,6 +307,52 @@ function Settings() {
                                 </Alert>
                             )}
 
+                            {/* ===== Enlace a la edición completa del perfil ===== */}
+
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    p: 3,
+                                    mb: 3,
+                                    borderRadius: 3,
+                                    border: "1px solid #E6E8EC",
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    flexWrap: "wrap",
+                                    gap: 2,
+                                }}
+                            >
+
+                                <Box>
+
+                                    <Typography fontWeight="bold" mb={0.5}>
+                                        Información de tu empresa
+                                    </Typography>
+
+                                    <Typography fontSize={13} color="text.secondary">
+                                        Razón social, NIT, teléfono, dirección
+                                        y descripción que ven las empresas
+                                        cuando publicas una vacante.
+                                    </Typography>
+
+                                </Box>
+
+                                <Button
+                                    variant="contained"
+                                    onClick={() => navigate("/empresa/perfil")}
+                                    sx={{
+                                        background: "#0B1F3A",
+                                        textTransform: "none",
+                                        fontWeight: 700,
+                                        "&:hover": { background: "#0A1830" },
+                                    }}
+                                >
+                                    Editar información completa
+                                </Button>
+
+                            </Paper>
+
                             {/* ===== Tu plan ===== */}
 
                             {plan && (

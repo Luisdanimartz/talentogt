@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -52,8 +53,39 @@ function diasDesde(fechaIso) {
   return Math.floor(ms / 86400000);
 }
 
+const HORAS_12 = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0"));
+const MINUTOS = ["00", "15", "30", "45"];
+const AMPM = ["a.m.", "p.m."];
+
+/* "14:30" -> { hora12: "02", minuto: "30", ampm: "p.m." } */
+function partesDeHora24(hora24) {
+
+  if (!hora24) return { hora12: "08", minuto: "00", ampm: "a.m." };
+
+  const [hStr, mStr] = hora24.split(":");
+  const h = parseInt(hStr, 10);
+  const ampm = h >= 12 ? "p.m." : "a.m.";
+
+  let hora12 = h % 12;
+  if (hora12 === 0) hora12 = 12;
+
+  return { hora12: String(hora12).padStart(2, "0"), minuto: mStr || "00", ampm };
+
+}
+
+/* { hora12: "02", minuto: "30", ampm: "p.m." } -> "14:30" */
+function hora24DePartes(hora12, minuto, ampm) {
+
+  let h = parseInt(hora12, 10) % 12;
+  if (ampm === "p.m.") h += 12;
+
+  return `${String(h).padStart(2, "0")}:${minuto}`;
+
+}
+
 const STATUS_OPTIONS = [
   { value: "draft", label: "Borrador" },
+  { value: "scheduled", label: "Programada" },
   { value: "published", label: "Publicada" },
   { value: "paused", label: "Pausada" },
   { value: "closed", label: "Cerrada" },
@@ -117,6 +149,8 @@ function JobForm({
 }) {
 
   const navigate = useNavigate();
+
+  const [programar, setProgramar] = useState(!!form.scheduled_publish_at);
 
   const diasAbierta = isEdit ? diasDesde(form.published_at) : null;
   const llevaMuchoTiempo =
@@ -425,6 +459,149 @@ function JobForm({
                   ))}
                 </TextField>
               </Grid>
+            )}
+
+            <Grid item xs={12} md={5}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={programar}
+                    onChange={(e) => {
+
+                      const activar = e.target.checked;
+                      setProgramar(activar);
+
+                      if (!activar) {
+                        onChange({
+                          target: { name: "scheduled_publish_at", value: "" },
+                        });
+                      }
+
+                    }}
+                  />
+                }
+                label="Programar publicación para una fecha y hora específica"
+              />
+            </Grid>
+
+            {programar && (
+              <>
+
+                <Grid item xs={6} md={3}>
+                  <TextField
+                    type="date"
+                    fullWidth
+                    label="Fecha de publicación"
+                    value={(form.scheduled_publish_at || "").split("T")[0] || ""}
+                    onChange={(e) => {
+
+                      const hora =
+                        (form.scheduled_publish_at || "").split("T")[1] || "08:00";
+
+                      onChange({
+                        target: {
+                          name: "scheduled_publish_at",
+                          value: `${e.target.value}T${hora}`,
+                        },
+                      });
+
+                    }}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+
+                <Grid item xs={4} md={2}>
+                  <TextField
+                    select
+                    fullWidth
+                    label="Hora"
+                    value={partesDeHora24((form.scheduled_publish_at || "").split("T")[1]).hora12}
+                    onChange={(e) => {
+
+                      const fecha =
+                        (form.scheduled_publish_at || "").split("T")[0] ||
+                        new Date().toISOString().slice(0, 10);
+
+                      const actual = partesDeHora24((form.scheduled_publish_at || "").split("T")[1]);
+
+                      const nuevaHora24 = hora24DePartes(e.target.value, actual.minuto, actual.ampm);
+
+                      onChange({
+                        target: { name: "scheduled_publish_at", value: `${fecha}T${nuevaHora24}` },
+                      });
+
+                    }}
+                  >
+                    {HORAS_12.map((h) => (
+                      <MenuItem key={h} value={h}>{h}</MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+
+                <Grid item xs={4} md={2}>
+                  <TextField
+                    select
+                    fullWidth
+                    label="Min."
+                    value={partesDeHora24((form.scheduled_publish_at || "").split("T")[1]).minuto}
+                    onChange={(e) => {
+
+                      const fecha =
+                        (form.scheduled_publish_at || "").split("T")[0] ||
+                        new Date().toISOString().slice(0, 10);
+
+                      const actual = partesDeHora24((form.scheduled_publish_at || "").split("T")[1]);
+
+                      const nuevaHora24 = hora24DePartes(actual.hora12, e.target.value, actual.ampm);
+
+                      onChange({
+                        target: { name: "scheduled_publish_at", value: `${fecha}T${nuevaHora24}` },
+                      });
+
+                    }}
+                  >
+                    {MINUTOS.map((m) => (
+                      <MenuItem key={m} value={m}>{m}</MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+
+                <Grid item xs={4} md={2}>
+                  <TextField
+                    select
+                    fullWidth
+                    label="a.m./p.m."
+                    value={partesDeHora24((form.scheduled_publish_at || "").split("T")[1]).ampm}
+                    onChange={(e) => {
+
+                      const fecha =
+                        (form.scheduled_publish_at || "").split("T")[0] ||
+                        new Date().toISOString().slice(0, 10);
+
+                      const actual = partesDeHora24((form.scheduled_publish_at || "").split("T")[1]);
+
+                      const nuevaHora24 = hora24DePartes(actual.hora12, actual.minuto, e.target.value);
+
+                      onChange({
+                        target: { name: "scheduled_publish_at", value: `${fecha}T${nuevaHora24}` },
+                      });
+
+                    }}
+                  >
+                    {AMPM.map((v) => (
+                      <MenuItem key={v} value={v}>{v}</MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+
+                <Grid item xs={12} md={3}>
+                  <Typography fontSize={12.5} color="text.secondary" mt={{ xs: 0, md: 2 }}>
+                    La vacante se publica sola ese día y hora, sin que
+                    tengas que entrar.
+                  </Typography>
+                </Grid>
+
+              </>
             )}
 
           </Grid>

@@ -7,6 +7,7 @@ import { formatSalary } from "../../../utils/formatSalary";
 
 const STATUS_LABELS = {
     draft: "Borrador",
+    scheduled: "Programada",
     published: "Publicada",
     paused: "Pausada",
     closed: "Cerrada",
@@ -145,11 +146,20 @@ function JobsTable({ jobs, loading, searching }) {
 
                         <div>
                             <strong>
-                                {job.published_at
-                                    ? new Date(job.published_at).toLocaleDateString("es-GT")
-                                    : "Sin publicar"}
+                                {job.status === "scheduled" && job.scheduled_publish_at
+                                    ? new Date(job.scheduled_publish_at).toLocaleString("es-GT", {
+                                        day: "2-digit",
+                                        month: "2-digit",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                    })
+                                    : job.published_at
+                                        ? new Date(job.published_at).toLocaleDateString("es-GT")
+                                        : "Sin publicar"}
                             </strong>
-                            <small>Publicada</small>
+                            <small>
+                                {job.status === "scheduled" ? "Se publica" : "Publicada"}
+                            </small>
                         </div>
 
                         <div>

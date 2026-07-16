@@ -92,6 +92,11 @@
     color: var(--cgt-slate);
 }
 
+.job-status-scheduled {
+    background: #E6EEFA;
+    color: #1A4B9B;
+}
+
 .job-status-published {
     background: var(--cgt-teal-soft);
     color: var(--cgt-teal);

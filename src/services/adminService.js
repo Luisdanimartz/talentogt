@@ -55,6 +55,23 @@ export async function getAdminCompaniesWithoutJobs() {
   return await supabase.rpc("admin_companies_without_jobs");
 }
 
+/* Reportes demográficos. Ver database/036_reportes_demograficos.sql */
+export async function getAdminCompaniesByLocation() {
+  return await supabase.rpc("admin_companies_by_location");
+}
+
+export async function getAdminCandidatesByLocation() {
+  return await supabase.rpc("admin_candidates_by_location");
+}
+
+export async function getAdminCandidatesByAge() {
+  return await supabase.rpc("admin_candidates_by_age");
+}
+
+export async function getAdminCandidatesByGender() {
+  return await supabase.rpc("admin_candidates_by_gender");
+}
+
 export async function getAdminList() {
   return await supabase.rpc("admin_list_admins");
 }

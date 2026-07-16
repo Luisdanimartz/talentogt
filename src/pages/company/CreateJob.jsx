@@ -32,6 +32,7 @@ const initialForm = {
   municipality_id: "",
   vacancies: 1,
   salary: "",
+  scheduled_publish_at: "",
   description: "",
   requirements: "",
   benefits: "",
@@ -137,17 +138,27 @@ function CreateJob() {
 
       }
 
-      const { salary, ...fields } = form;
+      const { salary, scheduled_publish_at, ...fields } = form;
 
       const salario = salarioANumero(salary);
 
+      const fechaProgramada = scheduled_publish_at
+        ? new Date(scheduled_publish_at)
+        : null;
+
+      const estaProgramada =
+        fechaProgramada && fechaProgramada.getTime() > Date.now();
+
       const job = {
         company_id: company.id,
-        status: "published",
-        published_at: new Date().toISOString(),
         ...fields,
         salary_min: salario,
         salary_max: salario,
+        status: estaProgramada ? "scheduled" : "published",
+        published_at: estaProgramada ? null : new Date().toISOString(),
+        scheduled_publish_at: estaProgramada
+          ? fechaProgramada.toISOString()
+          : null,
       };
 
       const { error } = await createJob(job);

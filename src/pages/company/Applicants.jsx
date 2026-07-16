@@ -4,6 +4,8 @@ import "./../../styles/theme.css";
 import "./../../styles/recruiter/layout/RecruiterDashboard.css";
 import "./../../styles/recruiter/Applicants.css";
 
+import { toTitleCase } from "../../utils/textFormat";
+
 import RecruiterSidebar from "../../components/recruiter/layout/RecruiterSidebar";
 
 import {
@@ -479,7 +481,7 @@ function Applicants() {
                             <p className="applicant-meta">
                                 {[
                                     app.candidate_profiles?.profession,
-                                    app.candidate_profiles?.municipality,
+                                    toTitleCase(app.candidate_profiles?.municipality),
                                     app.candidate_profiles?.phone,
                                 ]
                                     .filter(Boolean)

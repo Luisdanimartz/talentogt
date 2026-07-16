@@ -20,6 +20,21 @@ import {
 
 import { formatMiles, salarioANumero } from "../../utils/formatSalary";
 
+/* "2026-07-21T08:00:00+00:00" -> "2026-07-21T08:00" (hora local del
+   navegador), que es el formato que exige el input datetime-local */
+function isoADatetimeLocal(iso) {
+
+  const fecha = new Date(iso);
+
+  const pad = (n) => String(n).padStart(2, "0");
+
+  return (
+    `${fecha.getFullYear()}-${pad(fecha.getMonth() + 1)}-${pad(fecha.getDate())}` +
+    `T${pad(fecha.getHours())}:${pad(fecha.getMinutes())}`
+  );
+
+}
+
 function EditJob() {
 
   const { id } = useParams();
@@ -77,6 +92,9 @@ function EditJob() {
       salary: jobRes.data.salary_min
         ? formatMiles(jobRes.data.salary_min)
         : "",
+      scheduled_publish_at: jobRes.data.scheduled_publish_at
+        ? isoADatetimeLocal(jobRes.data.scheduled_publish_at)
+        : "",
     });
 
     setCategories(categoriesRes.data || []);
@@ -121,15 +139,43 @@ function EditJob() {
       created_at,
       updated_at,
       salary,
+      scheduled_publish_at,
+      status,
+      published_at,
       ...editableFields
     } = form;
 
     const salario = salarioANumero(salary);
 
+    const fechaProgramada = scheduled_publish_at
+      ? new Date(scheduled_publish_at)
+      : null;
+
+    const estaProgramada =
+      fechaProgramada && fechaProgramada.getTime() > Date.now();
+
+    /*
+      Si el interruptor de "programar" esta activo con una fecha
+      futura, eso manda sobre lo que diga el selector de Estado.
+      Si no, se respeta el Estado que la empresa eligio a mano.
+    */
+    const nuevoStatus = estaProgramada ? "scheduled" : status;
+
+    const nuevoPublishedAt = estaProgramada
+      ? null
+      : status === "published" && !published_at
+        ? new Date().toISOString()
+        : published_at;
+
     const { error } = await updateJob(id, {
       ...editableFields,
       salary_min: salario,
       salary_max: salario,
+      status: nuevoStatus,
+      published_at: nuevoPublishedAt,
+      scheduled_publish_at: estaProgramada
+        ? fechaProgramada.toISOString()
+        : null,
     });
 
     setLoading(false);

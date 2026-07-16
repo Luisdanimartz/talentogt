@@ -75,6 +75,7 @@ const initialForm = {
   municipality: "",
   address: "",
   birth_date: "",
+  gender: "",
   skills: "",
   summary: "",
   linkedin: "",
@@ -656,6 +657,24 @@ function CreateCV() {
               onChange={handleChange}
               fullWidth
             />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <TextField
+              select
+              label="Género (opcional)"
+              name="gender"
+              value={form.gender}
+              onChange={handleChange}
+              fullWidth
+              helperText="Nos ayuda a entender mejor a quién le llega ChanceGT"
+            >
+              <MenuItem value="">Prefiero no especificar</MenuItem>
+              <MenuItem value="femenino">Femenino</MenuItem>
+              <MenuItem value="masculino">Masculino</MenuItem>
+              <MenuItem value="otro">Otro</MenuItem>
+              <MenuItem value="prefiero_no_decir">Prefiero no decir</MenuItem>
+            </TextField>
           </Grid>
 
           <Grid item xs={12} md={4}>

@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import "../../styles/theme.css";
 import "../../styles/MyCV.css";
 
+import { toTitleCase } from "../../utils/textFormat";
+
 import { getApplicationForCV } from "../../services/applicationService";
 import { sinVineta, duracionEnMeses } from "../../utils/bullets";
 
@@ -110,7 +112,7 @@ function CandidateCV() {
     const contacto = [
         profile.phone ? `📞 ${profile.phone}` : null,
         [profile.municipality, profile.department].filter(Boolean).length
-            ? `📍 ${[profile.municipality, profile.department].filter(Boolean).join(", ")}`
+            ? `📍 ${[profile.municipality, profile.department].filter(Boolean).map(toTitleCase).join(", ")}`
             : null,
     ].filter(Boolean);
 

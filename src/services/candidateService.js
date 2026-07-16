@@ -87,6 +87,7 @@ export async function saveCandidateProfile(form, educationList = [], experienceL
     municipality: form.municipality || null,
     address: form.address || null,
     birth_date: form.birth_date || null,
+    gender: form.gender || null,
     skills: form.skills || null,
     summary: form.summary || null,
     linkedin: form.linkedin || null,

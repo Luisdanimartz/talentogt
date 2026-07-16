@@ -138,6 +138,7 @@ function Jobs() {
     const [fechaFiltro, setFechaFiltro] = useState("");
     const [salarioMinFiltro, setSalarioMinFiltro] = useState("");
     const [orden, setOrden] = useState("relevancia");
+    const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
     /* Tiempo de respuesta de cada empresa (para el orden "responde
        más rápido"), companyId -> { total, responded, avg_response_days } */
@@ -259,10 +260,10 @@ function Jobs() {
                 return false;
             }
 
-            if (departmentId && job.department_id !== departmentId) return false;
-            if (categoryId && job.category_id !== categoryId) return false;
+            if (departmentId && String(job.department_id) !== String(departmentId)) return false;
+            if (categoryId && String(job.category_id) !== String(categoryId)) return false;
             if (workMode && job.work_mode !== workMode) return false;
-            if (employmentTypeId && job.employment_type_id !== employmentTypeId) return false;
+            if (employmentTypeId && String(job.employment_type_id) !== String(employmentTypeId)) return false;
             if (experienceLevel && job.experience_level !== experienceLevel) return false;
             if (contractType && job.contract_type !== contractType) return false;
             if (soloUrgentes && !job.is_urgent) return false;
@@ -431,6 +432,11 @@ function Jobs() {
         search || departmentId || categoryId || workMode || employmentTypeId ||
         experienceLevel || contractType || soloUrgentes || fechaFiltro || salarioMinFiltro;
 
+    const contadorFiltrosActivos = [
+        departmentId, categoryId, workMode, employmentTypeId,
+        experienceLevel, contractType, fechaFiltro, salarioMinFiltro,
+    ].filter(Boolean).length + (soloUrgentes ? 1 : 0);
+
     const selectedMatch = selectedJob
         ? matchesPorVacante[selectedJob.id]
         : null;
@@ -452,7 +458,9 @@ function Jobs() {
                             : `${filteredJobs.length} ${filteredJobs.length === 1 ? "vacante" : "vacantes"} en Guatemala, con empresas que responden`}
                     </p>
 
-                    <div className="jobs-filters">
+                    <div className="jobs-filters-card">
+
+                    <div className="jobs-search-row">
 
                         <input
                             type="search"
@@ -460,7 +468,28 @@ function Jobs() {
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             aria-label="Buscar por puesto o empresa"
+                            className="jobs-search-input"
                         />
+
+                        <button
+                            type="button"
+                            className="jobs-filters-toggle"
+                            onClick={() => setMostrarFiltros((v) => !v)}
+                        >
+                            {mostrarFiltros
+                                ? "Ocultar filtros ▲"
+                                : `Filtros${contadorFiltrosActivos > 0 ? ` (${contadorFiltrosActivos})` : ""} ▼`}
+                        </button>
+
+                    </div>
+
+                    <div
+                        className={
+                            mostrarFiltros
+                                ? "jobs-filters"
+                                : "jobs-filters jobs-filters-collapsed"
+                        }
+                    >
 
                         <select
                             value={departmentId}
@@ -564,6 +593,8 @@ function Jobs() {
                             />
                             Solo urgentes
                         </label>
+
+                    </div>
 
                     </div>
 

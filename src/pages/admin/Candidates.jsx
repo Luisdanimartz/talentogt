@@ -4,6 +4,8 @@ import "./../../styles/theme.css";
 import "./../../styles/recruiter/layout/RecruiterDashboard.css";
 import "./../../styles/admin/Print.css";
 
+import { toTitleCase } from "../../utils/textFormat";
+
 import {
     Alert,
     Avatar,
@@ -179,24 +181,14 @@ function Candidates() {
 
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell
-                                            sx={{
-                                                position: "sticky",
-                                                top: 0,
-                                                left: 0,
-                                                zIndex: 3,
-                                                backgroundColor: "#fff",
-                                            }}
-                                        >
-                                            <strong>Candidato</strong>
-                                        </TableCell>
-                                        <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Contacto</strong></TableCell>
-                                        <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Profesión</strong></TableCell>
-                                        <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Ubicación</strong></TableCell>
-                                        <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Postulaciones</strong></TableCell>
-                                        <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Registrado</strong></TableCell>
-                                        <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Estado</strong></TableCell>
-                                        <TableCell align="center" className="no-print" sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Acciones</strong></TableCell>
+                                        <TableCell><strong>Candidato</strong></TableCell>
+                                        <TableCell><strong>Contacto</strong></TableCell>
+                                        <TableCell><strong>Profesión</strong></TableCell>
+                                        <TableCell><strong>Ubicación</strong></TableCell>
+                                        <TableCell><strong>Postulaciones</strong></TableCell>
+                                        <TableCell><strong>Registrado</strong></TableCell>
+                                        <TableCell><strong>Estado</strong></TableCell>
+                                        <TableCell align="center" className="no-print"><strong>Acciones</strong></TableCell>
                                     </TableRow>
                                 </TableHead>
 
@@ -206,14 +198,7 @@ function Candidates() {
 
                                         <TableRow key={c.id}>
 
-                                            <TableCell
-                                                sx={{
-                                                    position: "sticky",
-                                                    left: 0,
-                                                    zIndex: 1,
-                                                    backgroundColor: "inherit",
-                                                }}
-                                            >
+                                            <TableCell>
 
                                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
 
@@ -239,7 +224,7 @@ function Candidates() {
                                             <TableCell>{c.profession || "—"}</TableCell>
 
                                             <TableCell>
-                                                {[c.department, c.municipality].filter(Boolean).join(", ") || "—"}
+                                                {[c.department, c.municipality].filter(Boolean).map(toTitleCase).join(", ") || "—"}
                                             </TableCell>
 
                                             <TableCell>{c.total_postulaciones}</TableCell>

@@ -4,6 +4,8 @@ import "./../../styles/theme.css";
 import "./../../styles/recruiter/layout/RecruiterDashboard.css";
 import "./../../styles/company/SearchCandidates.css";
 
+import { toTitleCase } from "../../utils/textFormat";
+
 import RecruiterSidebar from "../../components/recruiter/layout/RecruiterSidebar";
 
 import { getMyCompanyContext } from "../../services/teamService";
@@ -273,6 +275,7 @@ function SearchCandidates() {
                                             c.profession,
                                             [c.municipality, c.department]
                                                 .filter(Boolean)
+                                                .map(toTitleCase)
                                                 .join(", "),
                                             c.years_experience > 0
                                                 ? `${c.years_experience} años de experiencia`
