@@ -158,6 +158,11 @@ function Register() {
 
   };
 
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    handleRegister();
+  };
+
    return (
 
     <Box
@@ -232,7 +237,7 @@ function Register() {
             md={7}
           >
 
-            <Box sx={{ p: 6 }}>
+            <Box component="form" onSubmit={handleFormSubmit} sx={{ p: 6 }}>
 
               <Typography
                 variant="h4"
@@ -367,15 +372,16 @@ function Register() {
               <Divider sx={{ my: 4 }} />
 
               <Button
+                type="submit"
                 variant="contained"
                 size="large"
                 fullWidth
-                onClick={handleRegister}
               >
                 Crear Cuenta
               </Button>
 
               <Button
+                type="button"
                 fullWidth
                 sx={{ mt: 2 }}
                 onClick={() =>

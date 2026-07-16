@@ -46,6 +46,11 @@ function ForgotPassword() {
 
   }
 
+  function handleFormSubmit(e) {
+    e.preventDefault();
+    handleSubmit();
+  }
+
   return (
 
     <Box
@@ -139,7 +144,7 @@ function ForgotPassword() {
 
               ) : (
 
-                <>
+                <Box component="form" onSubmit={handleFormSubmit}>
 
                   <Typography variant="h4" fontWeight="bold" mb={1}>
                     Recuperar contraseña
@@ -166,21 +171,21 @@ function ForgotPassword() {
                   />
 
                   <Button
+                    type="submit"
                     variant="contained"
                     fullWidth
                     size="large"
                     sx={{ mt: 3, mb: 2 }}
-                    onClick={handleSubmit}
                     disabled={enviando}
                   >
                     {enviando ? "Enviando…" : "Enviar instrucciones"}
                   </Button>
 
-                  <Button fullWidth onClick={() => navigate("/login")}>
+                  <Button type="button" fullWidth onClick={() => navigate("/login")}>
                     Volver al inicio de sesión
                   </Button>
 
-                </>
+                </Box>
 
               )}
 

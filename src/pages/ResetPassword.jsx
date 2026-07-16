@@ -56,6 +56,11 @@ function ResetPassword() {
 
   }
 
+  function handleFormSubmit(e) {
+    e.preventDefault();
+    handleSubmit();
+  }
+
   return (
 
     <Box
@@ -164,7 +169,7 @@ function ResetPassword() {
 
               ) : (
 
-                <>
+                <Box component="form" onSubmit={handleFormSubmit}>
 
                   <Typography variant="h4" fontWeight="bold" mb={1}>
                     Crea tu nueva contraseña
@@ -201,17 +206,17 @@ function ResetPassword() {
                   />
 
                   <Button
+                    type="submit"
                     variant="contained"
                     fullWidth
                     size="large"
                     sx={{ mt: 3 }}
-                    onClick={handleSubmit}
                     disabled={guardando}
                   >
                     {guardando ? "Guardando…" : "Guardar contraseña"}
                   </Button>
 
-                </>
+                </Box>
 
               )}
 

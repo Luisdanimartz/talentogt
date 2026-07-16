@@ -110,6 +110,11 @@ function Login() {
 
   };
 
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    handleLogin();
+  };
+
   return (
 
     <Box
@@ -186,7 +191,7 @@ function Login() {
             md={6}
           >
 
-            <Box sx={{ p: 6 }}>
+            <Box component="form" onSubmit={handleFormSubmit} sx={{ p: 6 }}>
 
               <Typography
                 variant="h4"
@@ -230,6 +235,7 @@ function Login() {
               />
 
               <Button
+                type="submit"
                 variant="contained"
                 fullWidth
                 size="large"
@@ -237,12 +243,12 @@ function Login() {
                   mt: 2,
                   mb: 3,
                 }}
-                onClick={handleLogin}
               >
                 Iniciar sesión
               </Button>
 
               <Button
+                type="button"
                 fullWidth
                 sx={{ mb: 2 }}
                 onClick={() => navigate("/forgot-password")}
@@ -251,6 +257,7 @@ function Login() {
               </Button>
 
               <Button
+                type="button"
                 fullWidth
                 variant="outlined"
                 sx={{ mb: 2 }}
@@ -262,6 +269,7 @@ function Login() {
               </Button>
 
               <Button
+                type="button"
                 fullWidth
                 onClick={() => navigate("/")}
               >
