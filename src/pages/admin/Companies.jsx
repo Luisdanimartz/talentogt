@@ -419,24 +419,14 @@ function Companies() {
 
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell
-                                                    sx={{
-                                                        position: "sticky",
-                                                        top: 0,
-                                                        left: 0,
-                                                        zIndex: 3,
-                                                        backgroundColor: "#fff",
-                                                    }}
-                                                >
-                                                    <strong>Empresa</strong>
-                                                </TableCell>
-                                                <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Vacantes</strong></TableCell>
-                                                <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Postulac.</strong></TableCell>
-                                                <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Estado</strong></TableCell>
-                                                <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Tarifa</strong></TableCell>
-                                                <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Vence</strong></TableCell>
-                                                <TableCell sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Colaboradora</strong></TableCell>
-                                                <TableCell align="center" sx={{ position: "sticky", top: 0, zIndex: 2, backgroundColor: "#fff" }}><strong>Acciones</strong></TableCell>
+                                                <TableCell><strong>Empresa</strong></TableCell>
+                                                <TableCell><strong>Vacantes</strong></TableCell>
+                                                <TableCell><strong>Postulac.</strong></TableCell>
+                                                <TableCell><strong>Estado</strong></TableCell>
+                                                <TableCell><strong>Tarifa</strong></TableCell>
+                                                <TableCell><strong>Vence</strong></TableCell>
+                                                <TableCell><strong>Colaboradora</strong></TableCell>
+                                                <TableCell align="center"><strong>Acciones</strong></TableCell>
                                             </TableRow>
                                         </TableHead>
 
@@ -452,14 +442,7 @@ function Companies() {
                                                     sx={{ cursor: "pointer" }}
                                                 >
 
-                                                    <TableCell
-                                                        sx={{
-                                                            position: "sticky",
-                                                            left: 0,
-                                                            zIndex: 1,
-                                                            backgroundColor: "inherit",
-                                                        }}
-                                                    >
+                                                    <TableCell>
                                                         <strong>{c.company_name}</strong>
                                                         {c.plan === "vip" && (
                                                             <span
@@ -497,6 +480,8 @@ function Companies() {
                                                     <TableCell>
                                                         <Typography fontSize={13}>
                                                             {c.active_plan_name || "Sin plan asignado"}
+                                                            {c.active_plan_job_limit != null &&
+                                                                ` (${c.active_plan_job_limit})`}
                                                         </Typography>
                                                     </TableCell>
 
@@ -626,7 +611,11 @@ function Companies() {
 
                                         <Chip
                                             size="small"
-                                            label={`Plan actual: ${seleccionada.active_plan_name || "Sin plan asignado"}`}
+                                            label={`Plan actual: ${seleccionada.active_plan_name || "Sin plan asignado"}${
+                                                seleccionada.active_plan_job_limit != null
+                                                    ? ` (${seleccionada.active_plan_job_limit})`
+                                                    : ""
+                                            }`}
                                             sx={{
                                                 mb: 1.5,
                                                 background: "#E4F5F0",
