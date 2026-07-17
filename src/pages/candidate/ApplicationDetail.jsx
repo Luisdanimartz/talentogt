@@ -8,7 +8,6 @@ import { getMyApplicationDetail } from "../../services/candidateService";
 import { getJobApplicantStats } from "../../services/jobService";
 import { getMyInterviewsForApplication } from "../../services/interviewService";
 import { formatSalary } from "../../utils/formatSalary";
-import { statusLabel } from "../../utils/applicationStatus";
 import CompanyResponseBadge from "../../components/CompanyResponseBadge";
 
 /*

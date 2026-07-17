@@ -36,6 +36,7 @@ export function AuthProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- patron estandar de Context + hook; solo afecta el hot-reload en desarrollo, no el build de produccion.
 export function useAuth() {
   return useContext(AuthContext);
 }

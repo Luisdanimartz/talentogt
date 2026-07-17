@@ -133,6 +133,7 @@ function EditJob() {
 
     setLoading(true);
 
+    /* eslint-disable no-unused-vars -- destructuring solo para excluir estos campos de editableFields */
     const {
       id: jobId,
       company_profiles,
@@ -144,6 +145,7 @@ function EditJob() {
       published_at,
       ...editableFields
     } = form;
+    /* eslint-enable no-unused-vars */
 
     const salario = salarioANumero(salary);
 

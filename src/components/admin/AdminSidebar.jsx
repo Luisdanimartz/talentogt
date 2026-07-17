@@ -9,7 +9,6 @@ import {
     Groups as GroupsIcon,
     BarChart as BarChartIcon,
     Settings as SettingsIcon,
-    AdminPanelSettings as AdminIcon,
     Business as BusinessIcon,
     OpenInNew as OpenInNewIcon,
 } from "@mui/icons-material";

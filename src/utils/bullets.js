@@ -43,7 +43,7 @@ export function normalizarVinetas(texto) {
     return String(texto || "")
         .split("\n")
         .map((linea) => {
-            const limpia = linea.replace(/^\s*[•\-\*]\s*/, "").trim();
+            const limpia = linea.replace(/^\s*[•\-*]\s*/, "").trim();
             return limpia ? `• ${limpia}` : "";
         })
         .filter(Boolean)
@@ -54,7 +54,7 @@ export function normalizarVinetas(texto) {
 /* "• Liderazgo integral..." -> "Liderazgo integral..." */
 export function sinVineta(linea) {
 
-    return String(linea || "").replace(/^\s*[•\-\*]\s*/, "").trim();
+    return String(linea || "").replace(/^\s*[•\-*]\s*/, "").trim();
 
 }
 

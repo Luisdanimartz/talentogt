@@ -63,6 +63,264 @@ const ESTADO_CHIP = {
     cancelada: { label: "Cancelada", bg: "#FDECEC", color: "#B3261E" },
 };
 
+function TarjetaEntrevista({
+    interview,
+    notesId,
+    notesDraft,
+    setNotesDraft,
+    setNotesId,
+    handleSaveNotes,
+    handleStatus,
+    puedeEditar,
+}) {
+
+    const app = interview.applications;
+    const estado = ESTADO_CHIP[interview.status] || ESTADO_CHIP.programada;
+
+    return (
+
+        <Paper
+            elevation={0}
+            sx={{
+                p: 2.5,
+                mb: 2,
+                borderRadius: 3,
+                border: "1px solid #E6E8EC",
+            }}
+        >
+
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 2,
+                    flexWrap: "wrap",
+                }}
+            >
+
+                <Box sx={{ flex: 1, minWidth: 240 }}>
+
+                    <Typography fontWeight={700} color="#0B1F3A">
+                        {nombreCandidato(app?.candidate_profiles)}
+                        {app?.candidate_profiles?.profession &&
+                            ` · ${app.candidate_profiles.profession}`}
+                    </Typography>
+
+                    <Typography fontSize={14} color="text.secondary">
+                        Vacante: {app?.jobs?.title || "—"}
+                    </Typography>
+
+                    <Typography fontSize={14} sx={{ mt: 0.5 }}>
+                        🗓 {fechaBonita(interview.scheduled_at)}
+                        {" · "}{interview.modality}
+                    </Typography>
+
+                    {interview.location_or_link && (
+                        <Typography fontSize={14} color="text.secondary">
+                            {interview.modality === "Virtual"
+                                ? "Enlace: "
+                                : interview.modality === "Telefónica"
+                                    ? "Teléfono: "
+                                    : "Lugar: "}
+                            {interview.location_or_link}
+                        </Typography>
+                    )}
+
+                    {app?.candidate_profiles?.phone && (
+                        <Typography fontSize={14} color="text.secondary">
+                            Contacto del candidato:{" "}
+                            {app.candidate_profiles.phone}
+                        </Typography>
+                    )}
+
+                </Box>
+
+                <Chip
+                    size="small"
+                    label={estado.label}
+                    sx={{ background: estado.bg, color: estado.color }}
+                />
+
+            </Box>
+
+            {/* Notas internas */}
+
+            {notesId === interview.id ? (
+
+                <Box sx={{ mt: 2 }}>
+
+                    <TextField
+                        fullWidth
+                        multiline
+                        rows={3}
+                        size="small"
+                        label="Notas internas (el candidato no las ve)"
+                        value={notesDraft}
+                        onChange={(e) => setNotesDraft(e.target.value)}
+                    />
+
+                    <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+
+                        <Button
+                            size="small"
+                            variant="contained"
+                            onClick={() => handleSaveNotes(interview)}
+                            sx={{
+                                background: "#0E8F73",
+                                textTransform: "none",
+                                "&:hover": { background: "#0C7A62" },
+                            }}
+                        >
+                            Guardar notas
+                        </Button>
+
+                        <Button
+                            size="small"
+                            onClick={() => setNotesId(null)}
+                            sx={{ textTransform: "none" }}
+                        >
+                            Cancelar
+                        </Button>
+
+                    </Box>
+
+                </Box>
+
+            ) : (
+
+                interview.notes && (
+                    <Typography
+                        fontSize={14}
+                        sx={{
+                            mt: 1.5,
+                            p: 1.5,
+                            background: "#F7F8FA",
+                            borderRadius: 2,
+                            whiteSpace: "pre-line",
+                        }}
+                    >
+                        📝 {interview.notes}
+                    </Typography>
+                )
+
+            )}
+
+            {/* Acciones */}
+
+            {puedeEditar && notesId !== interview.id && (
+
+                <Box
+                    sx={{
+                        display: "flex",
+                        gap: 1,
+                        mt: 2,
+                        flexWrap: "wrap",
+                    }}
+                >
+
+                    {interview.status === "programada" && (
+                        <>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                onClick={() =>
+                                    handleStatus(interview, "realizada")
+                                }
+                                sx={{ textTransform: "none" }}
+                            >
+                                ✓ Marcar realizada
+                            </Button>
+
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                color="error"
+                                onClick={() =>
+                                    handleStatus(interview, "cancelada")
+                                }
+                                sx={{ textTransform: "none" }}
+                            >
+                                Cancelar entrevista
+                            </Button>
+                        </>
+                    )}
+
+                    <Button
+                        size="small"
+                        onClick={() => {
+                            setNotesId(interview.id);
+                            setNotesDraft(interview.notes || "");
+                        }}
+                        sx={{ textTransform: "none" }}
+                    >
+                        {interview.notes
+                            ? "Editar notas"
+                            : "Agregar notas"}
+                    </Button>
+
+                </Box>
+
+            )}
+
+        </Paper>
+
+    );
+
+}
+
+function Bloque({
+    titulo,
+    lista,
+    vacio,
+    notesId,
+    notesDraft,
+    setNotesDraft,
+    setNotesId,
+    handleSaveNotes,
+    handleStatus,
+    puedeEditar,
+}) {
+
+    return (
+
+        <Box sx={{ mb: 4 }}>
+
+            <Typography
+                variant="h6"
+                fontWeight="bold"
+                color="#0B1F3A"
+                mb={1.5}
+            >
+                {titulo}
+                {lista.length > 0 && ` (${lista.length})`}
+            </Typography>
+
+            {lista.length === 0 ? (
+                <Typography color="text.secondary" fontSize={14}>
+                    {vacio}
+                </Typography>
+            ) : (
+                lista.map((i) => (
+                    <TarjetaEntrevista
+                        key={i.id}
+                        interview={i}
+                        notesId={notesId}
+                        notesDraft={notesDraft}
+                        setNotesDraft={setNotesDraft}
+                        setNotesId={setNotesId}
+                        handleSaveNotes={handleSaveNotes}
+                        handleStatus={handleStatus}
+                        puedeEditar={puedeEditar}
+                    />
+                ))
+            )}
+
+        </Box>
+
+    );
+
+}
+
 function Interviews() {
 
     const [company, setCompany] = useState(null);
@@ -74,12 +332,6 @@ function Interviews() {
     /* Edicion de notas: id de la entrevista abierta y su borrador */
     const [notesId, setNotesId] = useState(null);
     const [notesDraft, setNotesDraft] = useState("");
-
-    useEffect(() => {
-
-        loadData();
-
-    }, []);
 
     async function loadData() {
 
@@ -106,6 +358,12 @@ function Interviews() {
         setLoading(false);
 
     }
+
+    useEffect(() => {
+
+        loadData();
+
+    }, []);
 
     async function handleStatus(interview, status) {
 
@@ -181,234 +439,6 @@ function Interviews() {
 
     }, [interviews]);
 
-    function TarjetaEntrevista({ interview }) {
-
-        const app = interview.applications;
-        const estado = ESTADO_CHIP[interview.status] || ESTADO_CHIP.programada;
-
-        return (
-
-            <Paper
-                elevation={0}
-                sx={{
-                    p: 2.5,
-                    mb: 2,
-                    borderRadius: 3,
-                    border: "1px solid #E6E8EC",
-                }}
-            >
-
-                <Box
-                    sx={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        gap: 2,
-                        flexWrap: "wrap",
-                    }}
-                >
-
-                    <Box sx={{ flex: 1, minWidth: 240 }}>
-
-                        <Typography fontWeight={700} color="#0B1F3A">
-                            {nombreCandidato(app?.candidate_profiles)}
-                            {app?.candidate_profiles?.profession &&
-                                ` · ${app.candidate_profiles.profession}`}
-                        </Typography>
-
-                        <Typography fontSize={14} color="text.secondary">
-                            Vacante: {app?.jobs?.title || "—"}
-                        </Typography>
-
-                        <Typography fontSize={14} sx={{ mt: 0.5 }}>
-                            🗓 {fechaBonita(interview.scheduled_at)}
-                            {" · "}{interview.modality}
-                        </Typography>
-
-                        {interview.location_or_link && (
-                            <Typography fontSize={14} color="text.secondary">
-                                {interview.modality === "Virtual"
-                                    ? "Enlace: "
-                                    : interview.modality === "Telefónica"
-                                        ? "Teléfono: "
-                                        : "Lugar: "}
-                                {interview.location_or_link}
-                            </Typography>
-                        )}
-
-                        {app?.candidate_profiles?.phone && (
-                            <Typography fontSize={14} color="text.secondary">
-                                Contacto del candidato:{" "}
-                                {app.candidate_profiles.phone}
-                            </Typography>
-                        )}
-
-                    </Box>
-
-                    <Chip
-                        size="small"
-                        label={estado.label}
-                        sx={{ background: estado.bg, color: estado.color }}
-                    />
-
-                </Box>
-
-                {/* Notas internas */}
-
-                {notesId === interview.id ? (
-
-                    <Box sx={{ mt: 2 }}>
-
-                        <TextField
-                            fullWidth
-                            multiline
-                            rows={3}
-                            size="small"
-                            label="Notas internas (el candidato no las ve)"
-                            value={notesDraft}
-                            onChange={(e) => setNotesDraft(e.target.value)}
-                        />
-
-                        <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-
-                            <Button
-                                size="small"
-                                variant="contained"
-                                onClick={() => handleSaveNotes(interview)}
-                                sx={{
-                                    background: "#0E8F73",
-                                    textTransform: "none",
-                                    "&:hover": { background: "#0C7A62" },
-                                }}
-                            >
-                                Guardar notas
-                            </Button>
-
-                            <Button
-                                size="small"
-                                onClick={() => setNotesId(null)}
-                                sx={{ textTransform: "none" }}
-                            >
-                                Cancelar
-                            </Button>
-
-                        </Box>
-
-                    </Box>
-
-                ) : (
-
-                    interview.notes && (
-                        <Typography
-                            fontSize={14}
-                            sx={{
-                                mt: 1.5,
-                                p: 1.5,
-                                background: "#F7F8FA",
-                                borderRadius: 2,
-                                whiteSpace: "pre-line",
-                            }}
-                        >
-                            📝 {interview.notes}
-                        </Typography>
-                    )
-
-                )}
-
-                {/* Acciones */}
-
-                {puedeEditar && notesId !== interview.id && (
-
-                    <Box
-                        sx={{
-                            display: "flex",
-                            gap: 1,
-                            mt: 2,
-                            flexWrap: "wrap",
-                        }}
-                    >
-
-                        {interview.status === "programada" && (
-                            <>
-                                <Button
-                                    size="small"
-                                    variant="outlined"
-                                    onClick={() =>
-                                        handleStatus(interview, "realizada")
-                                    }
-                                    sx={{ textTransform: "none" }}
-                                >
-                                    ✓ Marcar realizada
-                                </Button>
-
-                                <Button
-                                    size="small"
-                                    variant="outlined"
-                                    color="error"
-                                    onClick={() =>
-                                        handleStatus(interview, "cancelada")
-                                    }
-                                    sx={{ textTransform: "none" }}
-                                >
-                                    Cancelar entrevista
-                                </Button>
-                            </>
-                        )}
-
-                        <Button
-                            size="small"
-                            onClick={() => {
-                                setNotesId(interview.id);
-                                setNotesDraft(interview.notes || "");
-                            }}
-                            sx={{ textTransform: "none" }}
-                        >
-                            {interview.notes
-                                ? "Editar notas"
-                                : "Agregar notas"}
-                        </Button>
-
-                    </Box>
-
-                )}
-
-            </Paper>
-
-        );
-
-    }
-
-    function Bloque({ titulo, lista, vacio }) {
-
-        return (
-
-            <Box sx={{ mb: 4 }}>
-
-                <Typography
-                    variant="h6"
-                    fontWeight="bold"
-                    color="#0B1F3A"
-                    mb={1.5}
-                >
-                    {titulo}
-                    {lista.length > 0 && ` (${lista.length})`}
-                </Typography>
-
-                {lista.length === 0 ? (
-                    <Typography color="text.secondary" fontSize={14}>
-                        {vacio}
-                    </Typography>
-                ) : (
-                    lista.map((i) => (
-                        <TarjetaEntrevista key={i.id} interview={i} />
-                    ))
-                )}
-
-            </Box>
-
-        );
-
-    }
-
     return (
 
         <div className="dashboard">
@@ -447,18 +477,39 @@ function Interviews() {
                                 titulo="Hoy"
                                 lista={grupos.hoy}
                                 vacio="No tienes entrevistas hoy."
+                                notesId={notesId}
+                                notesDraft={notesDraft}
+                                setNotesDraft={setNotesDraft}
+                                setNotesId={setNotesId}
+                                handleSaveNotes={handleSaveNotes}
+                                handleStatus={handleStatus}
+                                puedeEditar={puedeEditar}
                             />
 
                             <Bloque
                                 titulo="Próximas"
                                 lista={grupos.proximas}
                                 vacio="Nada agendado. Ve a Candidatos y usa «Agendar entrevista»."
+                                notesId={notesId}
+                                notesDraft={notesDraft}
+                                setNotesDraft={setNotesDraft}
+                                setNotesId={setNotesId}
+                                handleSaveNotes={handleSaveNotes}
+                                handleStatus={handleStatus}
+                                puedeEditar={puedeEditar}
                             />
 
                             <Bloque
                                 titulo="Pasadas"
                                 lista={grupos.pasadas}
                                 vacio="Aún no hay entrevistas realizadas o canceladas."
+                                notesId={notesId}
+                                notesDraft={notesDraft}
+                                setNotesDraft={setNotesDraft}
+                                setNotesId={setNotesId}
+                                handleSaveNotes={handleSaveNotes}
+                                handleStatus={handleStatus}
+                                puedeEditar={puedeEditar}
                             />
                         </>
                     )}

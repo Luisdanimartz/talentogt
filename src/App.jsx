@@ -1,49 +1,50 @@
 import "./App.css";
+import { lazy, Suspense } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 
 import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Jobs from "./pages/Jobs";
-import JobDetail from "./pages/JobDetail";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import CookiePolicy from "./pages/CookiePolicy";
-import Pricing from "./pages/Pricing";
-import Contact from "./pages/Contact";
-
-import CreateProfile from "./pages/company/CreateProfile";
-import CreateJob from "./pages/company/CreateJob";
-import EditJob from "./pages/company/EditJob";
-
-import RecruiterDashboard from "./pages/recruiter/RecruiterDashboard";
-import Applicants from "./pages/company/Applicants";
-import CandidateCV from "./pages/company/CandidateCV";
-import SearchCandidates from "./pages/company/SearchCandidates";
-import Interviews from "./pages/company/Interviews";
-import Reports from "./pages/company/Reports";
-import Settings from "./pages/company/Settings";
-import Plans from "./pages/company/Plans";
-import EditProfile from "./pages/company/EditProfile";
-
-import AdminDashboard from "./pages/admin/Dashboard";
-import AdminCompanies from "./pages/admin/Companies";
-import AdminCompanyDetail from "./pages/admin/CompanyDetail";
-import AdminJobs from "./pages/admin/Jobs";
-import AdminCandidates from "./pages/admin/Candidates";
-import AdminReports from "./pages/admin/Reports";
-import AdminSettings from "./pages/admin/Settings";
-
-import CandidateDashboard from "./pages/candidate/Dashboard";
-import CreateCV from "./pages/CreateCV";
-import ApplicationDetail from "./pages/candidate/ApplicationDetail";
-import MyCV from "./pages/candidate/MyCV";
-
 import ProtectedRoute from "./routes/ProtectedRoute";
+
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Jobs = lazy(() => import("./pages/Jobs"));
+const JobDetail = lazy(() => import("./pages/JobDetail"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
+const Pricing = lazy(() => import("./pages/Pricing"));
+const Contact = lazy(() => import("./pages/Contact"));
+
+const CreateProfile = lazy(() => import("./pages/company/CreateProfile"));
+const CreateJob = lazy(() => import("./pages/company/CreateJob"));
+const EditJob = lazy(() => import("./pages/company/EditJob"));
+
+const RecruiterDashboard = lazy(() => import("./pages/recruiter/RecruiterDashboard"));
+const Applicants = lazy(() => import("./pages/company/Applicants"));
+const CandidateCV = lazy(() => import("./pages/company/CandidateCV"));
+const SearchCandidates = lazy(() => import("./pages/company/SearchCandidates"));
+const Interviews = lazy(() => import("./pages/company/Interviews"));
+const Reports = lazy(() => import("./pages/company/Reports"));
+const Settings = lazy(() => import("./pages/company/Settings"));
+const Plans = lazy(() => import("./pages/company/Plans"));
+const EditProfile = lazy(() => import("./pages/company/EditProfile"));
+
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminCompanies = lazy(() => import("./pages/admin/Companies"));
+const AdminCompanyDetail = lazy(() => import("./pages/admin/CompanyDetail"));
+const AdminJobs = lazy(() => import("./pages/admin/Jobs"));
+const AdminCandidates = lazy(() => import("./pages/admin/Candidates"));
+const AdminReports = lazy(() => import("./pages/admin/Reports"));
+const AdminSettings = lazy(() => import("./pages/admin/Settings"));
+
+const CandidateDashboard = lazy(() => import("./pages/candidate/Dashboard"));
+const CreateCV = lazy(() => import("./pages/CreateCV"));
+const ApplicationDetail = lazy(() => import("./pages/candidate/ApplicationDetail"));
+const MyCV = lazy(() => import("./pages/candidate/MyCV"));
 
 function App() {
 
@@ -59,7 +60,23 @@ function App() {
 
       {!hideNavbar && <Navbar />}
 
-      <Routes>
+      <Suspense
+        fallback={
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "60vh",
+              color: "#0B1F3A",
+            }}
+          >
+            Cargando…
+          </div>
+        }
+      >
+
+        <Routes>
 
         {/* PÚBLICAS */}
 
@@ -337,6 +354,8 @@ function App() {
         />
 
       </Routes>
+
+      </Suspense>
 
     </>
 

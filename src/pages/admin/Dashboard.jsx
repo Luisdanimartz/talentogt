@@ -186,7 +186,6 @@ function Dashboard() {
             cargarFacturacion("month", null, null),
         ]).then(() => setLoading(false));
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     async function cargarKpis(desde, hasta) {

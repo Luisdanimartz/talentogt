@@ -71,15 +71,38 @@ function DashboardCards({ jobs, applications = [], applicationsError, interviews
                 tone: "navy",
                 soon: "Sin acceso a postulaciones (revisar permisos)",
             }
-            : {
-                title: "Candidatos por revisar",
-                value: applications.filter(
+            : (() => {
+
+                const pendientes = applications.filter(
                     (app) => (app.current_status || "applied") === "applied"
-                ).length,
-                icon: GroupsIcon,
-                tone: "navy",
-                target: "candidatos",
-            },
+                );
+
+                const diasMasAntiguo = pendientes.reduce((max, app) => {
+
+                    if (!app.applied_at) return max;
+
+                    const dias = Math.floor(
+                        (Date.now() - new Date(app.applied_at).getTime()) / 86400000
+                    );
+
+                    return Math.max(max, dias);
+
+                }, 0);
+
+                return {
+                    title: "Candidatos por revisar",
+                    value: pendientes.length,
+                    subtitle:
+                        pendientes.length > 0 && diasMasAntiguo >= 3
+                            ? `El más antiguo lleva ${diasMasAntiguo} días esperando`
+                            : null,
+                    urgent: diasMasAntiguo >= 3,
+                    icon: GroupsIcon,
+                    tone: "navy",
+                    target: "candidatos",
+                };
+
+            })(),
         interviewsToday === null
             ? {
                 title: "Entrevistas hoy",
@@ -154,9 +177,23 @@ function DashboardCards({ jobs, applications = [], applicationsError, interviews
 
                         ) : (
 
-                            <h2>
-                                {loading ? "…" : card.value}
-                            </h2>
+                            <>
+                                <h2>
+                                    {loading ? "…" : card.value}
+                                </h2>
+
+                                {!loading && card.subtitle && (
+                                    <small
+                                        className={
+                                            card.urgent
+                                                ? "card-subtitle card-subtitle-urgent"
+                                                : "card-subtitle"
+                                        }
+                                    >
+                                        {card.subtitle}
+                                    </small>
+                                )}
+                            </>
 
                         )}
 

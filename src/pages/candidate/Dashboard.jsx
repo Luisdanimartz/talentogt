@@ -13,6 +13,16 @@ import {
     statusLabel,
 } from "../../utils/applicationStatus";
 
+import { tiempoDesde } from "../../utils/timeAgo";
+
+/* Dias que la postulacion lleva sin respuesta (solo si sigue "applied") */
+function diasEsperando(appliedAt) {
+    if (!appliedAt) return 0;
+    return Math.floor(
+        (Date.now() - new Date(appliedAt).getTime()) / 86400000
+    );
+}
+
 const STATUS_COLORS = {
     applied: { bg: "#EEF1F5", color: "#64748B" },
     reviewing: { bg: "#FBF0DF", color: "#C98A2C" },
@@ -242,6 +252,27 @@ function CandidateDashboard() {
                                 {app.applied_at &&
                                     ` · Postulado el ${new Date(app.applied_at).toLocaleDateString("es-GT")}`}
                             </div>
+
+                            {(app.current_status || "applied") === "applied" && app.applied_at && (
+                                <div
+                                    style={{
+                                        display: "inline-block",
+                                        marginTop: 6,
+                                        padding: "3px 10px",
+                                        borderRadius: 999,
+                                        fontSize: 12,
+                                        fontWeight: 600,
+                                        background: diasEsperando(app.applied_at) >= 3
+                                            ? "#FBEAE9"
+                                            : "#EEF1F5",
+                                        color: diasEsperando(app.applied_at) >= 3
+                                            ? "#B3261E"
+                                            : "#64748B",
+                                    }}
+                                >
+                                    Esperando respuesta {tiempoDesde(app.applied_at)}
+                                </div>
+                            )}
                             <div
                                 style={{
                                     color: "#0E8F73",
