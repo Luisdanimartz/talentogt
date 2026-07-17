@@ -60,3 +60,59 @@ h1, h2, h3 {
     }
 
 }
+
+.plan-banner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    background: #FFFFFF;
+    border: 1px solid #E6E8EC;
+    border-radius: 12px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    font-size: 13.5px;
+    color: #1B2430;
+}
+
+.plan-banner-badge {
+    background: #E4F5F0;
+    color: #0E8F73;
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-weight: 600;
+}
+
+.plan-banner-item {
+    color: #5C6B7A;
+}
+
+.plan-banner-item strong {
+    color: #0B1F3A;
+}
+
+.plan-banner-link {
+    margin-left: auto;
+    color: #0E8F73;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.plan-banner-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 700px) {
+
+    .plan-banner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .plan-banner-link {
+        margin-left: 0;
+    }
+
+}
+

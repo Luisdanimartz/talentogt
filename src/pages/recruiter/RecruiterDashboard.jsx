@@ -14,7 +14,7 @@ import StatusOverview from "../../components/recruiter/dashboard/StatusOverview"
 import RoadmapPanel from "../../components/recruiter/dashboard/RoadmapPanel";
 
 import { getMyCompanyContext } from "../../services/teamService";
-import { getCompanyJobs } from "../../services/jobService";
+import { getCompanyJobs, getMyJobCredits } from "../../services/jobService";
 import { getCompanyApplications } from "../../services/applicationService";
 import { getCompanyInterviews, esHoy } from "../../services/interviewService";
 
@@ -31,6 +31,7 @@ function RecruiterDashboard() {
     const [interviewsToday, setInterviewsToday] = useState(null);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
+    const [credits, setCredits] = useState(null);
 
     useEffect(() => {
 
@@ -52,11 +53,14 @@ function RecruiterDashboard() {
         setCompany(companyData);
         setMyRole(role);
 
-        const [jobsRes, appsRes, interviewsRes] = await Promise.all([
+        const [jobsRes, appsRes, interviewsRes, creditsRes] = await Promise.all([
             getCompanyJobs(companyData.id),
             getCompanyApplications(companyData.id),
             getCompanyInterviews(companyData.id),
+            getMyJobCredits(),
         ]);
+
+        setCredits(creditsRes.data || null);
 
         setJobs(jobsRes.data || []);
 
@@ -134,6 +138,38 @@ function RecruiterDashboard() {
                     search={search}
                     onSearchChange={setSearch}
                 />
+
+                {credits && (
+                    <div className="plan-banner">
+                        <span className="plan-banner-badge">
+                            Plan: <strong>{credits.plan_name || "Sin plan"}</strong>
+                        </span>
+
+                        {credits.job_limit === null ? (
+                            <span className="plan-banner-item">
+                                📋 Vacantes ilimitadas
+                            </span>
+                        ) : (
+                            <span className="plan-banner-item">
+                                📋 <strong>{credits.job_credits_remaining ?? 0}</strong> publicación(es) disponible(s)
+                            </span>
+                        )}
+
+                        {credits.destacado_ilimitado ? (
+                            <span className="plan-banner-item">
+                                🔥 Destacado ilimitado
+                            </span>
+                        ) : (
+                            <span className="plan-banner-item">
+                                🔥 <strong>{credits.destacado_credits_remaining ?? 0}</strong> destacada(s) disponible(s)
+                            </span>
+                        )}
+
+                        <a href="/empresa/planes" className="plan-banner-link">
+                            Conseguir más →
+                        </a>
+                    </div>
+                )}
 
                 <DashboardCards
                     jobs={jobs}

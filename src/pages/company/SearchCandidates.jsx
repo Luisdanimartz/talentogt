@@ -17,6 +17,8 @@ import {
     getUnlockedCandidate,
 } from "../../services/companyService";
 
+import { getMyJobCredits } from "../../services/jobService";
+
 function nombreCompleto(c) {
 
     return [c.first_name, c.middle_name, c.last_name, c.second_last_name]
@@ -29,6 +31,7 @@ function SearchCandidates() {
 
     const [company, setCompany] = useState(null);
     const [myRole, setMyRole] = useState(null);
+    const [ilimitado, setIlimitado] = useState(false);
     const [departments, setDepartments] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -52,15 +55,17 @@ function SearchCandidates() {
 
         setLoading(true);
 
-        const [{ company: companyData, role }, departmentsRes] =
+        const [{ company: companyData, role }, departmentsRes, creditsRes] =
             await Promise.all([
                 getMyCompanyContext(),
                 getDepartments(),
+                getMyJobCredits(),
             ]);
 
         setDepartments(departmentsRes.data || []);
         setCompany(companyData || null);
         setMyRole(role || null);
+        setIlimitado(creditsRes?.data?.job_limit === null);
 
         setLoading(false);
 
@@ -98,14 +103,14 @@ function SearchCandidates() {
 
         if (!company) return;
 
-        const tieneCredito = company.unlock_credits > 0;
+        const tieneCredito = ilimitado || company.unlock_credits > 0;
         const yaDesbloqueado = results.find(
             (r) => r.candidate_profile_id === candidateProfileId
         )?.already_unlocked;
 
         if (!yaDesbloqueado && !tieneCredito) {
             alert(
-                "No tienes créditos disponibles. Escribe a ChanceGT para adquirir más."
+                "No te quedan usos de \"Ver perfil completo\" disponibles. Escribe a ChanceGT para adquirir más."
             );
             return;
         }
@@ -113,7 +118,9 @@ function SearchCandidates() {
         if (!yaDesbloqueado) {
 
             const seguro = window.confirm(
-                "Esto usará 1 crédito de desbloqueo para ver el perfil completo de este candidato. ¿Continuar?"
+                ilimitado
+                    ? "Tu plan Reclutador incluye ver el perfil completo de este candidato sin costo. ¿Continuar?"
+                    : "Esto usará 1 \"Ver perfil completo\" para ver toda la información de este candidato. ¿Continuar?"
             );
 
             if (!seguro) return;
@@ -145,7 +152,7 @@ function SearchCandidates() {
 
         setUnlocked((prev) => ({ ...prev, [candidateProfileId]: fullProfile }));
 
-        if (!yaDesbloqueado) {
+        if (!yaDesbloqueado && !ilimitado) {
             setCompany((prev) => ({
                 ...prev,
                 unlock_credits: prev.unlock_credits - 1,
@@ -186,12 +193,20 @@ function SearchCandidates() {
 
                     {!loading && (
                         <div className="credits-badge">
-                            <strong>{company?.unlock_credits ?? 0}</strong>
-                            <span>
-                                {company?.unlock_credits === 1
-                                    ? "crédito disponible"
-                                    : "créditos disponibles"}
-                            </span>
+                            {ilimitado ? (
+                                <span>
+                                    <strong>Ilimitado</strong> "Ver perfil completo" — incluido en tu plan Reclutador
+                                </span>
+                            ) : (
+                                <>
+                                    <strong>{company?.unlock_credits ?? 0}</strong>
+                                    <span>
+                                        {company?.unlock_credits === 1
+                                            ? "\"Ver perfil completo\" disponible"
+                                            : "\"Ver perfil completo\" disponibles"}
+                                    </span>
+                                </>
+                            )}
                         </div>
                     )}
 
@@ -321,10 +336,10 @@ function SearchCandidates() {
                                             onClick={() => handleUnlock(c.candidate_profile_id)}
                                         >
                                             {unlockingId === c.candidate_profile_id
-                                                ? "Desbloqueando…"
+                                                ? "Cargando…"
                                                 : c.already_unlocked
                                                     ? "Ver perfil completo"
-                                                    : "Desbloquear perfil (1 crédito)"}
+                                                    : ilimitado ? "Ver perfil completo (incluido)" : "Ver perfil completo (Q25)"}
                                         </button>
                                     )}
 

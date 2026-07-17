@@ -117,3 +117,21 @@ export async function getJobApplicantStats(jobId) {
     jid: jobId,
   });
 }
+
+/* Saldo de creditos de la empresa logueada (publicaciones y
+   destacados disponibles). Ver database/041_creditos_consumibles.sql */
+export async function getMyJobCredits() {
+  const { data, error } = await supabase.rpc("get_my_job_credits");
+
+  if (error) return { data: null, error };
+
+  return { data: data?.[0] || null, error: null };
+}
+
+/* Republicar gratis una vacante que no se llenó en 7 dias
+   (solo 1 vez por vacante, plan Individual). */
+export async function republishJobFree(jobId) {
+  return await supabase.rpc("republish_job_free", {
+    p_job_id: jobId,
+  });
+}

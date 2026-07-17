@@ -175,6 +175,47 @@ export async function grantFreePosts(companyId, cantidad, notes) {
     .single();
 }
 
+/* Otorga publicaciones DESTACADAS (🔥 Urgente + prioridad) a una
+   empresa. Ver database/041_creditos_consumibles.sql */
+export async function grantDestacadoCredits(companyId, cantidad, notes) {
+  return await supabase
+    .rpc("admin_grant_destacado_credits", {
+      p_company_id: companyId,
+      p_cantidad: cantidad,
+      p_notes: notes || null,
+    })
+    .single();
+}
+
+/* Fija cuántos usuarios de equipo puede tener una empresa sin plan
+   de pago (Individual = 1, Empresarial = 3...). */
+export async function setSeatLimit(companyId, seatLimit, notes) {
+  return await supabase
+    .rpc("admin_set_seat_limit", {
+      p_company_id: companyId,
+      p_seat_limit: seatLimit,
+      p_notes: notes || null,
+    })
+    .single();
+}
+
+/* Activa o desactiva una fila puntual del historial de tarifas
+   (para cortar el acceso antes de que venza, o reactivarla). */
+export async function setAssignmentActive(assignmentId, active) {
+  return await supabase.rpc("admin_set_assignment_active", {
+    p_assignment_id: assignmentId,
+    p_active: active,
+  });
+}
+
+/* Id de la asignación que hoy determina el plan vigente de una
+   empresa (para el botón único de activar/desactivar). */
+export async function getCurrentAssignmentId(companyId) {
+  return await supabase.rpc("admin_get_current_assignment", {
+    p_company_id: companyId,
+  });
+}
+
 export async function getCompanyPricingHistory(companyId) {
   return await supabase.rpc("admin_company_pricing_history", {
     p_company_id: companyId,

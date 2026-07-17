@@ -8,7 +8,7 @@ import "./../../../styles/recruiter/dashboard/RoadmapPanel.css";
 const ROADMAP = [
     {
         title: "Equipos por empresa",
-        detail: "Dueños, reclutadores y jefes viendo el mismo panel.",
+        detail: "Admins, reclutadores y jefes viendo el mismo panel.",
     },
     {
         title: "Postulaciones de candidatos",

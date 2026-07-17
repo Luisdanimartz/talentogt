@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "./../../../styles/recruiter/dashboard/JobsTable.css";
 
 import { formatSalary } from "../../../utils/formatSalary";
+import { republishJobFree } from "../../../services/jobService";
 
 const STATUS_LABELS = {
     draft: "Borrador",
@@ -42,6 +43,28 @@ function JobsTable({ jobs, loading, searching }) {
     const navigate = useNavigate();
 
     const [showAll, setShowAll] = useState(false);
+    const [republicando, setRepublicando] = useState(null);
+
+    async function handleRepublicar(jobId) {
+
+        if (!window.confirm(
+            "¿Republicar esta vacante gratis por 30 días más? Solo se puede usar una vez por vacante."
+        )) return;
+
+        setRepublicando(jobId);
+
+        const { error } = await republishJobFree(jobId);
+
+        setRepublicando(null);
+
+        if (error) {
+            alert(error.message);
+            return;
+        }
+
+        window.location.reload();
+
+    }
 
     const visibleJobs = showAll
         ? jobs
@@ -172,6 +195,19 @@ function JobsTable({ jobs, loading, searching }) {
                         <button onClick={() => navigate(`/empresa/vacante/${job.id}`)}>
                             Ver detalle
                         </button>
+
+                        {job.status === "published" &&
+                            !job.free_republish_used &&
+                            diasDesde(job.published_at) !== null &&
+                            diasDesde(job.published_at) >= 7 && (
+                                <button
+                                    onClick={() => handleRepublicar(job.id)}
+                                    disabled={republicando === job.id}
+                                    style={{ color: "#0E8F73", borderColor: "#0E8F73" }}
+                                >
+                                    {republicando === job.id ? "Republicando…" : "Republicar gratis"}
+                                </button>
+                            )}
 
                     </div>
 

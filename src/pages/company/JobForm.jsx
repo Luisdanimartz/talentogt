@@ -146,6 +146,7 @@ function JobForm({
   onSubmit,
   onFinalize,
   finalizing,
+  creditos,
 }) {
 
   const navigate = useNavigate();
@@ -207,6 +208,17 @@ function JobForm({
 
       {/* ===== Secciones ===== */}
       <Box sx={{ maxWidth: 900, mx: "auto", px: 3, mt: -4 }}>
+
+        {creditos && creditos.job_limit !== null && (
+          <Alert
+            severity={creditos.job_credits_remaining > 0 ? "info" : "error"}
+            sx={{ mb: 3, borderRadius: 3 }}
+          >
+            {creditos.job_credits_remaining > 0
+              ? <>Te quedan <strong>{creditos.job_credits_remaining}</strong> publicación(es) disponible(s) en tu plan.</>
+              : <>No te quedan publicaciones disponibles. <a href="/empresa/planes">Consigue más créditos aquí</a>.</>}
+          </Alert>
+        )}
 
         {llevaMuchoTiempo && (
           <Alert severity="warning" sx={{ mb: 3, borderRadius: 3 }}>

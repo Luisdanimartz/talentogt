@@ -33,6 +33,7 @@ const MENU = [
     { icon: PersonSearchIcon, title: "Buscar candidatos", path: "/empresa/buscar-candidatos" },
     { icon: EventIcon, title: "Entrevistas", path: "/empresa/entrevistas" },
     { icon: BarChartIcon, title: "Reportes", path: "/empresa/reportes" },
+    { icon: BusinessCenterIcon, title: "Planes", path: "/empresa/planes" },
     { icon: SettingsIcon, title: "Configuración", path: "/empresa/configuracion" },
 ];
 

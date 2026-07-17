@@ -9,7 +9,7 @@ function Navbar() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const role = user?.user_metadata?.role;
+  const role = user?.app_metadata?.role;
 
   /* A dónde lleva "Mi panel" según el rol */
   const panelPath =
@@ -59,6 +59,10 @@ function Navbar() {
 
           <Link to="/vacantes">
             Buscar empleo
+          </Link>
+
+          <Link to="/planes">
+            Tarifas
           </Link>
 
           <span className="nav-link-soon" title="Disponible próximamente">

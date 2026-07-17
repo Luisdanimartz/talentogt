@@ -11,7 +11,7 @@ import { getCompanyProfileByUserId } from "./companyService";
 */
 
 export const TEAM_ROLES = [
-  { value: "dueno", label: "Dueño" },
+  { value: "dueno", label: "Admin" },
   { value: "reclutador", label: "Reclutador" },
   { value: "observador", label: "Observador" },
 ];

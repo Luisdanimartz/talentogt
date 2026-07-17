@@ -8,6 +8,7 @@ import {
   getEmploymentTypes,
   getEducationLevels,
   createJob,
+  getMyJobCredits,
 } from "../../services/jobService";
 
 import {
@@ -51,10 +52,12 @@ function CreateJob() {
   const [municipalities, setMunicipalities] = useState([]);
 
   const [loading, setLoading] = useState(false);
+  const [creditos, setCreditos] = useState(null);
 
   useEffect(() => {
 
     loadCatalogs();
+    getMyJobCredits().then(({ data }) => setCreditos(data));
 
   }, []);
 
@@ -204,6 +207,8 @@ function CreateJob() {
       onChange={handleChange}
 
       onSubmit={handleSubmit}
+
+      creditos={creditos}
 
     />
 

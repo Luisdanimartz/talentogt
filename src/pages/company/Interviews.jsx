@@ -31,7 +31,7 @@ import {
 
   Tres bloques: HOY, PROXIMAS y PASADAS. Cada entrevista muestra
   candidato, vacante, fecha/hora, modalidad, lugar/enlace y notas
-  internas. Dueño y reclutador marcan Realizada / Cancelada y
+  internas. Admin y reclutador marcan Realizada / Cancelada y
   editan notas; el observador solo mira.
 */
 

@@ -17,7 +17,6 @@ import Pricing from "./pages/Pricing";
 import Contact from "./pages/Contact";
 
 import CreateProfile from "./pages/company/CreateProfile";
-import EditProfile from "./pages/company/EditProfile";
 import CreateJob from "./pages/company/CreateJob";
 import EditJob from "./pages/company/EditJob";
 
@@ -28,9 +27,12 @@ import SearchCandidates from "./pages/company/SearchCandidates";
 import Interviews from "./pages/company/Interviews";
 import Reports from "./pages/company/Reports";
 import Settings from "./pages/company/Settings";
+import Plans from "./pages/company/Plans";
+import EditProfile from "./pages/company/EditProfile";
 
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminCompanies from "./pages/admin/Companies";
+import AdminCompanyDetail from "./pages/admin/CompanyDetail";
 import AdminJobs from "./pages/admin/Jobs";
 import AdminCandidates from "./pages/admin/Candidates";
 import AdminReports from "./pages/admin/Reports";
@@ -225,6 +227,15 @@ function App() {
         />
 
         <Route
+          path="/empresa/planes"
+          element={
+            <ProtectedRoute allowedRoles={["empresa"]}>
+              <Plans />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/empresa/crear-perfil"
           element={
             <ProtectedRoute allowedRoles={["empresa"]}>
@@ -276,6 +287,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminCompanies />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/empresas/:id"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminCompanyDetail />
             </ProtectedRoute>
           }
         />

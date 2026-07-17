@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import "./../../styles/theme.css";
 import "./../../styles/recruiter/layout/RecruiterDashboard.css";
@@ -20,7 +21,7 @@ import {
     Typography,
 } from "@mui/material";
 
-import { Close as CloseIcon, Edit as EditIcon } from "@mui/icons-material";
+import { Edit as EditIcon } from "@mui/icons-material";
 
 import AdminSidebar from "../../components/admin/AdminSidebar";
 
@@ -31,11 +32,6 @@ import {
     setCompanyCollaborator,
     getPricingPlans,
     savePricingPlan,
-    assignPlanToCompany,
-    grantFreePosts,
-    addUnlockCredits,
-    getCompanyPricingHistory,
-    getCompanyUsage,
     getUpcomingPlanExpirations,
 } from "../../services/adminService";
 
@@ -60,24 +56,18 @@ function fechaCorta(iso) {
 
 function Companies() {
 
+    const navigate = useNavigate();
+
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [busyId, setBusyId] = useState(null);
 
     const [busqueda, setBusqueda] = useState("");
-    const [seleccionada, setSeleccionada] = useState(null);
 
     const [plans, setPlans] = useState([]);
     const [planForm, setPlanForm] = useState(null);
-    const [historial, setHistorial] = useState([]);
 
-    const [gratisCantidad, setGratisCantidad] = useState(1);
-    const [gratisNota, setGratisNota] = useState("");
-    const [creditosCantidad, setCreditosCantidad] = useState(5);
-    const [creditosMsg, setCreditosMsg] = useState(null);
-    const [dandoCreditos, setDandoCreditos] = useState(false);
-    const [uso, setUso] = useState(null);
     const [vencimientos, setVencimientos] = useState([]);
 
     useEffect(() => {
@@ -110,20 +100,6 @@ function Companies() {
 
     }
 
-    async function refrescarPlanVigente(companyId) {
-
-        const { data } = await getAdminCompanies();
-
-        setCompanies(data || []);
-
-        const actualizada = (data || []).find((c) => c.id === companyId);
-
-        if (actualizada) {
-            setSeleccionada(actualizada);
-        }
-
-    }
-
     async function cargarPlanes() {
 
         const { data, error } = await getPricingPlans();
@@ -131,25 +107,6 @@ function Companies() {
         if (error) setError(error.message);
 
         setPlans(data || []);
-
-    }
-
-    async function seleccionar(company) {
-
-        setSeleccionada(company);
-        setGratisCantidad(1);
-        setGratisNota("");
-        setCreditosMsg(null);
-
-        const { data, error } = await getCompanyPricingHistory(company.id);
-
-        if (error) setError(error.message);
-
-        setHistorial(data || []);
-
-        const { data: usoData } = await getCompanyUsage(company.id);
-
-        setUso(usoData);
 
     }
 
@@ -223,112 +180,6 @@ function Companies() {
 
         setPlanForm(null);
         cargarPlanes();
-
-    }
-
-    async function asignarPlan(plan) {
-
-        if (!seleccionada) return;
-
-        if (
-            !window.confirm(
-                `¿Asignar "${plan.name}" a ${seleccionada.company_name} por ${plan.duration_days} días?`
-            )
-        ) return;
-
-        const { error } = await assignPlanToCompany(seleccionada.id, plan.id);
-
-        if (error) { setError(error.message); return; }
-
-        const { data } = await getCompanyPricingHistory(seleccionada.id);
-        setHistorial(data || []);
-
-        const { data: usoData } = await getCompanyUsage(seleccionada.id);
-        setUso(usoData);
-
-        await refrescarPlanVigente(seleccionada.id);
-
-    }
-
-    async function darPublicacionesGratis() {
-
-        if (!seleccionada || !gratisCantidad) return;
-
-        const { error } = await grantFreePosts(
-            seleccionada.id,
-            Number(gratisCantidad),
-            gratisNota
-        );
-
-        if (error) { setError(error.message); return; }
-
-        setGratisCantidad(1);
-        setGratisNota("");
-
-        const { data } = await getCompanyPricingHistory(seleccionada.id);
-        setHistorial(data || []);
-
-        const { data: usoData } = await getCompanyUsage(seleccionada.id);
-        setUso(usoData);
-
-        await refrescarPlanVigente(seleccionada.id);
-
-    }
-
-    async function darCreditosBusqueda() {
-
-        if (!seleccionada) return;
-
-        const cantidad = Number(creditosCantidad);
-
-        if (!cantidad || cantidad <= 0) {
-            setCreditosMsg("Ingresa una cantidad mayor a 0.");
-            return;
-        }
-
-        setCreditosMsg(null);
-        setDandoCreditos(true);
-
-        try {
-
-            const { data, error } = await addUnlockCredits(
-                seleccionada.id,
-                cantidad
-            );
-
-            if (error) {
-                setCreditosMsg(error.message);
-                return;
-            }
-
-            setSeleccionada((prev) =>
-                prev ? { ...prev, unlock_credits: data } : prev
-            );
-
-            setCompanies((prev) =>
-                prev.map((c) =>
-                    c.id === seleccionada.id
-                        ? { ...c, unlock_credits: data }
-                        : c
-                )
-            );
-
-            const { data: historialNuevo } =
-                await getCompanyPricingHistory(seleccionada.id);
-
-            setHistorial(historialNuevo || []);
-
-            const { data: usoNuevo } = await getCompanyUsage(seleccionada.id);
-            setUso(usoNuevo);
-
-            setCreditosMsg(`Listo, ahora tiene ${data} créditos.`);
-
-        } catch (e) {
-            console.error("Error agregando créditos:", e);
-            setCreditosMsg("Ocurrió un error inesperado. Intenta de nuevo.");
-        } finally {
-            setDandoCreditos(false);
-        }
 
     }
 
@@ -437,8 +288,7 @@ function Companies() {
                                                 <TableRow
                                                     key={c.id}
                                                     hover
-                                                    selected={seleccionada?.id === c.id}
-                                                    onClick={() => seleccionar(c)}
+                                                    onClick={() => navigate(`/admin/empresas/${c.id}`)}
                                                     sx={{ cursor: "pointer" }}
                                                 >
 
@@ -579,259 +429,6 @@ function Companies() {
 
                         <Box sx={{ flex: "1 1 340px", minWidth: 300 }}>
 
-                            {/* Empresa seleccionada */}
-
-                            <Paper
-                                elevation={0}
-                                sx={{ p: 2.5, mb: 2.5, borderRadius: 3, border: "1px solid #E6E8EC" }}
-                            >
-
-                                {!seleccionada ? (
-
-                                    <Typography fontSize={14} color="text.secondary">
-                                        Haz clic en una empresa de la lista para asignarle
-                                        una tarifa o darle publicaciones gratis.
-                                    </Typography>
-
-                                ) : (
-
-                                    <>
-
-                                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-
-                                            <Typography fontWeight="bold" color="#0B1F3A">
-                                                {seleccionada.company_name}
-                                            </Typography>
-
-                                            <IconButton size="small" onClick={() => setSeleccionada(null)}>
-                                                <CloseIcon fontSize="small" />
-                                            </IconButton>
-
-                                        </Box>
-
-                                        <Chip
-                                            size="small"
-                                            label={`Plan actual: ${seleccionada.active_plan_name || "Sin plan asignado"}${
-                                                seleccionada.active_plan_job_limit != null
-                                                    ? ` (${seleccionada.active_plan_job_limit})`
-                                                    : ""
-                                            }`}
-                                            sx={{
-                                                mb: 1.5,
-                                                background: "#E4F5F0",
-                                                color: "#0E8F73",
-                                                fontWeight: 600,
-                                            }}
-                                        />
-
-                                        <Typography fontSize={13} color="text.secondary" mb={2}>
-                                            Asignar tarifa:
-                                        </Typography>
-
-                                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mb: 2 }}>
-
-                                            {plans.filter((p) => p.is_active).map((p) => (
-                                                <Button
-                                                    key={p.id}
-                                                    size="small"
-                                                    variant="outlined"
-                                                    onClick={() => asignarPlan(p)}
-                                                    sx={{ textTransform: "none", justifyContent: "space-between" }}
-                                                >
-                                                    <span>{p.name}</span>
-                                                    <span>Q{p.price} · {p.duration_days}d</span>
-                                                </Button>
-                                            ))}
-
-                                            {plans.filter((p) => p.is_active).length === 0 && (
-                                                <Typography fontSize={13} color="text.secondary">
-                                                    No hay tarifas activas todavía. Crea una abajo.
-                                                </Typography>
-                                            )}
-
-                                        </Box>
-
-                                        <Typography fontSize={13} color="text.secondary" mb={1}>
-                                            O regalar publicaciones gratis:
-                                        </Typography>
-
-                                        <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
-
-                                            <TextField
-                                                size="small"
-                                                type="number"
-                                                value={gratisCantidad}
-                                                onChange={(e) => setGratisCantidad(e.target.value)}
-                                                sx={{ width: 90 }}
-                                                inputProps={{ min: 1 }}
-                                            />
-
-                                            <Button
-                                                size="small"
-                                                variant="contained"
-                                                onClick={darPublicacionesGratis}
-                                                sx={{ textTransform: "none", background: "#0E8F73" }}
-                                            >
-                                                Regalar
-                                            </Button>
-
-                                        </Box>
-
-                                        <TextField
-                                            size="small"
-                                            placeholder="Nota (opcional)"
-                                            value={gratisNota}
-                                            onChange={(e) => setGratisNota(e.target.value)}
-                                            sx={{ width: "100%", mb: 2 }}
-                                        />
-
-                                        {uso && (
-
-                                            <Box
-                                                sx={{
-                                                    display: "flex",
-                                                    gap: 2,
-                                                    flexWrap: "wrap",
-                                                    mb: 2,
-                                                    p: 1.2,
-                                                    background: "#FFFFFF",
-                                                    borderRadius: 2,
-                                                    border: "1px solid #E6E8EC",
-                                                }}
-                                            >
-
-                                                <Typography fontSize={12.5} color="text.secondary">
-                                                    Vacantes:{" "}
-                                                    <strong style={{ color: "#0B1F3A" }}>
-                                                        {uso.vacantes_activas}
-                                                    </strong>
-                                                    {" / "}
-                                                    {uso.job_limit === null
-                                                        ? "ilimitadas"
-                                                        : uso.job_limit}
-                                                    {uso.job_limit !== null && (
-                                                        <span style={{ color: "#0E8F73" }}>
-                                                            {" "}({uso.vacantes_disponibles} disponibles)
-                                                        </span>
-                                                    )}
-                                                </Typography>
-
-                                                <Typography fontSize={12.5} color="text.secondary">
-                                                    Publicaciones gratis acumuladas:{" "}
-                                                    <strong style={{ color: "#0B1F3A" }}>
-                                                        {uso.publicaciones_gratis_acumuladas}
-                                                    </strong>
-                                                </Typography>
-
-                                                <Typography fontSize={12.5} color="text.secondary">
-                                                    Créditos usados:{" "}
-                                                    <strong style={{ color: "#0B1F3A" }}>
-                                                        {uso.creditos_usados}
-                                                    </strong>
-                                                </Typography>
-
-                                            </Box>
-
-                                        )}
-
-                                        {uso && uso.plan_expires_at && (
-
-                                            <Box
-                                                sx={{
-                                                    mb: 2,
-                                                    p: 1.2,
-                                                    background: uso.dias_para_vencer <= 3
-                                                        ? "#FCEBEB"
-                                                        : "#FAEEDA",
-                                                    borderRadius: 2,
-                                                }}
-                                            >
-
-                                                <Typography
-                                                    fontSize={12.5}
-                                                    fontWeight={600}
-                                                    color={uso.dias_para_vencer <= 3 ? "#A32D2D" : "#854F0B"}
-                                                >
-                                                    {uso.dias_para_vencer === 0
-                                                        ? "Su plan vence hoy"
-                                                        : `Su plan vence en ${uso.dias_para_vencer} día${uso.dias_para_vencer === 1 ? "" : "s"}`}
-                                                    {" "}({fechaCorta(uso.plan_expires_at)})
-                                                </Typography>
-
-                                            </Box>
-
-                                        )}
-
-                                        <Typography fontSize={13} color="text.secondary" mb={1}>
-                                            Créditos de búsqueda de candidatos
-                                            (tiene {seleccionada.unlock_credits ?? 0}):
-                                        </Typography>
-
-                                        <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
-
-                                            <TextField
-                                                size="small"
-                                                type="number"
-                                                value={creditosCantidad}
-                                                onChange={(e) => setCreditosCantidad(e.target.value)}
-                                                sx={{ width: 90 }}
-                                            />
-
-                                            <Button
-                                                size="small"
-                                                variant="contained"
-                                                onClick={darCreditosBusqueda}
-                                                disabled={dandoCreditos}
-                                                sx={{ textTransform: "none", background: "#C98A2C" }}
-                                            >
-                                                {dandoCreditos ? "Agregando…" : "Agregar créditos"}
-                                            </Button>
-
-                                        </Box>
-
-                                        {creditosMsg && (
-                                            <Typography
-                                                fontSize={12.5}
-                                                color={creditosMsg.startsWith("Listo") ? "#0E8F73" : "error"}
-                                                mb={2}
-                                            >
-                                                {creditosMsg}
-                                            </Typography>
-                                        )}
-
-                                        <Typography fontSize={13} fontWeight={600} color="#0B1F3A" mb={1}>
-                                            Historial
-                                        </Typography>
-
-                                        {historial.length === 0 ? (
-                                            <Typography fontSize={12.5} color="text.secondary">
-                                                Sin tarifas ni regalos asignados todavía.
-                                            </Typography>
-                                        ) : (
-                                            historial.map((h) => (
-                                                <Box key={h.id} sx={{ fontSize: 12.5, mb: 1, pb: 1, borderBottom: "1px solid #F0F2F6" }}>
-                                                    <strong>
-                                                        {h.plan_name
-                                                            || (h.free_posts_granted
-                                                                ? `${h.free_posts_granted} publicación(es) gratis`
-                                                                : h.notes || "Movimiento")}
-                                                    </strong>
-                                                    <br />
-                                                    <span style={{ color: "#64748B" }}>
-                                                        {fechaCorta(h.started_at)}
-                                                        {h.expires_at && (h.plan_name || h.free_posts_granted > 0) && ` → ${fechaCorta(h.expires_at)}`}
-                                                        {h.notes && (h.plan_name || h.free_posts_granted) && ` · ${h.notes}`}
-                                                    </span>
-                                                </Box>
-                                            ))
-                                        )}
-
-                                    </>
-
-                                )}
-
-                            </Paper>
-
                             {/* Catalogo de tarifas */}
 
                             <Paper
@@ -953,7 +550,16 @@ function Companies() {
                                             </Typography>
                                         </Box>
 
-                                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+
+                                            <Typography
+                                                fontSize={12}
+                                                fontWeight={700}
+                                                color={p.is_active ? "#0E8F73" : "#94A3B8"}
+                                                sx={{ mr: 0.5 }}
+                                            >
+                                                {p.is_active ? "Activo" : "Inactivo"}
+                                            </Typography>
 
                                             <Switch
                                                 size="small"

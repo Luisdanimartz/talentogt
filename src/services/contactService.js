@@ -11,7 +11,22 @@ export async function sendContactMessage({ nombre, correo, mensaje }) {
   });
 
   if (error) {
-    return { data: null, error };
+
+    // Supabase no expone el cuerpo real del error en error.message;
+    // hay que leerlo aparte desde error.context (la respuesta HTTP).
+    let detalle = error.message;
+
+    if (error.context) {
+      try {
+        const cuerpo = await error.context.json();
+        detalle = cuerpo?.error || cuerpo?.message || detalle;
+      } catch {
+        // El cuerpo no era JSON; nos quedamos con error.message
+      }
+    }
+
+    return { data: null, error: new Error(detalle) };
+
   }
 
   if (data?.error) {
