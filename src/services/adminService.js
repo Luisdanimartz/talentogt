@@ -30,23 +30,43 @@ export async function getAdminJobs() {
   return await supabase.rpc("admin_jobs");
 }
 
-export async function getAdminHiringFunnel() {
-  return await supabase.rpc("admin_hiring_funnel").single();
+/* Rango de fechas opcional para los reportes: yyyy-mm-dd o null.
+   Con null las funciones SQL devuelven todo el histórico (052). */
+function rangoFechas(desde, hasta) {
+  return {
+    p_desde: desde || null,
+    p_hasta: hasta || null,
+  };
 }
 
-export async function getAdminTopCompanies(limit = 10) {
-  return await supabase.rpc("admin_top_companies", { p_limit: limit });
+export async function getAdminHiringFunnel(desde, hasta) {
+  return await supabase
+    .rpc("admin_hiring_funnel", rangoFechas(desde, hasta))
+    .single();
 }
 
-export async function getAdminCandidatesByDepartment() {
-  return await supabase.rpc("admin_candidates_by_department");
+export async function getAdminTopCompanies(limit = 10, desde, hasta) {
+  return await supabase.rpc("admin_top_companies", {
+    p_limit: limit,
+    ...rangoFechas(desde, hasta),
+  });
+}
+
+export async function getAdminCandidatesByDepartment(desde, hasta) {
+  return await supabase.rpc(
+    "admin_candidates_by_department",
+    rangoFechas(desde, hasta)
+  );
 }
 
 /* Vistas vs postulaciones por vacante: dice si el problema de una
    vacante es de alcance (pocas vistas) o de conversión (hay vistas
    pero casi nadie aplica). */
-export async function getAdminJobViewsVsApplications() {
-  return await supabase.rpc("admin_job_views_vs_applications");
+export async function getAdminJobViewsVsApplications(desde, hasta) {
+  return await supabase.rpc("admin_job_views_vs_applications", {
+    p_company_id: null,
+    ...rangoFechas(desde, hasta),
+  });
 }
 
 /* Empresas/vacantes con candidatos SIN respuesta (current_status
@@ -62,21 +82,34 @@ export async function getAdminCompaniesWithoutJobs() {
   return await supabase.rpc("admin_companies_without_jobs");
 }
 
-/* Reportes demográficos. Ver database/036_reportes_demograficos.sql */
-export async function getAdminCompaniesByLocation() {
-  return await supabase.rpc("admin_companies_by_location");
+/* Reportes demográficos (se filtran por fecha de registro del
+   perfil). Ver database/036 y 052. */
+export async function getAdminCompaniesByLocation(desde, hasta) {
+  return await supabase.rpc(
+    "admin_companies_by_location",
+    rangoFechas(desde, hasta)
+  );
 }
 
-export async function getAdminCandidatesByLocation() {
-  return await supabase.rpc("admin_candidates_by_location");
+export async function getAdminCandidatesByLocation(desde, hasta) {
+  return await supabase.rpc(
+    "admin_candidates_by_location",
+    rangoFechas(desde, hasta)
+  );
 }
 
-export async function getAdminCandidatesByAge() {
-  return await supabase.rpc("admin_candidates_by_age");
+export async function getAdminCandidatesByAge(desde, hasta) {
+  return await supabase.rpc(
+    "admin_candidates_by_age",
+    rangoFechas(desde, hasta)
+  );
 }
 
-export async function getAdminCandidatesByGender() {
-  return await supabase.rpc("admin_candidates_by_gender");
+export async function getAdminCandidatesByGender(desde, hasta) {
+  return await supabase.rpc(
+    "admin_candidates_by_gender",
+    rangoFechas(desde, hasta)
+  );
 }
 
 export async function getAdminList() {
