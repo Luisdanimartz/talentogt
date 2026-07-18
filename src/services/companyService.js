@@ -138,6 +138,7 @@ export async function searchCandidates(companyId, filters = {}) {
     p_company_id: companyId,
     p_profession: filters.profession || null,
     p_department: filters.department || null,
+    p_municipality: filters.municipality || null,
     p_min_years: filters.minYears || null,
     p_skill: filters.skill || null,
   });

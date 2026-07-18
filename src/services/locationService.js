@@ -21,3 +21,14 @@ export async function getMunicipalitiesByDepartment(departmentId) {
     .eq("department_id", departmentId)
     .order("name");
 }
+
+/* Todos los municipios del pais, con su departamento. Util cuando
+   se necesita mostrar el nombre del municipio de una vacante o
+   filtrar en el cliente sin tener que esperar un fetch en cascada
+   por cada cambio de departamento (son solo ~340 filas). */
+export async function getMunicipalities() {
+  return await supabase
+    .from("municipalities")
+    .select("id, name, department_id")
+    .order("name");
+}

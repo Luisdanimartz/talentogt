@@ -82,6 +82,7 @@ export async function getPublishedJobs() {
       salary_max,
       published_at,
       department_id,
+      municipality_id,
       category_id,
       employment_type_id,
       experience_level,

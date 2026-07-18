@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import "./../../styles/theme.css";
 import "./../../styles/recruiter/layout/RecruiterDashboard.css";
@@ -9,7 +9,7 @@ import { toTitleCase } from "../../utils/textFormat";
 import RecruiterSidebar from "../../components/recruiter/layout/RecruiterSidebar";
 
 import { getMyCompanyContext } from "../../services/teamService";
-import { getDepartments } from "../../services/locationService";
+import { getDepartments, getMunicipalities } from "../../services/locationService";
 
 import {
     searchCandidates,
@@ -33,10 +33,12 @@ function SearchCandidates() {
     const [myRole, setMyRole] = useState(null);
     const [ilimitado, setIlimitado] = useState(false);
     const [departments, setDepartments] = useState([]);
+    const [municipalities, setMunicipalities] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const [profession, setProfession] = useState("");
     const [department, setDepartment] = useState("");
+    const [municipality, setMunicipality] = useState("");
     const [skill, setSkill] = useState("");
 
     const [results, setResults] = useState([]);
@@ -55,14 +57,16 @@ function SearchCandidates() {
 
         setLoading(true);
 
-        const [{ company: companyData, role }, departmentsRes, creditsRes] =
+        const [{ company: companyData, role }, departmentsRes, municipalitiesRes, creditsRes] =
             await Promise.all([
                 getMyCompanyContext(),
                 getDepartments(),
+                getMunicipalities(),
                 getMyJobCredits(),
             ]);
 
         setDepartments(departmentsRes.data || []);
+        setMunicipalities(municipalitiesRes.data || []);
         setCompany(companyData || null);
         setMyRole(role || null);
         setIlimitado(creditsRes?.data?.job_limit === null);
@@ -70,6 +74,30 @@ function SearchCandidates() {
         setLoading(false);
 
     }
+
+    /* department guarda el NOMBRE (para el filtro de texto de la
+       funcion SQL), pero municipalities viene con department_id, asi
+       que buscamos primero el id del departamento elegido */
+    const selectedDepartmentId =
+        departments.find((d) => d.name === department)?.id || "";
+
+    /* Al cambiar de departamento, el municipio elegido antes puede
+       no pertenecer al nuevo -> se limpia */
+    useEffect(() => {
+
+        setMunicipality("");
+
+    }, [department]);
+
+    const municipalitiesForFilter = useMemo(() => {
+
+        if (!selectedDepartmentId) return [];
+
+        return municipalities.filter(
+            (m) => String(m.department_id) === String(selectedDepartmentId)
+        );
+
+    }, [municipalities, selectedDepartmentId]);
 
     async function handleSearch(e) {
 
@@ -84,6 +112,7 @@ function SearchCandidates() {
         const { data, error } = await searchCandidates(company.id, {
             profession: profession.trim() || null,
             department: department || null,
+            municipality: municipality || null,
             skill: skill.trim() || null,
         });
 
@@ -231,6 +260,21 @@ function SearchCandidates() {
                             {departments.map((d) => (
                                 <option key={d.id} value={d.name}>
                                     {d.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        <select
+                            value={municipality}
+                            onChange={(e) => setMunicipality(e.target.value)}
+                            disabled={!department}
+                        >
+                            <option value="">
+                                {department ? "Todo el departamento" : "Elige un departamento primero"}
+                            </option>
+                            {municipalitiesForFilter.map((m) => (
+                                <option key={m.id} value={m.name}>
+                                    {m.name}
                                 </option>
                             ))}
                         </select>

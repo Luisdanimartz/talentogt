@@ -10,7 +10,7 @@ import {
     getEmploymentTypes,
     getPublicCompanyResponseSummary,
 } from "../services/jobService";
-import { getDepartments } from "../services/locationService";
+import { getDepartments, getMunicipalities } from "../services/locationService";
 import { formatSalary } from "../utils/formatSalary";
 import { tiempoDesde } from "../utils/timeAgo";
 import { computeMatches } from "../utils/matching";
@@ -120,6 +120,7 @@ function Jobs() {
 
     const [jobs, setJobs] = useState([]);
     const [departments, setDepartments] = useState([]);
+    const [municipalities, setMunicipalities] = useState([]);
     const [categories, setCategories] = useState([]);
     const [employmentTypes, setEmploymentTypes] = useState([]);
     const [profile, setProfile] = useState(null);
@@ -129,6 +130,7 @@ function Jobs() {
     const [searchParams] = useSearchParams();
     const [search, setSearch] = useState(searchParams.get("q") || "");
     const [departmentId, setDepartmentId] = useState("");
+    const [municipalityId, setMunicipalityId] = useState("");
     const [categoryId, setCategoryId] = useState("");
     const [workMode, setWorkMode] = useState("");
     const [employmentTypeId, setEmploymentTypeId] = useState("");
@@ -159,6 +161,26 @@ function Jobs() {
 
     }, []);
 
+    /* Cuando cambia el departamento, limpia el municipio elegido
+       antes (puede no pertenecer al departamento nuevo) */
+    useEffect(() => {
+
+        setMunicipalityId("");
+
+    }, [departmentId]);
+
+    /* Municipios que se muestran en el selector: solo los del
+       departamento elegido (o ninguno, si no se ha elegido) */
+    const municipalitiesForFilter = useMemo(() => {
+
+        if (!departmentId) return [];
+
+        return municipalities.filter(
+            (m) => String(m.department_id) === String(departmentId)
+        );
+
+    }, [municipalities, departmentId]);
+
     async function loadData() {
 
         setLoading(true);
@@ -166,6 +188,7 @@ function Jobs() {
         const peticiones = [
             getPublishedJobs(),
             getDepartments(),
+            getMunicipalities(),
             getJobCategories(),
             getEmploymentTypes(),
             getPublicCompanyResponseSummary(),
@@ -175,11 +198,12 @@ function Jobs() {
             peticiones.push(getCurrentCandidateProfile());
         }
 
-        const [jobsRes, departmentsRes, categoriesRes, employmentRes, respuestaRes, profileRes] =
+        const [jobsRes, departmentsRes, municipalitiesRes, categoriesRes, employmentRes, respuestaRes, profileRes] =
             await Promise.all(peticiones);
 
         setJobs(jobsRes.data || []);
         setDepartments(departmentsRes.data || []);
+        setMunicipalities(municipalitiesRes.data || []);
         setCategories(categoriesRes.data || []);
         setEmploymentTypes(employmentRes.data || []);
         setProfile(profileRes?.data || null);
@@ -196,6 +220,9 @@ function Jobs() {
 
     const departmentName = (id) =>
         departments.find((d) => d.id === id)?.name || "";
+
+    const municipalityName = (id) =>
+        municipalities.find((m) => m.id === id)?.name || "";
 
     const employmentTypeName = (id) =>
         employmentTypes.find((t) => t.id === id)?.name || "";
@@ -261,6 +288,7 @@ function Jobs() {
             }
 
             if (departmentId && String(job.department_id) !== String(departmentId)) return false;
+            if (municipalityId && String(job.municipality_id) !== String(municipalityId)) return false;
             if (categoryId && String(job.category_id) !== String(categoryId)) return false;
             if (workMode && job.work_mode !== workMode) return false;
             if (employmentTypeId && String(job.employment_type_id) !== String(employmentTypeId)) return false;
@@ -349,6 +377,7 @@ function Jobs() {
         jobs,
         search,
         departmentId,
+        municipalityId,
         categoryId,
         workMode,
         employmentTypeId,
@@ -429,11 +458,11 @@ function Jobs() {
     }
 
     const hayFiltros =
-        search || departmentId || categoryId || workMode || employmentTypeId ||
+        search || departmentId || municipalityId || categoryId || workMode || employmentTypeId ||
         experienceLevel || contractType || soloUrgentes || fechaFiltro || salarioMinFiltro;
 
     const contadorFiltrosActivos = [
-        departmentId, categoryId, workMode, employmentTypeId,
+        departmentId, municipalityId, categoryId, workMode, employmentTypeId,
         experienceLevel, contractType, fechaFiltro, salarioMinFiltro,
     ].filter(Boolean).length + (soloUrgentes ? 1 : 0);
 
@@ -499,6 +528,20 @@ function Jobs() {
                             <option value="">Todo el país</option>
                             {departments.map((d) => (
                                 <option key={d.id} value={d.id}>{d.name}</option>
+                            ))}
+                        </select>
+
+                        <select
+                            value={municipalityId}
+                            onChange={(e) => setMunicipalityId(e.target.value)}
+                            aria-label="Filtrar por municipio"
+                            disabled={!departmentId}
+                        >
+                            <option value="">
+                                {departmentId ? "Todo el departamento" : "Elige un departamento primero"}
+                            </option>
+                            {municipalitiesForFilter.map((m) => (
+                                <option key={m.id} value={m.id}>{m.name}</option>
                             ))}
                         </select>
 
@@ -681,7 +724,10 @@ function Jobs() {
                                 </p>
 
                                 <p className="job-item-meta">
-                                    📍 {departmentName(job.department_id) || "Guatemala"}
+                                    📍 {municipalityName(job.municipality_id)
+                                        ? `${municipalityName(job.municipality_id)}, `
+                                        : ""}
+                                    {departmentName(job.department_id) || "Guatemala"}
                                     {" · "}
                                     {tiempoDesde(job.published_at)}
                                 </p>
@@ -773,7 +819,12 @@ function Jobs() {
 
                             <div className="detail-tags">
 
-                                <span>📍 {departmentName(selectedJob.department_id) || "Guatemala"}</span>
+                                <span>
+                                    📍 {municipalityName(selectedJob.municipality_id)
+                                        ? `${municipalityName(selectedJob.municipality_id)}, `
+                                        : ""}
+                                    {departmentName(selectedJob.department_id) || "Guatemala"}
+                                </span>
 
                                 {selectedJob.work_mode && (
                                     <span>{selectedJob.work_mode}</span>
