@@ -82,27 +82,17 @@
 
     flex-direction:column;
 
-}
-
-.logo-text h2{
-
-    margin:0;
-
-    font-family:var(--font-display);
-
-    font-size:28px;
-
-    line-height:1;
-
-    font-weight:800;
-
-    color:#FFFFFF;
+    justify-content:center;
 
 }
 
-.logo-text h2 span{
+.logo-wordmark{
 
-    color:var(--cgt-amber);
+    height:26px;
+
+    width:auto;
+
+    display:block;
 
 }
 
@@ -319,12 +309,6 @@
 
 }
 
-.logo-text small{
-
-    display:none;
-
-}
-
 .publish{
 
     display:none;
@@ -363,17 +347,9 @@
 
 }
 
-.logo-text h2{
+.logo-wordmark{
 
-    font-size:20px;
-
-    line-height:1;
-
-}
-
-.logo-text small{
-
-    display:none;
+    height:22px;
 
 }
 
@@ -405,12 +381,12 @@
 
 @media (max-width: 760px) {
 
-    .logo-text small {
-        display: none;
+    .logo-wordmark {
+        height: 24px;
     }
 
-    .logo-text h2 {
-        font-size: 19px;
+    .logo-text small {
+        display: none;
     }
 
     .nav-links {
