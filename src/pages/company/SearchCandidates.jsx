@@ -274,7 +274,7 @@ function SearchCandidates() {
                             </option>
                             {municipalitiesForFilter.map((m) => (
                                 <option key={m.id} value={m.name}>
-                                    {m.name}
+                                    {toTitleCase(m.name)}
                                 </option>
                             ))}
                         </select>

@@ -12,6 +12,7 @@ import {
 } from "../services/jobService";
 import { getDepartments, getMunicipalities } from "../services/locationService";
 import { formatSalary } from "../utils/formatSalary";
+import { toTitleCase } from "../utils/textFormat";
 import { tiempoDesde } from "../utils/timeAgo";
 import { computeMatches } from "../utils/matching";
 
@@ -222,7 +223,7 @@ function Jobs() {
         departments.find((d) => d.id === id)?.name || "";
 
     const municipalityName = (id) =>
-        municipalities.find((m) => m.id === id)?.name || "";
+        toTitleCase(municipalities.find((m) => m.id === id)?.name || "");
 
     const employmentTypeName = (id) =>
         employmentTypes.find((t) => t.id === id)?.name || "";
@@ -541,7 +542,7 @@ function Jobs() {
                                 {departmentId ? "Todo el departamento" : "Elige un departamento primero"}
                             </option>
                             {municipalitiesForFilter.map((m) => (
-                                <option key={m.id} value={m.id}>{m.name}</option>
+                                <option key={m.id} value={m.id}>{toTitleCase(m.name)}</option>
                             ))}
                         </select>
 
