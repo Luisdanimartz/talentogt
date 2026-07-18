@@ -4,7 +4,7 @@
 
 .cta{
 
-    background: linear-gradient(180deg,#F8FAFC 0%,#EEF4FF 100%);
+    background: linear-gradient(180deg,var(--cgt-bg) 0%,var(--cgt-teal-soft) 100%);
 
     padding:35px 20px 0;
 
@@ -38,13 +38,15 @@
 
 .cta h2{
 
+    font-family:var(--font-display);
+
     font-size:34px;
 
     max-width:760px;
 
     margin:0 auto 14px;
 
-    color:#0B2F6B;
+    color:var(--cgt-navy);
 
     font-weight:800;
 
@@ -80,7 +82,7 @@
 
 .candidate-btn{
 
-    background:#2563EB;
+    background:var(--cgt-teal);
 
     color:white;
 
@@ -104,7 +106,7 @@
 
 .company-btn{
 
-    background:#16A34A;
+    background:var(--cgt-amber);
 
     color:white;
 

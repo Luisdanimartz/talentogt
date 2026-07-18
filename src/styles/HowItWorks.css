@@ -26,9 +26,11 @@
 
     text-align:center;
 
+    font-family:var(--font-display);
+
     font-size:42px;
 
-    color:#0B2F6B;
+    color:var(--cgt-navy);
 
     font-weight:800;
 
@@ -122,19 +124,21 @@
 
 .candidate{
 
-    background:#2563EB;
+    background:var(--cgt-teal);
 
 }
 
 .company{
 
-    background:#16A34A;
+    background:var(--cgt-amber);
 
 }
 
 .how-header h3{
 
-    color:#0B2F6B;
+    font-family:var(--font-display);
+
+    color:var(--cgt-navy);
 
     font-size:26px;
 
@@ -184,9 +188,9 @@
 
     border-radius:50%;
 
-    background:#E8F0FF;
+    background:var(--cgt-teal-soft);
 
-    color:#2563EB;
+    color:var(--cgt-teal);
 
     font-weight:700;
 
@@ -202,7 +206,7 @@
 
 .step-item h4{
 
-    color:#0B2F6B;
+    color:var(--cgt-navy);
 
     font-size:16px;
 
@@ -258,13 +262,13 @@
 
 .how-card:first-child button{
 
-    background:#2563EB;
+    background:var(--cgt-teal);
 
 }
 
 .how-card:last-child button{
 
-    background:#16A34A;
+    background:var(--cgt-amber);
 
 }
 

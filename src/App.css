@@ -18,9 +18,9 @@ body,
 
 body{
 
-    font-family:Arial, Helvetica, sans-serif;
-    background:#F5F7FB;
-    color:#333;
+    font-family:var(--font-body);
+    background:var(--cgt-bg);
+    color:var(--cgt-ink);
 
 }
 

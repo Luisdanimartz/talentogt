@@ -15,7 +15,7 @@
     align-items:center;
 
     background:
-    linear-gradient(rgba(8,38,84,.82),rgba(8,38,84,.82)),
+    linear-gradient(rgba(11,31,58,.88),rgba(11,31,58,.88)),
     url("https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1800&q=80");
 
     background-size:cover;
@@ -84,11 +84,15 @@
 
     margin:0;
 
+    font-family:var(--font-display);
+
     font-size:54px;
 
     line-height:1.05;
 
     font-weight:800;
+
+    letter-spacing:-0.5px;
 
     color:#FFFFFF;
 
@@ -96,7 +100,7 @@
 
 .hero-left h1 span{
 
-    color:#60A5FA;
+    color:var(--cgt-amber);
 
 }
 
@@ -170,7 +174,7 @@
 
     border:none;
 
-    background:#2563EB;
+    background:var(--cgt-teal);
 
     color:#FFFFFF;
 
@@ -186,7 +190,7 @@
 
 .hero-search button:hover{
 
-    background:#1D4ED8;
+    background:#0B6E58;
 
 }
 
@@ -324,6 +328,8 @@
 .stat-box h3{
 
     margin:0;
+
+    font-family:var(--font-display);
 
     color:#FFFFFF;
 

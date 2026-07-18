@@ -4,7 +4,7 @@
 
 .footer {
 
-    background:#0B2F6B;
+    background:var(--cgt-navy);
 
     color:white;
 
@@ -32,6 +32,7 @@
 
 .footer-brand h2 {
 
+    font-family:var(--font-display);
     font-size:28px;
     margin-bottom:12px;
     font-weight:800;
@@ -49,7 +50,7 @@
 
 .footer-brand span {
 
-    color:#C7D2FE;
+    color:var(--cgt-teal-soft);
     line-height:1.5;
     font-size:15px;
 
@@ -72,7 +73,7 @@
 
 .footer-column a {
 
-    color:#D6E4FF;
+    color:rgba(255,255,255,.75);
     text-decoration:none;
     margin-bottom:9px;
     font-size:15px;
@@ -100,7 +101,7 @@
 .footer-bottom p {
 
     margin:4px 0;
-    color:#C7D2FE;
+    color:var(--cgt-teal-soft);
     font-size:13px;
 
 }
