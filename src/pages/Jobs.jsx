@@ -9,6 +9,7 @@ import {
     getJobCategories,
     getEmploymentTypes,
     getPublicCompanyResponseSummary,
+    registerJobView,
 } from "../services/jobService";
 import { getDepartments, getMunicipalities } from "../services/locationService";
 import { formatSalary } from "../utils/formatSalary";
@@ -417,6 +418,21 @@ function Jobs() {
         };
 
     }, [selectedJob?.id, user]);
+
+    /* Registrar la vista de la vacante mostrada en el panel de detalle.
+       El dedupe diario lo maneja la BD (índice job_id + session_hash + día).
+       En móvil el detalle está oculto hasta que el usuario toca una vacante,
+       así que solo contamos cuando realmente está visible. */
+    useEffect(() => {
+
+        if (!selectedJob) return;
+
+        const esMovil = window.matchMedia("(max-width: 900px)").matches;
+        if (esMovil && !mobileDetail) return;
+
+        registerJobView(selectedJob.id); // fire-and-forget, no bloquea la UI
+
+    }, [selectedJob?.id, mobileDetail]);
 
     function seleccionar(job) {
 
