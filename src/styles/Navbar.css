@@ -58,6 +58,8 @@
 
     gap:16px;
 
+    margin-right:48px;
+
     text-decoration:none;
 
     flex-shrink:0;
@@ -88,7 +90,7 @@
 
 .logo-wordmark{
 
-    height:36px;
+    height:46px;
 
     width:auto;
 
