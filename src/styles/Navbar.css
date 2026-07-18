@@ -88,7 +88,7 @@
 
 .logo-wordmark{
 
-    height:26px;
+    height:36px;
 
     width:auto;
 
@@ -349,7 +349,7 @@
 
 .logo-wordmark{
 
-    height:22px;
+    height:30px;
 
 }
 
@@ -382,7 +382,7 @@
 @media (max-width: 760px) {
 
     .logo-wordmark {
-        height: 24px;
+        height: 28px;
     }
 
     .logo-text small {
