@@ -1,0 +1,391 @@
+/* =======================================================
+   NAVBAR
+======================================================= */
+
+.navbar{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:82px;
+
+    background:var(--cgt-navy);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:9999;
+
+    box-shadow:0 4px 20px rgba(0,0,0,.15);
+
+}
+
+.navbar-container{
+
+    width:100%;
+
+    max-width:1280px;
+
+    height:82px;
+
+    margin:0 auto;
+
+    padding:0 24px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+/* =======================================================
+   LOGO
+======================================================= */
+
+.logo{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+    text-decoration:none;
+
+    flex-shrink:0;
+
+}
+
+.flag{
+
+    width:48px;
+
+    height:48px;
+
+    object-fit:cover;
+
+    border-radius:8px;
+
+}
+
+.logo-wordmark{
+
+    height:38px;
+
+    width:auto;
+
+}
+
+/* =======================================================
+   MENU
+======================================================= */
+
+.nav-links{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:36px;
+
+}
+
+.nav-links a{
+
+    color:#FFFFFF;
+
+    text-decoration:none;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.nav-links a:hover{
+
+    color:var(--cgt-amber);
+
+}
+
+.nav-link-soon{
+
+    color:rgba(255,255,255,0.45);
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:default;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+}
+
+.nav-link-soon em{
+
+    font-style:normal;
+
+    font-size:10.5px;
+
+    font-weight:700;
+
+    background:rgba(255,255,255,0.15);
+
+    padding:2px 7px;
+
+    border-radius:20px;
+
+}
+/* =======================================================
+   BOTONES
+======================================================= */
+
+.nav-actions{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    flex-shrink:0;
+
+}
+
+.publish{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-decoration:none;
+
+    background:var(--cgt-amber);
+
+    color:#FFFFFF;
+
+    border:none;
+
+    padding:14px 26px;
+
+    border-radius:12px;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.publish:hover{
+
+    background:#A87423;
+
+}
+
+.login{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-decoration:none;
+
+    background:transparent;
+
+    color:#FFFFFF;
+
+    border:1px solid rgba(255,255,255,.35);
+
+    padding:14px 22px;
+
+    border-radius:12px;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.login:hover{
+
+    background:rgba(255,255,255,.08);
+
+}
+
+.register{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-decoration:none;
+
+    background:var(--cgt-teal);
+
+    color:#FFFFFF;
+
+    border:none;
+
+    padding:14px 22px;
+
+    border-radius:12px;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.register:hover{
+
+    background:#0B6E58;
+
+}
+
+/* =======================================================
+   RESPONSIVE
+======================================================= */
+
+@media (max-width:1200px){
+
+.nav-links{
+
+    display:none;
+
+}
+
+.publish{
+
+    display:none;
+
+}
+
+}
+
+@media (max-width:768px){
+
+.navbar{
+
+    height:64px;
+
+}
+
+.navbar-container{
+
+    height:64px;
+
+    padding:0 14px;
+
+}
+
+.logo{
+
+    gap:10px;
+
+}
+
+.flag{
+
+    width:36px;
+
+    height:36px;
+
+}
+
+.logo-wordmark{
+
+    height:28px;
+
+}
+
+.auth{
+
+    gap:8px;
+
+}
+
+.login,
+.register{
+
+    padding:10px 14px;
+
+    font-size:13px;
+
+}
+
+}
+/* Cerrar sesion en el navbar (mismo estilo que .login pero es button) */
+.navbar-logout {
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    background: transparent;
+}
+
+/* ===== Navbar en celular: sin traslapes ===== */
+
+@media (max-width: 760px) {
+
+    .logo-wordmark {
+        height: 24px;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .navbar-container {
+        gap: 8px;
+        padding: 0 10px;
+    }
+
+    .nav-actions {
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+
+    .nav-actions a,
+    .nav-actions .navbar-logout {
+        padding: 9px 12px;
+        font-size: 12.5px;
+        white-space: nowrap;
+    }
+
+    .nav-actions .publish {
+        display: none;
+    }
+
+}
