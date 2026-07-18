@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-import { getJobById } from "../services/jobService";
+import { getJobById, registerJobView } from "../services/jobService";
 import { formatSalary } from "../utils/formatSalary";
 
 import {
@@ -71,6 +71,7 @@ function JobDetail() {
 
         if (!error) {
             setJob(data);
+            registerJobView(id); // no bloquea la carga, el dedupe lo maneja la BD
         }
 
         /* Si es candidato, revisamos si ya se postuló

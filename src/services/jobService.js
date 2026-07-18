@@ -56,6 +56,32 @@ export async function getJobById(jobId) {
     .single();
 }
 
+/* Registra una vista de la vacante (para saber si la gente
+   entra a verla aunque no aplique). session_hash evita contar
+   refresh/recargas como vistas nuevas el mismo día. */
+export async function registerJobView(jobId) {
+  const sessionHash = getOrCreateSessionHash();
+
+  return await supabase.rpc("register_job_view", {
+    p_job_id: jobId,
+    p_session_hash: sessionHash,
+  });
+}
+
+function getOrCreateSessionHash() {
+  const key = "cgt_session_hash";
+  let hash = localStorage.getItem(key);
+
+  if (!hash) {
+    hash =
+      Math.random().toString(36).slice(2) +
+      Date.now().toString(36);
+    localStorage.setItem(key, hash);
+  }
+
+  return hash;
+}
+
 export async function updateJob(jobId, job) {
   return await supabase
     .from("jobs")

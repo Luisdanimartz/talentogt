@@ -42,6 +42,13 @@ export async function getAdminCandidatesByDepartment() {
   return await supabase.rpc("admin_candidates_by_department");
 }
 
+/* Vistas vs postulaciones por vacante: dice si el problema de una
+   vacante es de alcance (pocas vistas) o de conversión (hay vistas
+   pero casi nadie aplica). */
+export async function getAdminJobViewsVsApplications() {
+  return await supabase.rpc("admin_job_views_vs_applications");
+}
+
 /* Empresas/vacantes con candidatos SIN respuesta (current_status
    sigue en 'applied'), con dias desde la postulacion pendiente
    mas antigua. Ver database/032_visibilidad_pendientes_y_tiempo_respuesta.sql */

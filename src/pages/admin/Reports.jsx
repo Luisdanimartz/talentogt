@@ -27,6 +27,7 @@ import {
     getAdminCandidatesByLocation,
     getAdminCandidatesByAge,
     getAdminCandidatesByGender,
+    getAdminJobViewsVsApplications,
 } from "../../services/adminService";
 
 /*
@@ -67,6 +68,7 @@ function Reports() {
     const [candidatosPorUbicacion, setCandidatosPorUbicacion] = useState([]);
     const [candidatosPorEdad, setCandidatosPorEdad] = useState([]);
     const [candidatosPorGenero, setCandidatosPorGenero] = useState([]);
+    const [vistasVsAplicaciones, setVistasVsAplicaciones] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -82,17 +84,19 @@ function Reports() {
             getAdminCandidatesByLocation(),
             getAdminCandidatesByAge(),
             getAdminCandidatesByGender(),
+            getAdminJobViewsVsApplications(),
         ]).then(([
             funnelRes, topRes, deptoRes, pendientesRes, sinPublicarRes,
             empresasUbicacionRes, candidatosUbicacionRes, candidatosEdadRes,
-            candidatosGeneroRes,
+            candidatosGeneroRes, vistasVsAplicacionesRes,
         ]) => {
 
             const primerError =
                 funnelRes.error || topRes.error || deptoRes.error ||
                 pendientesRes.error || sinPublicarRes.error ||
                 empresasUbicacionRes.error || candidatosUbicacionRes.error ||
-                candidatosEdadRes.error || candidatosGeneroRes.error;
+                candidatosEdadRes.error || candidatosGeneroRes.error ||
+                vistasVsAplicacionesRes.error;
 
             if (primerError) {
                 setError(primerError.message);
@@ -107,6 +111,7 @@ function Reports() {
             setCandidatosPorUbicacion(candidatosUbicacionRes.data || []);
             setCandidatosPorEdad(candidatosEdadRes.data || []);
             setCandidatosPorGenero(candidatosGeneroRes.data || []);
+            setVistasVsAplicaciones(vistasVsAplicacionesRes.data || []);
 
             setLoading(false);
 
@@ -200,6 +205,56 @@ function Reports() {
 
                                         })}
 
+                                    </Box>
+                                )}
+
+                            </Paper>
+
+                            {/* Vistas vs postulaciones por vacante */}
+
+                            <Paper
+                                elevation={0}
+                                sx={{ p: 3, mb: 4, borderRadius: 3, border: "1px solid #E6E8EC" }}
+                            >
+
+                                <Typography variant="h6" fontWeight="bold" color="#0B1F3A" mb={0.5}>
+                                    Vistas vs postulaciones por vacante
+                                </Typography>
+
+                                <Typography color="text.secondary" fontSize={13} mb={2}>
+                                    Si una vacante tiene vistas pero pocas postulaciones, el
+                                    problema es de conversión. Si casi no tiene vistas, el
+                                    problema es de alcance (poca gente está llegando a verla).
+                                </Typography>
+
+                                {vistasVsAplicaciones.length === 0 ? (
+                                    <Typography color="text.secondary" fontSize={14}>
+                                        Todavía no hay datos de vistas registrados.
+                                    </Typography>
+                                ) : (
+                                    <Box sx={{ overflowX: "auto" }}>
+                                        <Table size="small">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell><strong>Vacante</strong></TableCell>
+                                                    <TableCell><strong>Empresa</strong></TableCell>
+                                                    <TableCell align="right"><strong>Vistas</strong></TableCell>
+                                                    <TableCell align="right"><strong>Postulaciones</strong></TableCell>
+                                                    <TableCell align="right"><strong>Conversión</strong></TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {vistasVsAplicaciones.map((v) => (
+                                                    <TableRow key={v.job_id}>
+                                                        <TableCell>{v.job_title}</TableCell>
+                                                        <TableCell>{v.company_name || "—"}</TableCell>
+                                                        <TableCell align="right">{v.total_views}</TableCell>
+                                                        <TableCell align="right">{v.total_applications}</TableCell>
+                                                        <TableCell align="right">{v.conversion_rate}%</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
                                     </Box>
                                 )}
 
