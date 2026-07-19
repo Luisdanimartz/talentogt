@@ -318,6 +318,25 @@ export async function setCompanyCollaborator(companyId, isCollaborator) {
     .single();
 }
 
+/* Comentario de la empresa colaboradora: su vision de como apoyar
+   el reclutamiento en Guatemala (se muestra en el landing). */
+export async function getCompanyCollaboratorComment(companyId) {
+  return await supabase
+    .from("company_profiles")
+    .select("id, collaborator_comment")
+    .eq("id", companyId)
+    .single();
+}
+
+export async function setCompanyCollaboratorComment(companyId, comentario) {
+  return await supabase
+    .from("company_profiles")
+    .update({ collaborator_comment: comentario || null })
+    .eq("id", companyId)
+    .select("id, collaborator_comment")
+    .single();
+}
+
 /* ===== Acciones sobre candidatos ===== */
 
 export async function setCandidateStatus(candidateProfileId, status) {

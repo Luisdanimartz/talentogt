@@ -8,7 +8,7 @@
 
     background:#FFFFFF;
 
-    padding:70px 0;
+    padding:64px 0;
 
     overflow:hidden;
 
@@ -177,5 +177,116 @@
     line-height:1.6;
 
     margin:0;
+
+}
+/* =======================================================
+   MODO ESTÁTICO (menos de 5 logos): tarjetas centradas
+======================================================= */
+
+.logos-grid{
+
+    display:flex;
+
+    justify-content:center;
+
+    flex-wrap:wrap;
+
+    gap:24px;
+
+}
+
+.logo-card{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    gap:12px;
+
+    background:#FFFFFF;
+
+    border:1px solid #DCE9F5;
+
+    border-radius:16px;
+
+    padding:26px 34px;
+
+    min-width:220px;
+
+    box-shadow:0 8px 22px rgba(11,31,58,.06);
+
+    transition:.3s;
+
+}
+
+.logo-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 14px 30px rgba(11,31,58,.10);
+
+}
+
+.logo-card img{
+
+    height:64px;
+
+    width:auto;
+
+    max-width:190px;
+
+    object-fit:contain;
+
+}
+
+.logo-card span{
+
+    color:var(--cgt-slate);
+
+    font-size:13.5px;
+
+    font-weight:600;
+
+}
+
+@media (max-width:768px){
+
+.logo-card{
+
+    min-width:160px;
+
+    padding:20px 24px;
+
+}
+
+.logo-card img{
+
+    height:52px;
+
+}
+
+}
+
+.logos-subtitulo{
+
+    text-align:center;
+
+    color:var(--cgt-slate);
+
+    font-size:16px;
+
+    margin:-30px 0 40px;
+
+}
+
+.logo-estrellas{
+
+    color:var(--cgt-amber);
+
+    font-size:16px;
+
+    letter-spacing:2px;
 
 }

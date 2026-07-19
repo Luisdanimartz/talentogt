@@ -65,6 +65,18 @@ function Login() {
             "encuentran, con seguimiento real durante todo el proceso.",
         };
 
+  /* Imagen del panel segun el tipo de cuenta (estilo organico) */
+  const IMAGEN =
+    tipo === "empresa"
+      ? {
+          src: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=80",
+          alt: "Equipo de reclutamiento trabajando",
+        }
+      : {
+          src: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=900&q=80",
+          alt: "Profesional guatemalteca",
+        };
+
   const validate = () => {
 
     let newErrors = {};
@@ -119,12 +131,14 @@ function Login() {
 
     <Box
       sx={{
-        minHeight: "90vh",
+        minHeight: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         bgcolor: "#f5f7fb",
         p: 3,
+        pt: { xs: "110px", md: "120px" },
+        pb: 5,
       }}
     >
 
@@ -147,37 +161,52 @@ function Login() {
             xs={12}
             md={6}
             sx={{
-              background: "linear-gradient(135deg,#0A4D8C,#1976d2)",
-              color: "#fff",
+              background: "linear-gradient(180deg,#F4F9FE 0%,#E3EFFA 100%)",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              p: 6,
+              p: { xs: 4, md: 5 },
             }}
           >
 
-            <Box>
+            <Box sx={{ textAlign: "center", maxWidth: 400 }}>
 
               <Typography
-                variant="h3"
+                variant="h4"
                 fontWeight="bold"
-                mb={3}
+                mb={1.5}
+                sx={{ color: "#0B1F3A", fontFamily: "var(--font-display)" }}
               >
                 ChanceGT
               </Typography>
 
               <Typography
-                variant="h5"
-                mb={2}
+                variant="h6"
+                mb={1.5}
+                sx={{ color: "#0B1F3A", fontWeight: 700 }}
               >
                 {TEXTOS.titulo}
               </Typography>
 
-              <Typography>
-
+              <Typography mb={3} sx={{ color: "#3D5573", fontSize: 15 }}>
                 {TEXTOS.texto}
-
               </Typography>
+
+              <Box
+                component="img"
+                src={IMAGEN.src}
+                alt={IMAGEN.alt}
+                sx={{
+                  width: "100%",
+                  maxWidth: 340,
+                  aspectRatio: "1 / 1.08",
+                  objectFit: "cover",
+                  borderRadius: "58% 42% 45% 55% / 52% 48% 52% 48%",
+                  boxShadow: "0 24px 50px rgba(11,31,58,.18)",
+                  display: { xs: "none", md: "block" },
+                  mx: "auto",
+                }}
+              />
 
             </Box>
 

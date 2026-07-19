@@ -11,6 +11,10 @@ import {
     Chip,
     IconButton,
     Paper,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
     Switch,
     Table,
     TableBody,
@@ -30,6 +34,8 @@ import {
     setCompanyStatus,
     setCompanyPlan,
     setCompanyCollaborator,
+    getCompanyCollaboratorComment,
+    setCompanyCollaboratorComment,
     getPricingPlans,
     savePricingPlan,
     getUpcomingPlanExpirations,
@@ -67,6 +73,7 @@ function Companies() {
 
     const [plans, setPlans] = useState([]);
     const [planForm, setPlanForm] = useState(null);
+    const [comentarioForm, setComentarioForm] = useState(null);
 
     const [vencimientos, setVencimientos] = useState([]);
 
@@ -164,6 +171,40 @@ function Companies() {
                 c.id === company.id ? { ...c, is_collaborator: nuevo } : c
             )
         );
+
+        /* Al activarla, abrir de una vez la captura del comentario */
+        if (nuevo) {
+            abrirComentario({ ...company, is_collaborator: true });
+        }
+
+    }
+
+    async function abrirComentario(company) {
+
+        const { data } = await getCompanyCollaboratorComment(company.id);
+
+        setComentarioForm({
+            id: company.id,
+            nombre: company.company_name,
+            texto: data?.collaborator_comment || "",
+        });
+
+    }
+
+    async function guardarComentario() {
+
+        setBusyId(comentarioForm.id);
+
+        const { error } = await setCompanyCollaboratorComment(
+            comentarioForm.id,
+            comentarioForm.texto.trim()
+        );
+
+        setBusyId(null);
+
+        if (error) { setError(error.message); return; }
+
+        setComentarioForm(null);
 
     }
 
@@ -399,6 +440,18 @@ function Companies() {
                                                             {c.is_collaborator ? "Quitar colaboradora" : "Marcar colaboradora"}
                                                         </Button>
 
+                                                        {c.is_collaborator && (
+                                                            <Button
+                                                                size="small"
+                                                                variant="outlined"
+                                                                disabled={busyId === c.id}
+                                                                onClick={() => abrirComentario(c)}
+                                                                sx={{ textTransform: "none", ml: 1 }}
+                                                            >
+                                                                Comentario
+                                                            </Button>
+                                                        )}
+
                                                     </TableCell>
 
                                                 </TableRow>
@@ -592,6 +645,64 @@ function Companies() {
                     </Box>
 
                 </Box>
+
+                {/* Comentario de la empresa colaboradora */}
+
+                <Dialog
+                    open={Boolean(comentarioForm)}
+                    onClose={() => setComentarioForm(null)}
+                    fullWidth
+                    maxWidth="sm"
+                >
+
+                    <DialogTitle>
+                        Comentario de {comentarioForm?.nombre}
+                    </DialogTitle>
+
+                    <DialogContent>
+
+                        <Typography color="text.secondary" fontSize={13.5} mb={2}>
+                            Cómo piensa esta empresa apoyar el reclutamiento en
+                            Guatemala. Se muestra con su logo en el landing, en
+                            la sección de empresas colaboradoras. Usa las
+                            palabras de la empresa, no las nuestras.
+                        </Typography>
+
+                        <TextField
+                            autoFocus
+                            fullWidth
+                            multiline
+                            minRows={4}
+                            label="Comentario de la empresa"
+                            value={comentarioForm?.texto || ""}
+                            onChange={(e) =>
+                                setComentarioForm((prev) => ({
+                                    ...prev,
+                                    texto: e.target.value,
+                                }))
+                            }
+                        />
+
+                    </DialogContent>
+
+                    <DialogActions>
+
+                        <Button onClick={() => setComentarioForm(null)}>
+                            Cancelar
+                        </Button>
+
+                        <Button
+                            variant="contained"
+                            disabled={busyId === comentarioForm?.id}
+                            onClick={guardarComentario}
+                            sx={{ background: "#0B1F3A" }}
+                        >
+                            Guardar
+                        </Button>
+
+                    </DialogActions>
+
+                </Dialog>
 
             </main>
 

@@ -4,9 +4,9 @@
 
 .cta{
 
-    background: linear-gradient(180deg,var(--cgt-bg) 0%,var(--cgt-teal-soft) 100%);
+    background:#EAF2FA;
 
-    padding:35px 20px 0;
+    padding:64px 20px;
 
     position:relative;
 

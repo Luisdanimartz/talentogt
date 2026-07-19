@@ -16,6 +16,9 @@ import {
   Chip,
   InputAdornment,
   FormControlLabel,
+  Step,
+  StepButton,
+  Stepper,
   Switch,
 } from "@mui/material";
 
@@ -157,6 +160,44 @@ function CreateCV() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
+
+  /* Asistente por pasos */
+  const [paso, setPaso] = useState(0);
+
+  const PASOS = [
+    {
+      label: "Datos personales",
+      guia:
+        "Cuéntanos quién eres y dónde estás. Tu teléfono y ubicación " +
+        "ayudan a las empresas a contactarte y a mostrarte vacantes " +
+        "cerca de ti.",
+    },
+    {
+      label: "Formación",
+      guia:
+        "Agrega tus estudios empezando por el más reciente. Si todavía " +
+        "estás estudiando, márcalo — eso también cuenta para las empresas.",
+    },
+    {
+      label: "Experiencia",
+      guia:
+        "Tu historial laboral. ¿Es tu primer empleo? No te preocupes: " +
+        "puedes dejar esta parte vacía y destacar tu formación y " +
+        "habilidades.",
+    },
+    {
+      label: "Perfil y habilidades",
+      guia:
+        "El cierre: tu resumen profesional, tus habilidades y si quieres " +
+        "aparecer en las búsquedas de los reclutadores. Mientras más " +
+        "completo tu perfil, mejores coincidencias con las vacantes.",
+    },
+  ];
+
+  function irAPaso(nuevoPaso) {
+    setPaso(nuevoPaso);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   useEffect(() => {
 
@@ -475,7 +516,57 @@ function CreateCV() {
           coincidencias con las vacantes.
         </Typography>
 
-        <Divider sx={{ mb: 4 }} />
+        <Stepper nonLinear activeStep={paso} alternativeLabel sx={{ mb: 3 }}>
+          {PASOS.map((p, i) => (
+            <Step key={p.label} completed={false}>
+              <StepButton onClick={() => irAPaso(i)}>{p.label}</StepButton>
+            </Step>
+          ))}
+        </Stepper>
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 3,
+            background: "linear-gradient(180deg,#F4F9FE,#E9F2FB)",
+            border: "1px solid #DCE9F5",
+            borderRadius: 3,
+            p: { xs: 2.5, md: 3 },
+            mb: 4,
+          }}
+        >
+
+          <Box sx={{ flex: 1 }}>
+
+            <Typography fontWeight="bold" sx={{ color: "#0B1F3A" }} mb={0.5}>
+              Paso {paso + 1} de {PASOS.length}: {PASOS[paso].label}
+            </Typography>
+
+            <Typography sx={{ color: "#3D5573", fontSize: 14.5 }}>
+              {PASOS[paso].guia}
+            </Typography>
+
+          </Box>
+
+          <Box
+            component="img"
+            src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80"
+            alt="Guía del perfil"
+            sx={{
+              width: 96,
+              height: 96,
+              objectFit: "cover",
+              borderRadius: "58% 42% 45% 55% / 52% 48% 52% 48%",
+              boxShadow: "0 10px 24px rgba(11,31,58,.15)",
+              display: { xs: "none", md: "block" },
+            }}
+          />
+
+        </Box>
+
+        {/* ===== Paso 1 ===== */}
+        <Box sx={{ display: paso === 0 ? "block" : "none" }}>
 
         <Typography variant="h6" fontWeight="bold" mb={3}>
           Información Personal
@@ -749,6 +840,11 @@ function CreateCV() {
 
         <Divider sx={{ my: 5 }} />
 
+        </Box>
+
+        {/* ===== Paso 4 ===== */}
+        <Box sx={{ display: paso === 3 ? "block" : "none" }}>
+
         <Typography variant="h6" fontWeight="bold" mb={1}>
           Privacidad
         </Typography>
@@ -802,7 +898,11 @@ function CreateCV() {
 
         <Divider sx={{ my: 5 }} />
 
+        </Box>
+
         {/* ================= FORMACIÓN ================= */}
+        {/* ===== Paso 2 ===== */}
+        <Box sx={{ display: paso === 1 ? "block" : "none" }}>
 
         <Typography variant="h6" fontWeight="bold" mb={1}>
           Formación Académica
@@ -934,7 +1034,11 @@ function CreateCV() {
 
         <Divider sx={{ my: 5 }} />
 
+        </Box>
+
         {/* ================= EXPERIENCIA ================= */}
+        {/* ===== Paso 3 ===== */}
+        <Box sx={{ display: paso === 2 ? "block" : "none" }}>
 
         <Typography variant="h6" fontWeight="bold" mb={1}>
           Experiencia Laboral
@@ -1141,7 +1245,11 @@ function CreateCV() {
 
         <Divider sx={{ my: 5 }} />
 
+        </Box>
+
         {/* ================= HABILIDADES ================= */}
+        {/* ===== Paso 4 ===== */}
+        <Box sx={{ display: paso === 3 ? "block" : "none" }}>
 
         <Typography variant="h6" fontWeight="bold" mb={1}>
           Habilidades
@@ -1199,6 +1307,8 @@ function CreateCV() {
 
         <Divider sx={{ my: 5 }} />
 
+        </Box>
+
         <Typography fontWeight="bold" mb={1}>
           Perfil completado {progress}%
         </Typography>
@@ -1218,27 +1328,62 @@ function CreateCV() {
         <Box
           sx={{
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
             gap: 2,
           }}
         >
 
           <Button
-            variant="outlined"
             size="large"
             onClick={() => navigate("/candidato/dashboard")}
           >
             Volver a mi panel
           </Button>
 
-          <Button
-            variant="contained"
-            size="large"
-            onClick={handleSave}
-            disabled={saving}
-          >
-            {saving ? "Guardando..." : "Guardar perfil"}
-          </Button>
+          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+
+            <Button
+              variant="outlined"
+              size="large"
+              disabled={paso === 0}
+              onClick={() => irAPaso(paso - 1)}
+            >
+              Anterior
+            </Button>
+
+            {paso < PASOS.length - 1 && (
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={handleSave}
+                disabled={saving}
+              >
+                {saving ? "Guardando..." : "Guardar"}
+              </Button>
+            )}
+
+            {paso < PASOS.length - 1 ? (
+              <Button
+                variant="contained"
+                size="large"
+                onClick={() => irAPaso(paso + 1)}
+              >
+                Siguiente
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                size="large"
+                onClick={handleSave}
+                disabled={saving}
+              >
+                {saving ? "Guardando..." : "Guardar perfil"}
+              </Button>
+            )}
+
+          </Box>
 
         </Box>
 

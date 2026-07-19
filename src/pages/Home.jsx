@@ -6,6 +6,7 @@ import TopResponseCompanies from "../components/TopResponseCompanies";
 import HowItWorks from "../components/HowItWorks";
 import Footer from "../components/Footer";
 import CallToAction from "../components/CallToAction";
+import Testimonials from "../components/Testimonials";
 
 function Home() {
   return (
@@ -14,8 +15,8 @@ function Home() {
       <HowItWorks />
       <CallToAction />
       <CompanyLogos modo="vip" />
-      <CompanyLogos modo="colaboradora" />
       <TopResponseCompanies />
+      <Testimonials />
       <Footer />
     </>
   );

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import "../styles/CompanyLogos.css";
-import { getVipCompanies, getCollaboratorCompanies } from "../services/publicService";
+import { getFeaturedCompanies, getCollaboratorCompanies } from "../services/publicService";
 
 /*
   Carrusel de logos. Nada inventado: solo empresas reales, activas,
@@ -14,9 +14,17 @@ import { getVipCompanies, getCollaboratorCompanies } from "../services/publicSer
 
 const CONFIG = {
     vip: {
-        cargar: getVipCompanies,
+        cargar: getFeaturedCompanies,
         titulo: "Empresas destacadas en ChanceGT",
-        pendiente: null,
+        subtitulo:
+            "Calificadas con estrellas reales: responden a sus candidatos.",
+        pendiente: {
+            etiqueta: "Próximamente",
+            texto:
+                "Aquí van a aparecer las empresas mejor calificadas de " +
+                "ChanceGT — las que responden a sus candidatos. El lugar " +
+                "se gana respondiendo, no pagando.",
+        },
     },
     colaboradora: {
         cargar: getCollaboratorCompanies,
@@ -70,6 +78,55 @@ function CompanyLogos({ modo = "vip" }) {
                         </span>
 
                         <p>{config.pendiente.texto}</p>
+
+                    </div>
+
+                </div>
+
+            </section>
+        );
+
+    }
+
+    /* Con pocos logos la tira animada se ve rota: mostramos
+       tarjetas estaticas centradas. La animacion continua solo
+       tiene sentido a partir de 5 logos. */
+    const usarTira = empresas.length >= 5;
+
+    if (!usarTira) {
+
+        return (
+            <section className="company-logos">
+
+                <div className="logos-container">
+
+                    <h2>{config.titulo}</h2>
+
+                    {config.subtitulo && (
+                        <p className="logos-subtitulo">{config.subtitulo}</p>
+                    )}
+
+                    <div className="logos-grid">
+
+                        {empresas.map((empresa) => (
+                            <div className="logo-card" key={empresa.id}>
+                                <img
+                                    src={empresa.logo}
+                                    alt={empresa.company_name}
+                                    title={empresa.company_name}
+                                />
+                                <span>{empresa.company_name}</span>
+                                {empresa.estrellas && (
+                                    <span
+                                        className="logo-estrellas"
+                                        aria-label={`${empresa.estrellas} de 5 estrellas`}
+                                    >
+                                        {"★".repeat(empresa.estrellas)}
+                                        {"☆".repeat(5 - empresa.estrellas)}
+                                    </span>
+                                )}
+                            </div>
+                        ))}
 
                     </div>
 
