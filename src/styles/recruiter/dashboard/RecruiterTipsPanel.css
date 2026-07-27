@@ -1,0 +1,105 @@
+/*
+  Panel de consejos del reclutador.
+  Mantiene la tarjeta navy que ya tenia el panel anterior para no
+  romper el ritmo visual de la columna derecha del dashboard.
+*/
+
+.tips-panel {
+    background: var(--cgt-navy);
+    border-radius: var(--cgt-radius);
+    padding: 24px;
+    box-shadow: var(--cgt-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.tips-head h2 {
+    margin: 0 0 5px;
+    color: #FFFFFF;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.tips-head p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 12.5px;
+    line-height: 1.45;
+}
+
+.tips-body {
+    border-left: 3px solid var(--cgt-amber);
+    padding-left: 14px;
+    min-height: 108px;
+}
+
+.tips-body strong {
+    display: block;
+    color: #FFFFFF;
+    font-size: 14.5px;
+    font-weight: 600;
+    line-height: 1.35;
+    margin-bottom: 7px;
+}
+
+.tips-body p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.tips-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 14px;
+}
+
+.tips-contador {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+}
+
+.tips-nav {
+    display: flex;
+    gap: 8px;
+}
+
+.tips-nav button {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    color: #FFFFFF;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.tips-nav button:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.32);
+}
+
+.tips-nav button:focus-visible {
+    outline: 2px solid var(--cgt-amber);
+    outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+
+    .tips-panel {
+        padding: 20px;
+    }
+
+    .tips-body {
+        min-height: 0;
+    }
+
+}

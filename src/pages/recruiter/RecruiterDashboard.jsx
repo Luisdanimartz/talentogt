@@ -11,7 +11,7 @@ import DashboardCards from "../../components/recruiter/dashboard/DashboardCards"
 import JobsTable from "../../components/recruiter/dashboard/JobsTable";
 import RecentActivity from "../../components/recruiter/dashboard/RecentActivity";
 import StatusOverview from "../../components/recruiter/dashboard/StatusOverview";
-import RoadmapPanel from "../../components/recruiter/dashboard/RoadmapPanel";
+import RecruiterTipsPanel from "../../components/recruiter/dashboard/RecruiterTipsPanel";
 
 import { getMyCompanyContext } from "../../services/teamService";
 import { getCompanyJobs, getMyJobCredits } from "../../services/jobService";
@@ -202,7 +202,7 @@ function RecruiterDashboard() {
 
                         <StatusOverview jobs={jobs} loading={loading} />
 
-                        <RoadmapPanel />
+                        <RecruiterTipsPanel />
 
                     </aside>
 
