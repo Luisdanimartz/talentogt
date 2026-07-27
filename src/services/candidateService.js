@@ -300,6 +300,7 @@ export async function getMyApplications() {
       current_status,
       applied_at,
       updated_at,
+      cv_viewed_at,
       jobs (
         id,
         title,
@@ -334,6 +335,7 @@ export async function getMyApplicationDetail(applicationId) {
       applied_at,
       updated_at,
       auto_resolved,
+      cv_viewed_at,
       jobs (
         id,
         title,

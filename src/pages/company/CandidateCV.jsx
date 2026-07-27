@@ -6,7 +6,10 @@ import "../../styles/MyCV.css";
 
 import { toTitleCase } from "../../utils/textFormat";
 
-import { getApplicationForCV } from "../../services/applicationService";
+import {
+    getApplicationForCV,
+    markApplicationCvViewed,
+} from "../../services/applicationService";
 import { sinVineta, duracionEnMeses } from "../../utils/bullets";
 
 /* "2" (perfiles viejos) -> "2 años"; "1 año 6 meses" queda igual */
@@ -70,6 +73,13 @@ function CandidateCV() {
 
             setApplication(data || null);
             setLoading(false);
+
+            /* El candidato deja de estar a ciegas sin que el
+               reclutador tenga que hacer nada. Si falla, no se le
+               avisa a nadie: es informacion extra, no critica. */
+            if (data && !error) {
+                markApplicationCvViewed(applicationId);
+            }
 
         });
 

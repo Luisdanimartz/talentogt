@@ -22,13 +22,18 @@ h1, h2, h3 {
 
 .dashboard-content {
     flex: 1;
+    /* Sin esto el contenido no puede encogerse por debajo de su
+       ancho natural (los items flex traen min-width:auto), la
+       columna derecha se sale de la pantalla y se ve cortada. */
+    min-width: 0;
     padding: 36px 40px;
-    overflow-x: auto;
 }
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 2fr 380px;
+    /* minmax(0, 2fr) por la misma razon: una columna de grid
+       tampoco se encoge sola por debajo de su contenido. */
+    grid-template-columns: minmax(0, 2fr) 380px;
     gap: 28px;
     margin-top: 28px;
 }
@@ -37,15 +42,19 @@ h1, h2, h3 {
     display: flex;
     flex-direction: column;
     gap: 28px;
+    min-width: 0;
 }
 
 .dashboard-right {
     display: flex;
     flex-direction: column;
     gap: 28px;
+    min-width: 0;
 }
 
-@media (max-width: 1200px) {
+/* A 1200px el menu lateral mas las dos columnas ya no caben:
+   se apilan antes para que nada quede cortado. */
+@media (max-width: 1320px) {
 
     .dashboard {
         flex-direction: column;

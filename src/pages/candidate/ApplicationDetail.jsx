@@ -23,14 +23,24 @@ import ResolutionBadge from "../../components/ResolutionBadge";
 /* Etapas del proceso, en orden */
 const PIPELINE = [
     { key: "applied", label: "Postulado", detail: "Tu postulación llegó a la empresa" },
+    { key: "cv_viewed", label: "CV abierto", detail: "Alguien de la empresa abrió tu CV" },
     { key: "reviewing", label: "En revisión", detail: "La empresa está revisando tu perfil" },
     { key: "interview", label: "Entrevista", detail: "¡Te llamaron a entrevista!" },
     { key: "decision", label: "Decisión", detail: "Resultado del proceso" },
 ];
 
-function etapaDe(status) {
+/*
+  "CV abierto" no es un estado que la empresa elija: es un hecho que
+  el sistema detecta solo (applications.cv_viewed_at). Por eso no
+  vive en current_status — si viviera ahí, abrir un CV le subiría la
+  reputación de respuesta a la empresa sin que haya respondido nada.
+  Ver database/058_cv_abierto_automatico.sql.
+*/
+function etapaDe(status, cvVisto) {
 
     if (status === "hired" || status === "rejected") return "decision";
+
+    if (status === "applied" && cvVisto) return "cv_viewed";
 
     return status;
 
@@ -153,7 +163,16 @@ function ApplicationDetail() {
         fechaPorEtapa[etapaDe(evento.status)] = evento.created_at;
     });
 
-    const etapaActual = etapaDe(application.current_status);
+    /* La fecha del paso "CV abierto" no viene del historial de
+       estados sino del sello que deja el sistema al abrirlo. */
+    if (application.cv_viewed_at) {
+        fechaPorEtapa.cv_viewed = application.cv_viewed_at;
+    }
+
+    const etapaActual = etapaDe(
+        application.current_status,
+        application.cv_viewed_at
+    );
 
     const indexActual = PIPELINE.findIndex(
         (paso) => paso.key === etapaActual
@@ -351,9 +370,9 @@ function ApplicationDetail() {
 
                         {application.current_status === "applied" && (
                             <p className="timeline-note">
-                                La empresa aún no responde. En ChanceGT su
-                                reputación de respuesta es pública, así que
-                                le conviene hacerlo pronto.
+                                {application.cv_viewed_at
+                                    ? "Ya abrieron tu CV, pero la empresa todavía no da su respuesta formal. En ChanceGT su reputación de respuesta es pública, así que le conviene hacerlo pronto."
+                                    : "La empresa aún no responde. En ChanceGT su reputación de respuesta es pública, así que le conviene hacerlo pronto."}
                             </p>
                         )}
 

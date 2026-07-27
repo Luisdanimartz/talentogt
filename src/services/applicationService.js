@@ -17,6 +17,7 @@ export async function getCompanyApplications(companyId) {
       id,
       current_status,
       applied_at,
+      cv_viewed_at,
       jobs!inner ( id, title, description, requirements, department_id, salary_min, salary_max, company_id, status, resolution_deadline, deadline_extensions ),
       interviews ( id, status, scheduled_at ),
       candidate_profiles (
@@ -80,6 +81,22 @@ export async function getApplicationForCV(applicationId) {
     `)
     .eq("id", applicationId)
     .single();
+
+}
+
+/*
+  Deja constancia de que la empresa ABRIÓ el CV del candidato.
+
+  Se llama sola al entrar a la pantalla del CV: el reclutador no
+  hace nada extra. Ojo — esto NO cuenta como respuesta para la
+  reputación pública de la empresa; es solo una señal de vida para
+  el candidato. Ver database/058_cv_abierto_automatico.sql.
+*/
+export async function markApplicationCvViewed(applicationId) {
+
+  return await supabase.rpc("mark_application_cv_viewed", {
+    p_application_id: applicationId,
+  });
 
 }
 
