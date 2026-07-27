@@ -98,6 +98,30 @@ export function diasParaResolver(deadline) {
 
 }
 
+/*
+  "Supervisor de ventas · 27 jul" — para distinguir dos vacantes
+  con el mismo titulo. Pasa seguido: la misma plaza se vuelve a
+  publicar meses despues y en las listas se ven identicas, aunque
+  por dentro son procesos totalmente distintos (cada vacante tiene
+  su propio id y sus propios candidatos).
+*/
+export function tituloConFecha(titulo, fecha) {
+
+    if (!fecha) return titulo || "";
+
+    const d = new Date(fecha);
+
+    if (Number.isNaN(d.getTime())) return titulo || "";
+
+    const corta = d.toLocaleDateString("es-GT", {
+        day: "numeric",
+        month: "short",
+    });
+
+    return `${titulo} · ${corta}`;
+
+}
+
 /* "15 de agosto" */
 export function fechaLarga(deadline) {
 

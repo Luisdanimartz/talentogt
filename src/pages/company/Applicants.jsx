@@ -24,7 +24,11 @@ import {
 } from "../../services/applicationService";
 
 import { APPLICATION_STATUSES } from "../../utils/applicationStatus";
-import { diasParaResolver, fechaLarga } from "../../utils/resolution";
+import {
+    diasParaResolver,
+    fechaLarga,
+    tituloConFecha,
+} from "../../utils/resolution";
 import "../../styles/ResolutionBadge.css";
 import { computeMatches } from "../../utils/matching";
 import { getDepartments } from "../../services/locationService";
@@ -292,7 +296,10 @@ function Applicants() {
 
             return {
                 id: app.jobs.id,
-                title: app.jobs.title,
+                title: tituloConFecha(
+                    app.jobs.title,
+                    app.jobs.published_at
+                ),
                 deadline: app.jobs.resolution_deadline,
                 dias,
                 sinResolver,
@@ -307,7 +314,10 @@ function Applicants() {
         new Map(
             applications
                 .filter((app) => app.jobs?.id)
-                .map((app) => [app.jobs.id, app.jobs.title])
+                .map((app) => [
+                    app.jobs.id,
+                    tituloConFecha(app.jobs.title, app.jobs.published_at),
+                ])
         ).entries()
     ).map(([id, title]) => ({ id, title }));
 

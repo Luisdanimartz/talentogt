@@ -78,6 +78,37 @@ export async function getAdminPendingResponses() {
 
 /* Empresas registradas que nunca publicaron ninguna vacante.
    Ver database/033_empresas_sin_publicar.sql */
+/* Salud de la experiencia del candidato en toda la plataforma.
+   Ver database/060_admin_salud_candidato.sql */
+export async function getAdminExperienciaCandidato(desde, hasta) {
+  return await supabase.rpc("admin_experiencia_candidato", {
+    p_desde: desde ? new Date(desde).toISOString() : null,
+    p_hasta: hasta ? new Date(hasta).toISOString() : null,
+  });
+}
+
+/* Vacantes publicadas que siguen sin recibir un solo candidato */
+export async function getAdminVacantesSinPostulaciones(dias = 3) {
+  return await supabase.rpc("admin_vacantes_sin_postulaciones", {
+    p_dias_minimos: dias,
+  });
+}
+
+/* Ranking de empresas por porcentaje de respuesta (peores primero) */
+export async function getAdminRankingRespuesta(limite = 20) {
+  return await supabase.rpc("admin_ranking_respuesta", {
+    p_limite: limite,
+  });
+}
+
+/* Vacantes con el plazo de compromiso por vencer.
+   Ver database/056_auto_resolucion_de_procesos.sql */
+export async function getAdminDeadlinesProximos(dias = 5) {
+  return await supabase.rpc("admin_deadlines_proximos", {
+    p_dias: dias,
+  });
+}
+
 export async function getAdminCompaniesWithoutJobs() {
   return await supabase.rpc("admin_companies_without_jobs");
 }

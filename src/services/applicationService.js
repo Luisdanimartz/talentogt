@@ -18,7 +18,7 @@ export async function getCompanyApplications(companyId) {
       current_status,
       applied_at,
       cv_viewed_at,
-      jobs!inner ( id, title, description, requirements, department_id, salary_min, salary_max, company_id, status, resolution_deadline, deadline_extensions ),
+      jobs!inner ( id, title, description, requirements, department_id, salary_min, salary_max, company_id, status, published_at, resolution_deadline, deadline_extensions ),
       interviews ( id, status, scheduled_at ),
       candidate_profiles (
         id,

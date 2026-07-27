@@ -40,6 +40,7 @@ const AdminCompanyDetail = lazy(() => import("./pages/admin/CompanyDetail"));
 const AdminJobs = lazy(() => import("./pages/admin/Jobs"));
 const AdminCandidates = lazy(() => import("./pages/admin/Candidates"));
 const AdminReports = lazy(() => import("./pages/admin/Reports"));
+const AdminCandidateHealth = lazy(() => import("./pages/admin/CandidateHealth"));
 const AdminSettings = lazy(() => import("./pages/admin/Settings"));
 
 const CandidateDashboard = lazy(() => import("./pages/candidate/Dashboard"));
@@ -296,6 +297,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/salud-candidato"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminCandidateHealth />
             </ProtectedRoute>
           }
         />

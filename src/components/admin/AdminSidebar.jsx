@@ -10,6 +10,7 @@ import {
     BarChart as BarChartIcon,
     Settings as SettingsIcon,
     Business as BusinessIcon,
+    MonitorHeart as FavoriteIcon,
     OpenInNew as OpenInNewIcon,
 } from "@mui/icons-material";
 
@@ -22,6 +23,7 @@ const MENU = [
     { icon: WorkIcon, title: "Vacantes", path: "/admin/vacantes" },
     { icon: GroupsIcon, title: "Candidatos", path: "/admin/candidatos" },
     { icon: BarChartIcon, title: "Reportes", path: "/admin/reportes" },
+    { icon: FavoriteIcon, title: "Salud del candidato", path: "/admin/salud-candidato" },
     { icon: SettingsIcon, title: "Configuración", path: "/admin/configuracion" },
 ];
 

@@ -31,6 +31,8 @@ import {
     getMonthlyMetrics,
 } from "../../services/reportService";
 
+import { tituloConFecha } from "../../utils/resolution";
+
 import StageEfficiency from "../../components/company/reports/StageEfficiency";
 import MonthlyTrend from "../../components/company/reports/MonthlyTrend";
 
@@ -327,7 +329,7 @@ function VacancyBars({ vacantes }) {
                                     maxWidth: 280,
                                 }}
                             >
-                                {v.title}
+                                {tituloConFecha(v.title, v.published_at)}
                             </Typography>
 
                             <Typography fontSize={12.5} color="text.secondary">
@@ -449,7 +451,7 @@ function TablaVacantes({ vacantes }) {
                                 component="td"
                                 sx={{ py: 1.4, pr: 2, fontWeight: 600, color: "#0B1F3A" }}
                             >
-                                {v.title}
+                                {tituloConFecha(v.title, v.published_at)}
                             </Box>
 
                             <Box component="td" sx={{ py: 1.4, pr: 2 }}>
