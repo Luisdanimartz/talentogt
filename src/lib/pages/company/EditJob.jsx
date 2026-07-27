@@ -1,0 +1,351 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
+import JobForm from "./JobForm";
+
+import {
+  getJobCategories,
+  getEmploymentTypes,
+  getEducationLevels,
+  getJobById,
+  updateJob,
+  extendJobDeadline,
+} from "../../services/jobService";
+
+import { finalizeJobApplications } from "../../services/applicationService";
+
+import {
+  getDepartments,
+  getMunicipalitiesByDepartment,
+} from "../../services/locationService";
+
+import { formatMiles, salarioANumero } from "../../utils/formatSalary";
+
+/* "2026-07-21T08:00:00+00:00" -> "2026-07-21T08:00" (hora local del
+   navegador), que es el formato que exige el input datetime-local */
+function isoADatetimeLocal(iso) {
+
+  const fecha = new Date(iso);
+
+  const pad = (n) => String(n).padStart(2, "0");
+
+  return (
+    `${fecha.getFullYear()}-${pad(fecha.getMonth() + 1)}-${pad(fecha.getDate())}` +
+    `T${pad(fecha.getHours())}:${pad(fecha.getMinutes())}`
+  );
+
+}
+
+function EditJob() {
+
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState(null);
+
+  const [categories, setCategories] = useState([]);
+  const [employmentTypes, setEmploymentTypes] = useState([]);
+  const [educationLevels, setEducationLevels] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [municipalities, setMunicipalities] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+  const [finalizing, setFinalizing] = useState(false);
+  const [extending, setExtending] = useState(false);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+
+    loadData();
+
+  }, [id]);
+
+  useEffect(() => {
+
+    if (form?.department_id) {
+      loadMunicipalities(form.department_id);
+    }
+
+  }, [form?.department_id]);
+
+  async function loadData() {
+
+    const [
+      jobRes,
+      categoriesRes,
+      employmentRes,
+      educationRes,
+      departmentsRes,
+    ] = await Promise.all([
+      getJobById(id),
+      getJobCategories(),
+      getEmploymentTypes(),
+      getEducationLevels(),
+      getDepartments(),
+    ]);
+
+    if (jobRes.error || !jobRes.data) {
+      setNotFound(true);
+      return;
+    }
+
+    setForm({
+      ...jobRes.data,
+      salary: jobRes.data.salary_min
+        ? formatMiles(jobRes.data.salary_min)
+        : "",
+      salary_top:
+        jobRes.data.salary_max &&
+          jobRes.data.salary_max !== jobRes.data.salary_min
+          ? formatMiles(jobRes.data.salary_max)
+          : "",
+      resolution_deadline: jobRes.data.resolution_deadline || "",
+      scheduled_publish_at: jobRes.data.scheduled_publish_at
+        ? isoADatetimeLocal(jobRes.data.scheduled_publish_at)
+        : "",
+    });
+
+    setCategories(categoriesRes.data || []);
+    setEmploymentTypes(employmentRes.data || []);
+    setEducationLevels(educationRes.data || []);
+    setDepartments(departmentsRes.data || []);
+
+  }
+
+  async function loadMunicipalities(departmentId) {
+
+    const { data } =
+      await getMunicipalitiesByDepartment(departmentId);
+
+    setMunicipalities(data || []);
+
+  }
+
+  function handleChange(e) {
+
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+
+      ...prev,
+
+      [name]: value,
+
+      ...(name === "department_id" ? { municipality_id: "" } : {}),
+
+    }));
+
+  }
+
+  async function handleSubmit() {
+
+    setLoading(true);
+
+    /* eslint-disable no-unused-vars -- destructuring solo para excluir estos campos de editableFields */
+    const {
+      id: jobId,
+      company_profiles,
+      created_at,
+      updated_at,
+      salary,
+      salary_top,
+      scheduled_publish_at,
+      status,
+      published_at,
+      /* El plazo NO se edita desde aqui: se mueve solo con el boton
+         "Ampliar plazo", que pasa por extend_job_deadline() para que
+         el contador de ampliaciones que ve el candidato sea real. */
+      resolution_deadline,
+      original_deadline,
+      deadline_extensions,
+      last_extended_at,
+      ...editableFields
+    } = form;
+    /* eslint-enable no-unused-vars */
+
+    const salario = salarioANumero(salary);
+    const salarioTecho = salarioANumero(salary_top);
+
+    if (
+      (status === "published" || status === "scheduled") &&
+      (!salario || salario <= 0)
+    ) {
+      setLoading(false);
+      alert(
+        "Toda vacante publicada en ChanceGT debe indicar el salario mensual."
+      );
+      return;
+    }
+
+    if (salarioTecho && salarioTecho < salario) {
+      setLoading(false);
+      alert("El salario máximo no puede ser menor que el salario mensual.");
+      return;
+    }
+
+    const fechaProgramada = scheduled_publish_at
+      ? new Date(scheduled_publish_at)
+      : null;
+
+    const estaProgramada =
+      fechaProgramada && fechaProgramada.getTime() > Date.now();
+
+    /*
+      Si el interruptor de "programar" esta activo con una fecha
+      futura, eso manda sobre lo que diga el selector de Estado.
+      Si no, se respeta el Estado que la empresa eligio a mano.
+    */
+    const nuevoStatus = estaProgramada ? "scheduled" : status;
+
+    const nuevoPublishedAt = estaProgramada
+      ? null
+      : status === "published" && !published_at
+        ? new Date().toISOString()
+        : published_at;
+
+    const { error } = await updateJob(id, {
+      ...editableFields,
+      salary_min: salario,
+      salary_max: salarioTecho && salarioTecho > salario
+        ? salarioTecho
+        : salario,
+      status: nuevoStatus,
+      published_at: nuevoPublishedAt,
+      scheduled_publish_at: estaProgramada
+        ? fechaProgramada.toISOString()
+        : null,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert("Vacante actualizada correctamente.");
+
+    navigate("/empresa/dashboard");
+
+  }
+
+  async function handleExtend(dias) {
+
+    const seguro = window.confirm(
+      `¿Ampliar ${dias} días más el plazo de "${form.title}"? ` +
+      `Los candidatos verán que ampliaste el plazo, así que úsalo ` +
+      `solo cuando de verdad lo necesites.`
+    );
+
+    if (!seguro) return;
+
+    setExtending(true);
+
+    const { data, error } = await extendJobDeadline(id, dias);
+
+    setExtending(false);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      resolution_deadline: data,
+      deadline_extensions: (Number(prev.deadline_extensions) || 0) + 1,
+    }));
+
+    alert("Plazo ampliado. Los candidatos ya ven la fecha nueva.");
+
+  }
+
+  async function handleFinalize() {
+
+    const seguro = window.confirm(
+      `¿Finalizar el proceso de "${form.title}"? La vacante se cerrará y ` +
+      `todos los candidatos que sigan en proceso (sin contratar) recibirán ` +
+      `automáticamente un correo avisando que no fueron seleccionados.`
+    );
+
+    if (!seguro) return;
+
+    setFinalizing(true);
+
+    const { error: closeError } = await updateJob(id, { status: "closed" });
+
+    if (closeError) {
+      setFinalizing(false);
+      alert(closeError.message);
+      return;
+    }
+
+    const { error: notifyError, notificados } =
+      await finalizeJobApplications(id);
+
+    setFinalizing(false);
+
+    if (notifyError) {
+      alert(
+        "La vacante se cerró, pero hubo un problema avisando a algunos " +
+        "candidatos: " + notifyError.message
+      );
+    } else {
+      alert(
+        notificados > 0
+          ? `Proceso finalizado. Se avisó a ${notificados} candidato${notificados === 1 ? "" : "s"} que no fue${notificados === 1 ? "" : "n"} seleccionado${notificados === 1 ? "" : "s"}.`
+          : "Proceso finalizado. No había candidatos pendientes por avisar."
+      );
+    }
+
+    navigate("/empresa/dashboard");
+
+  }
+
+  if (notFound) {
+    return <p style={{ textAlign: "center", marginTop: 40 }}>Vacante no encontrada.</p>;
+  }
+
+  if (!form) {
+    return <p style={{ textAlign: "center", marginTop: 40 }}>Cargando...</p>;
+  }
+
+  return (
+
+    <JobForm
+
+      form={form}
+
+      categories={categories}
+
+      employmentTypes={employmentTypes}
+
+      educationLevels={educationLevels}
+
+      departments={departments}
+
+      municipalities={municipalities}
+
+      loading={loading}
+
+      isEdit
+
+      onChange={handleChange}
+
+      onSubmit={handleSubmit}
+
+      onFinalize={handleFinalize}
+
+      finalizing={finalizing}
+
+      onExtendDeadline={handleExtend}
+
+      extending={extending}
+
+    />
+
+  );
+
+}
+
+export default EditJob;

@@ -1,0 +1,89 @@
+/*
+  Insignia de compromiso de respuesta.
+  Colores de marca ChanceGT: navy #0B1F3A, teal #0E8F73, ambar #B8860B.
+*/
+
+.res-badge {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    border: 1px solid transparent;
+    line-height: 1.45;
+}
+
+.res-badge strong {
+    font-size: 14.5px;
+    font-weight: 700;
+}
+
+.res-badge span {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.res-nota {
+    font-size: 12px;
+    font-style: italic;
+    opacity: 0.8;
+    margin-top: 2px;
+}
+
+.res-badge.res-ok {
+    background: #E4F5F0;
+    border-color: #9FE1CB;
+    color: #0B5341;
+}
+
+.res-badge.res-pronto {
+    background: #FBF0DF;
+    border-color: #F0D5A0;
+    color: #7A5405;
+}
+
+.res-badge.res-vencido {
+    background: #FCEBEB;
+    border-color: #F0999A;
+    color: #8C2727;
+}
+
+/* ----- Version compacta (tarjetas del listado) ----- */
+
+.res-chip {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin-top: 6px;
+    white-space: nowrap;
+}
+
+.res-chip.res-ok {
+    background: #E4F5F0;
+    color: #0B5341;
+}
+
+.res-chip.res-pronto {
+    background: #FBF0DF;
+    color: #7A5405;
+}
+
+.res-chip.res-vencido {
+    background: #FCEBEB;
+    color: #8C2727;
+}
+
+@media (max-width: 600px) {
+
+    .res-badge {
+        padding: 10px 13px;
+    }
+
+    .res-badge strong {
+        font-size: 13.5px;
+    }
+
+}
