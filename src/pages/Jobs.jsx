@@ -26,6 +26,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 
 import CompanyResponseBadge from "../components/CompanyResponseBadge";
+import ResolutionBadge from "../components/ResolutionBadge";
 import { sinVineta } from "../utils/bullets";
 
 const WORK_MODES = ["Presencial", "Remoto", "Híbrido"];
@@ -722,6 +723,8 @@ function Jobs() {
 
                                 <h2>{job.title}</h2>
 
+                                <ResolutionBadge job={job} variante="compacta" />
+
                                 <p className="job-item-company">
                                     {job.company_profiles?.logo && (
                                         <img
@@ -864,6 +867,8 @@ function Jobs() {
                                 </span>
 
                             </div>
+
+                            <ResolutionBadge job={selectedJob} />
 
                             {/* Postularme */}
                             {(!user || role === "candidato") && (

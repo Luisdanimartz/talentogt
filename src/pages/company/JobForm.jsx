@@ -18,6 +18,16 @@ import {
 import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
 
 import { formatMiles } from "../../utils/formatSalary";
+
+import {
+  hoyISO,
+  fechaLarga,
+  diasParaResolver,
+  fechaMaximaCompromiso,
+  DIAS_VIGENCIA,
+  MAX_AMPLIACIONES,
+  OPCIONES_AMPLIACION,
+} from "../../utils/resolution";
 import { toTitleCase } from "../../utils/textFormat";
 
 import {
@@ -147,11 +157,37 @@ function JobForm({
   onFinalize,
   finalizing,
   creditos,
+  onExtendDeadline,
+  extending,
 }) {
 
   const navigate = useNavigate();
 
   const [programar, setProgramar] = useState(!!form.scheduled_publish_at);
+
+  /* Dias que la empresa quiere agregar al plazo (boton "Ampliar plazo") */
+  const [diasAmpliar, setDiasAmpliar] = useState(OPCIONES_AMPLIACION[0].value);
+
+  const ampliaciones = Number(form.deadline_extensions) || 0;
+  const puedeAmpliar = ampliaciones < MAX_AMPLIACIONES;
+
+  const diasRestantes = form.resolution_deadline
+    ? diasParaResolver(form.resolution_deadline)
+    : null;
+
+  /* La publicacion vale 30 dias: el compromiso no puede pasarse de
+     ahi. Si la vacante esta programada, la cuenta arranca el dia
+     que se publique, no hoy. Ver 057_compromiso_dentro_de_vigencia. */
+  const topeCompromiso = fechaMaximaCompromiso(
+    form.scheduled_publish_at || form.published_at || null
+  );
+
+  /* La empresa PUEDE resolver antes, pero que sepa que al hacerlo
+     esta soltando dias de publicacion que ya pago. */
+  const cierraAntesDeTiempo =
+    !isEdit &&
+    form.resolution_deadline &&
+    form.resolution_deadline.slice(0, 10) < topeCompromiso;
 
   const diasAbierta = isEdit ? diasDesde(form.published_at) : null;
   const llevaMuchoTiempo =
@@ -427,13 +463,25 @@ function JobForm({
 
         <Paper elevation={0} sx={seccion}>
 
-          <TituloSeccion numero={3}>Compensación</TituloSeccion>
+          <TituloSeccion numero={3}>
+            Compensación y compromiso de respuesta
+          </TituloSeccion>
+
+          <Alert
+            severity="info"
+            sx={{ mb: 3, borderRadius: 3 }}
+          >
+            En ChanceGT toda vacante dice cuánto paga y para cuándo se
+            resuelve. Es lo que nos diferencia — y son 5 segundos tuyos
+            que le sirven a todos los candidatos que se postulen.
+          </Alert>
 
           <Grid container spacing={3}>
 
-            <Grid item xs={12} md={5}>
+            <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
+                required
                 label="Salario mensual"
                 name="salary"
                 value={form.salary}
@@ -450,9 +498,171 @@ function JobForm({
                     <InputAdornment position="start">Q</InputAdornment>
                   ),
                 }}
-                helperText="Solo números; las comas se ponen solas"
+                helperText="Obligatorio. Solo números; las comas se ponen solas"
               />
             </Grid>
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="Hasta (opcional)"
+                name="salary_top"
+                value={form.salary_top || ""}
+                onChange={(e) =>
+                  onChange({
+                    target: {
+                      name: "salary_top",
+                      value: formatMiles(e.target.value),
+                    },
+                  })
+                }
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">Q</InputAdornment>
+                  ),
+                }}
+                helperText="Si manejas un rango, aquí va el techo"
+              />
+            </Grid>
+
+            {/* ===== Compromiso de resolución ===== */}
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                type="date"
+                fullWidth
+                required
+                label="Me comprometo a resolver antes del"
+                name="resolution_deadline"
+                value={(form.resolution_deadline || "").slice(0, 10)}
+                onChange={onChange}
+                disabled={isEdit}
+                InputLabelProps={{ shrink: true }}
+                inputProps={{ min: hoyISO(), max: topeCompromiso }}
+                helperText={
+                  isEdit
+                    ? "Para moverla usa “Ampliar plazo”"
+                    : `Hasta el ${fechaLarga(topeCompromiso)} (tu publicación dura ${DIAS_VIGENCIA} días)`
+                }
+              />
+            </Grid>
+
+            {cierraAntesDeTiempo && (
+              <Grid item xs={12}>
+                <Alert severity="warning" sx={{ borderRadius: 3 }}>
+                  Estás eligiendo resolver antes del{" "}
+                  <strong>{fechaLarga(topeCompromiso)}</strong>, que es
+                  hasta cuando llega tu publicación. Al llegar tu fecha la
+                  vacante se cierra, aunque te queden días pagados. Si no
+                  es lo que quieres, déjala en{" "}
+                  {fechaLarga(topeCompromiso)}.
+                </Alert>
+              </Grid>
+            )}
+
+            {!isEdit && (
+              <Grid item xs={12}>
+                <Typography fontSize={12.5} color="text.secondary">
+                  Cuando llegue esa fecha, ChanceGT cierra la vacante y le
+                  avisa por correo a todos los candidatos que sigan en
+                  proceso. No tienes que acordarte de nada: si no alcanzas
+                  a responder, el sistema responde por ti y nadie se queda
+                  colgado.
+                </Typography>
+              </Grid>
+            )}
+
+            {isEdit && form.resolution_deadline && (
+
+              <Grid item xs={12}>
+
+                <Box
+                  sx={{
+                    background: diasRestantes !== null && diasRestantes <= 3
+                      ? "#FBF0DF"
+                      : "#E4F5F0",
+                    border: "1px solid",
+                    borderColor: diasRestantes !== null && diasRestantes <= 3
+                      ? "#F0D5A0"
+                      : "#9FE1CB",
+                    borderRadius: 3,
+                    p: 2.5,
+                  }}
+                >
+
+                  <Typography
+                    fontWeight={700}
+                    fontSize={14.5}
+                    color={
+                      diasRestantes !== null && diasRestantes <= 3
+                        ? "#7A5405"
+                        : "#0B5341"
+                    }
+                  >
+                    {diasRestantes === null
+                      ? "Sin plazo definido"
+                      : diasRestantes < 0
+                        ? "Tu plazo ya venció — ChanceGT está resolviendo por ti"
+                        : diasRestantes === 0
+                          ? "Tu plazo vence hoy"
+                          : `Te comprometiste a resolver antes del ${fechaLarga(form.resolution_deadline)} · faltan ${diasRestantes} día(s)`}
+                  </Typography>
+
+                  <Typography
+                    fontSize={12.5}
+                    color="text.secondary"
+                    sx={{ mt: 0.5 }}
+                  >
+                    {ampliaciones === 0
+                      ? `Puedes ampliarlo hasta ${MAX_AMPLIACIONES} veces. Cada ampliación queda visible para los candidatos.`
+                      : `Ya ampliaste este plazo ${ampliaciones} vez(ces) de ${MAX_AMPLIACIONES}. Los candidatos ven ese dato.`}
+                  </Typography>
+
+                  {puedeAmpliar && onExtendDeadline && (
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        gap: 2,
+                        mt: 2,
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                      }}
+                    >
+
+                      <TextField
+                        select
+                        size="small"
+                        label="Ampliar"
+                        value={diasAmpliar}
+                        onChange={(e) => setDiasAmpliar(Number(e.target.value))}
+                        sx={{ minWidth: 160, background: "#FFFFFF" }}
+                      >
+                        {OPCIONES_AMPLIACION.map((op) => (
+                          <MenuItem key={op.value} value={op.value}>
+                            {op.label}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+
+                      <Button
+                        variant="outlined"
+                        onClick={() => onExtendDeadline(diasAmpliar)}
+                        disabled={extending}
+                        sx={{ textTransform: "none", fontWeight: 600 }}
+                      >
+                        {extending ? "Ampliando…" : "Ampliar plazo"}
+                      </Button>
+
+                    </Box>
+
+                  )}
+
+                </Box>
+
+              </Grid>
+
+            )}
 
             {isEdit && (
               <Grid item xs={12} md={5}>

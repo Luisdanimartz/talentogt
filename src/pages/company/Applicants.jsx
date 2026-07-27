@@ -24,6 +24,8 @@ import {
 } from "../../services/applicationService";
 
 import { APPLICATION_STATUSES } from "../../utils/applicationStatus";
+import { diasParaResolver, fechaLarga } from "../../utils/resolution";
+import "../../styles/ResolutionBadge.css";
 import { computeMatches } from "../../utils/matching";
 import { getDepartments } from "../../services/locationService";
 
@@ -259,6 +261,47 @@ function Applicants() {
         (app) => app.current_status === "applied"
     ).length;
 
+    /*
+      Vacantes cuyo plazo comprometido esta por vencer (o ya vencio)
+      y todavia tienen candidatos sin resolver. Es el aviso que evita
+      que ChanceGT tenga que cerrar el proceso por la empresa —
+      cuando eso pasa, su reputacion publica baja.
+    */
+    const vacantesEnRiesgo = Array.from(
+        new Map(
+            applications
+                .filter((app) => app.jobs?.id && app.jobs?.resolution_deadline)
+                .filter(
+                    (app) =>
+                        app.current_status !== "hired" &&
+                        app.current_status !== "rejected"
+                )
+                .map((app) => [app.jobs.id, app])
+        ).values()
+    )
+        .map((app) => {
+
+            const dias = diasParaResolver(app.jobs.resolution_deadline);
+
+            const sinResolver = applications.filter(
+                (otra) =>
+                    otra.jobs?.id === app.jobs.id &&
+                    otra.current_status !== "hired" &&
+                    otra.current_status !== "rejected"
+            ).length;
+
+            return {
+                id: app.jobs.id,
+                title: app.jobs.title,
+                deadline: app.jobs.resolution_deadline,
+                dias,
+                sinResolver,
+            };
+
+        })
+        .filter((v) => v.dias !== null && v.dias <= 5)
+        .sort((a, b) => a.dias - b.dias);
+
     /* Vacantes unicas presentes en las postulaciones, para el filtro */
     const vacantesDisponibles = Array.from(
         new Map(
@@ -328,6 +371,46 @@ function Applicants() {
                         </p>
 
                     </div>
+
+                    {!loading && vacantesEnRiesgo.length > 0 && (
+
+                        <div style={{ width: "100%", marginTop: 12 }}>
+
+                            {vacantesEnRiesgo.map((vacante) => (
+
+                                <div
+                                    key={vacante.id}
+                                    className={
+                                        vacante.dias < 0
+                                            ? "res-badge res-vencido"
+                                            : "res-badge res-pronto"
+                                    }
+                                >
+
+                                    <strong>
+                                        {vacante.dias < 0
+                                            ? `“${vacante.title}”: tu plazo venció`
+                                            : vacante.dias === 0
+                                                ? `“${vacante.title}”: tu plazo vence hoy`
+                                                : `“${vacante.title}”: te quedan ${vacante.dias} día(s)`}
+                                    </strong>
+
+                                    <span>
+                                        {vacante.sinResolver} candidato(s) sin
+                                        resolver. Te comprometiste al{" "}
+                                        {fechaLarga(vacante.deadline)}.
+                                        {vacante.dias < 0
+                                            ? " ChanceGT ya está cerrando el proceso y avisándoles; eso baja tu reputación pública."
+                                            : " Si no resuelves, ChanceGT los cerrará por ti y tu reputación pública baja."}
+                                    </span>
+
+                                </div>
+
+                            ))}
+
+                        </div>
+
+                    )}
 
                     {!loading && vacantesDisponibles.length > 0 && (
 

@@ -9,6 +9,7 @@ import { getJobApplicantStats } from "../../services/jobService";
 import { getMyInterviewsForApplication } from "../../services/interviewService";
 import { formatSalary } from "../../utils/formatSalary";
 import CompanyResponseBadge from "../../components/CompanyResponseBadge";
+import ResolutionBadge from "../../components/ResolutionBadge";
 
 /*
   Estado del proceso de seleccion — la version ChanceGT.
@@ -201,6 +202,28 @@ function ApplicationDetail() {
                             companyId={job?.company_id}
                             companyName={job?.company_profiles?.company_name}
                         />
+
+                        {/* Mientras el proceso siga abierto, el candidato
+                            ve cuanto falta para que la empresa resuelva.
+                            Si ya se resolvio, no tiene sentido mostrarlo. */}
+                        {application.current_status !== "hired" &&
+                            application.current_status !== "rejected" && (
+                                <ResolutionBadge job={job} />
+                            )}
+
+                        {application.auto_resolved && (
+                            <div className="res-badge res-vencido">
+                                <strong>
+                                    ChanceGT cerró este proceso por ti
+                                </strong>
+                                <span>
+                                    La empresa no resolvió dentro del plazo al
+                                    que se comprometió, así que el sistema cerró
+                                    el proceso para que no te quedaras esperando
+                                    sin respuesta.
+                                </span>
+                            </div>
+                        )}
 
                     </div>
 

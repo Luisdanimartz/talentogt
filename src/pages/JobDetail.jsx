@@ -13,6 +13,7 @@ import {
 import { getDepartments } from "../services/locationService";
 import { computeMatches } from "../utils/matching";
 import CompanyResponseBadge from "../components/CompanyResponseBadge";
+import ResolutionBadge from "../components/ResolutionBadge";
 import "../styles/Jobs.css";
 
 import { useAuth } from "../context/AuthContext";
@@ -345,6 +346,10 @@ function JobDetail() {
                 <strong>Salario:</strong>{" "}
                 {formatSalary(job.salary_min, job.salary_max)}
             </div>
+
+            {/* Compromiso de respuesta: lo que ninguna otra bolsa
+                de trabajo del pais le dice al candidato */}
+            <ResolutionBadge job={job} />
 
             <div style={{ marginBottom: 16 }}>
                 <strong>Descripción</strong>

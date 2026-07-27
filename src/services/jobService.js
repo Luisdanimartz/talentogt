@@ -114,6 +114,9 @@ export async function getPublishedJobs() {
       experience_level,
       contract_type,
       is_urgent,
+      resolution_deadline,
+      original_deadline,
+      deadline_extensions,
       description,
       requirements,
       benefits,
@@ -153,6 +156,20 @@ export async function getMyJobCredits() {
   if (error) return { data: null, error };
 
   return { data: data?.[0] || null, error: null };
+}
+
+/* Amplía el plazo de resolución de una vacante.
+
+   La base de datos es la que manda: máximo 2 ampliaciones y
+   máximo 15 días cada una. Editar la fecha a mano en la tabla
+   no funciona a propósito — así el contador de ampliaciones que
+   ve el candidato siempre es verdad.
+   Ver database/055_compromiso_de_respuesta.sql */
+export async function extendJobDeadline(jobId, dias) {
+  return await supabase.rpc("extend_job_deadline", {
+    p_job_id: jobId,
+    p_dias: dias,
+  });
 }
 
 /* Republicar gratis una vacante que no se llenó en 7 dias

@@ -9,6 +9,7 @@ import {
   getEducationLevels,
   getJobById,
   updateJob,
+  extendJobDeadline,
 } from "../../services/jobService";
 
 import { finalizeJobApplications } from "../../services/applicationService";
@@ -50,6 +51,7 @@ function EditJob() {
 
   const [loading, setLoading] = useState(false);
   const [finalizing, setFinalizing] = useState(false);
+  const [extending, setExtending] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
@@ -92,6 +94,12 @@ function EditJob() {
       salary: jobRes.data.salary_min
         ? formatMiles(jobRes.data.salary_min)
         : "",
+      salary_top:
+        jobRes.data.salary_max &&
+          jobRes.data.salary_max !== jobRes.data.salary_min
+          ? formatMiles(jobRes.data.salary_max)
+          : "",
+      resolution_deadline: jobRes.data.resolution_deadline || "",
       scheduled_publish_at: jobRes.data.scheduled_publish_at
         ? isoADatetimeLocal(jobRes.data.scheduled_publish_at)
         : "",
@@ -140,14 +148,40 @@ function EditJob() {
       created_at,
       updated_at,
       salary,
+      salary_top,
       scheduled_publish_at,
       status,
       published_at,
+      /* El plazo NO se edita desde aqui: se mueve solo con el boton
+         "Ampliar plazo", que pasa por extend_job_deadline() para que
+         el contador de ampliaciones que ve el candidato sea real. */
+      resolution_deadline,
+      original_deadline,
+      deadline_extensions,
+      last_extended_at,
       ...editableFields
     } = form;
     /* eslint-enable no-unused-vars */
 
     const salario = salarioANumero(salary);
+    const salarioTecho = salarioANumero(salary_top);
+
+    if (
+      (status === "published" || status === "scheduled") &&
+      (!salario || salario <= 0)
+    ) {
+      setLoading(false);
+      alert(
+        "Toda vacante publicada en ChanceGT debe indicar el salario mensual."
+      );
+      return;
+    }
+
+    if (salarioTecho && salarioTecho < salario) {
+      setLoading(false);
+      alert("El salario máximo no puede ser menor que el salario mensual.");
+      return;
+    }
 
     const fechaProgramada = scheduled_publish_at
       ? new Date(scheduled_publish_at)
@@ -172,7 +206,9 @@ function EditJob() {
     const { error } = await updateJob(id, {
       ...editableFields,
       salary_min: salario,
-      salary_max: salario,
+      salary_max: salarioTecho && salarioTecho > salario
+        ? salarioTecho
+        : salario,
       status: nuevoStatus,
       published_at: nuevoPublishedAt,
       scheduled_publish_at: estaProgramada
@@ -190,6 +226,37 @@ function EditJob() {
     alert("Vacante actualizada correctamente.");
 
     navigate("/empresa/dashboard");
+
+  }
+
+  async function handleExtend(dias) {
+
+    const seguro = window.confirm(
+      `¿Ampliar ${dias} días más el plazo de "${form.title}"? ` +
+      `Los candidatos verán que ampliaste el plazo, así que úsalo ` +
+      `solo cuando de verdad lo necesites.`
+    );
+
+    if (!seguro) return;
+
+    setExtending(true);
+
+    const { data, error } = await extendJobDeadline(id, dias);
+
+    setExtending(false);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      resolution_deadline: data,
+      deadline_extensions: (Number(prev.deadline_extensions) || 0) + 1,
+    }));
+
+    alert("Plazo ampliado. Los candidatos ya ven la fecha nueva.");
 
   }
 
@@ -270,6 +337,10 @@ function EditJob() {
       onFinalize={handleFinalize}
 
       finalizing={finalizing}
+
+      onExtendDeadline={handleExtend}
+
+      extending={extending}
 
     />
 

@@ -304,6 +304,8 @@ export async function getMyApplications() {
         id,
         title,
         status,
+        resolution_deadline,
+        deadline_extensions,
         company_profiles ( company_name, logo )
       )
     `)
@@ -331,6 +333,7 @@ export async function getMyApplicationDetail(applicationId) {
       current_status,
       applied_at,
       updated_at,
+      auto_resolved,
       jobs (
         id,
         title,
@@ -338,6 +341,9 @@ export async function getMyApplicationDetail(applicationId) {
         salary_min,
         salary_max,
         company_id,
+        status,
+        resolution_deadline,
+        deadline_extensions,
         company_profiles ( company_name, logo )
       ),
       application_status_history ( status, created_at )
