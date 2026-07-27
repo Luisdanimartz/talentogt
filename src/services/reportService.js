@@ -20,6 +20,26 @@ export async function getHiringFunnel(companyId, desde, hasta) {
     .single();
 }
 
+/* Cuantos dias tarda la empresa en pasar de una etapa a la
+   siguiente. Ver database/059_eficiencia_por_etapa.sql */
+export async function getStageEfficiency(companyId, desde, hasta) {
+  return await supabase.rpc("company_stage_efficiency", {
+    cid: companyId,
+    p_desde: desde ? new Date(desde).toISOString() : null,
+    p_hasta: hasta ? new Date(hasta).toISOString() : null,
+  });
+}
+
+/* Postulaciones y contrataciones mes a mes (ultimos N meses).
+   No usa el filtro de fecha de la pantalla a proposito: es una
+   tendencia, y una tendencia de un solo mes no dice nada. */
+export async function getMonthlyMetrics(companyId, meses = 12) {
+  return await supabase.rpc("company_monthly_metrics", {
+    cid: companyId,
+    p_meses: meses,
+  });
+}
+
 /* El mismo desglose, vacante por vacante */
 export async function getJobsReport(companyId, desde, hasta) {
   return await supabase.rpc("company_jobs_report", {

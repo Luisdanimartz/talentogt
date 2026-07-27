@@ -24,7 +24,15 @@ import {
 import RecruiterSidebar from "../../components/recruiter/layout/RecruiterSidebar";
 
 import { getMyCompanyContext } from "../../services/teamService";
-import { getHiringFunnel, getJobsReport } from "../../services/reportService";
+import {
+    getHiringFunnel,
+    getJobsReport,
+    getStageEfficiency,
+    getMonthlyMetrics,
+} from "../../services/reportService";
+
+import StageEfficiency from "../../components/company/reports/StageEfficiency";
+import MonthlyTrend from "../../components/company/reports/MonthlyTrend";
 
 /*
   Reportes de la empresa: embudo de contratacion, tiempos de
@@ -493,6 +501,8 @@ function Reports() {
     const [myRole, setMyRole] = useState(null);
     const [funnel, setFunnel] = useState(null);
     const [jobs, setJobs] = useState([]);
+    const [etapas, setEtapas] = useState([]);
+    const [tendencia, setTendencia] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -523,10 +533,13 @@ function Reports() {
         setCompany(companyData);
         setMyRole(role);
 
-        const [funnelResult, jobsResult] = await Promise.all([
-            getHiringFunnel(companyData.id, rangoActual.desde, rangoActual.hasta),
-            getJobsReport(companyData.id, rangoActual.desde, rangoActual.hasta),
-        ]);
+        const [funnelResult, jobsResult, etapasResult, tendenciaResult] =
+            await Promise.all([
+                getHiringFunnel(companyData.id, rangoActual.desde, rangoActual.hasta),
+                getJobsReport(companyData.id, rangoActual.desde, rangoActual.hasta),
+                getStageEfficiency(companyData.id, rangoActual.desde, rangoActual.hasta),
+                getMonthlyMetrics(companyData.id, 12),
+            ]);
 
         if (funnelResult.error || jobsResult.error) {
             setError(
@@ -537,6 +550,8 @@ function Reports() {
 
         setFunnel(funnelResult.data || null);
         setJobs(jobsResult.data || []);
+        setEtapas(etapasResult.data || []);
+        setTendencia(tendenciaResult.data || []);
 
         setLoading(false);
 
@@ -784,6 +799,76 @@ function Reports() {
                                 </Paper>
 
                             )}
+
+                            {/* Eficiencia por etapa: donde se atora el proceso */}
+
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    p: 3,
+                                    borderRadius: 3,
+                                    border: "1px solid #E6E8EC",
+                                }}
+                            >
+
+                                <Typography
+                                    variant="h6"
+                                    fontWeight="bold"
+                                    color="#0B1F3A"
+                                >
+                                    ¿Dónde se atora tu proceso?
+                                </Typography>
+
+                                <Typography
+                                    fontSize={13}
+                                    color="text.secondary"
+                                    mb={2.5}
+                                >
+                                    Días promedio que tardas en mover a un
+                                    candidato de un paso al siguiente.
+                                </Typography>
+
+                                <StageEfficiency
+                                    etapas={etapas}
+                                    loading={loading}
+                                />
+
+                            </Paper>
+
+                            {/* Tendencia mensual */}
+
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    p: 3,
+                                    borderRadius: 3,
+                                    border: "1px solid #E6E8EC",
+                                }}
+                            >
+
+                                <Typography
+                                    variant="h6"
+                                    fontWeight="bold"
+                                    color="#0B1F3A"
+                                >
+                                    Cómo vas mes a mes
+                                </Typography>
+
+                                <Typography
+                                    fontSize={13}
+                                    color="text.secondary"
+                                    mb={2.5}
+                                >
+                                    Últimos 12 meses. Esta gráfica no cambia
+                                    con el filtro de arriba: es una tendencia.
+                                </Typography>
+
+                                <MonthlyTrend
+                                    meses={tendencia}
+                                    loading={loading}
+                                />
+
+                            </Paper>
 
                             {/* Tabla detallada por vacante */}
 
