@@ -27,9 +27,9 @@ function Hero() {
     function handleBuscar() {
 
         if (busqueda.trim()) {
-            navigate(`/vacantes?q=${encodeURIComponent(busqueda.trim())}`);
+            navigate(`/empleos?q=${encodeURIComponent(busqueda.trim())}`);
         } else {
-            navigate("/vacantes");
+            navigate("/empleos");
         }
 
     }

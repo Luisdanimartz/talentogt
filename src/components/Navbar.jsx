@@ -59,7 +59,7 @@ function Navbar() {
 
         <nav className="nav-links">
 
-          <Link to="/vacantes">
+          <Link to="/empleos">
             Buscar empleo
           </Link>
 

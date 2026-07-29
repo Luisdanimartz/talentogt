@@ -1,0 +1,15 @@
+# ChanceGT - https://www.chancegt.com
+
+User-agent: *
+Allow: /
+
+# Areas privadas: nunca deben indexarse
+Disallow: /candidato/
+Disallow: /empresa/
+Disallow: /admin/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+
+Sitemap: https://www.chancegt.com/sitemap.xml

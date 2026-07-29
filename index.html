@@ -1,16 +1,87 @@
 <!doctype html>
-<html lang="en">
+<html lang="es-GT">
+
   <head>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ChanceGT | Plataforma de Empleo para Guatemala</title>
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- ============================================================
+         Identidad de marca: Sora para titulares, Inter para texto.
+         Antes se cargaba Roboto, que no es la tipografia del sistema
+         de diseno de ChanceGT.
+         ============================================================ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet">
+
+    <!-- ============================================================
+         SEO base
+
+         Estas etiquetas son las de respaldo, para las paginas que se
+         sirven directo desde el SPA. Las paginas publicas de empleo
+         (/empleos y /empleos/{slug}) reciben sus propias etiquetas
+         desde las funciones de Vercel, ya renderizadas por servidor.
+         ============================================================ -->
+
+    <title>ChanceGT | Bolsa de trabajo en Guatemala</title>
+
+    <meta
+      name="description"
+      content="Bolsa de trabajo de Guatemala donde toda vacante publica su salario y su fecha de resolucion. Postulate y segui tu proceso en todo momento." />
+
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="ChanceGT" />
+    <link rel="canonical" href="https://www.chancegt.com/" />
+
+    <!-- Open Graph: esto es lo que se ve al compartir en WhatsApp,
+         Facebook y LinkedIn. Sin esto el enlace sale en blanco. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ChanceGT" />
+    <meta property="og:locale" content="es_GT" />
+    <meta property="og:title" content="ChanceGT | Bolsa de trabajo en Guatemala" />
+    <meta
+      property="og:description"
+      content="Toda vacante con salario visible y fecha de resolucion. Conectamos talento, creamos oportunidades." />
+    <meta property="og:url" content="https://www.chancegt.com/" />
+    <meta property="og:image" content="https://www.chancegt.com/og-chancegt.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ChanceGT | Bolsa de trabajo en Guatemala" />
+    <meta
+      name="twitter:description"
+      content="Toda vacante con salario visible y fecha de resolucion." />
+    <meta name="twitter:image" content="https://www.chancegt.com/og-chancegt.png" />
+
+    <meta name="theme-color" content="#0B2447" />
+
+    <!-- Identidad de la organizacion para Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "ChanceGT",
+      "url": "https://www.chancegt.com/",
+      "logo": "https://www.chancegt.com/logo-chancegt.svg",
+      "slogan": "Conectamos talento, creamos oportunidades",
+      "areaServed": {
+        "@type": "Country",
+        "name": "Guatemala"
+      }
+    }
+    </script>
+
   </head>
+
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
+
 </html>

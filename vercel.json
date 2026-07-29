@@ -1,5 +1,41 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+
   "rewrites": [
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+
+    { "source": "/empleos", "destination": "/api/empleos" },
+
+    {
+      "source": "/empleos/en/:departamento",
+      "destination": "/api/empleos?departamento=:departamento"
+    },
+    {
+      "source": "/empleos/en/:departamento/:municipio",
+      "destination": "/api/empleos?departamento=:departamento&municipio=:municipio"
+    },
+    {
+      "source": "/empleos/de/:categoria",
+      "destination": "/api/empleos?categoria=:categoria"
+    },
+
+    { "source": "/empleos/:slug", "destination": "/api/empleo?slug=:slug" },
+
+    { "source": "/vacantes", "destination": "/api/empleos" },
+    { "source": "/vacantes/:slug", "destination": "/api/empleo?slug=:slug" },
+
     { "source": "/(.*)", "destination": "/index.html" }
+  ],
+
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, must-revalidate"
+        }
+      ]
+    }
   ]
 }

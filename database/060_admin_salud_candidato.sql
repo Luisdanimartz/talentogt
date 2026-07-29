@@ -73,6 +73,8 @@ begin
       min(h.created_at) filter (where h.status <> 'applied')
         as primera_respuesta
     from public.applications a
+    left join public.application_status_history h
+      on h.application_id = a.id
     where (p_desde is null or a.applied_at >= p_desde)
       and (p_hasta is null or a.applied_at <= p_hasta)
     group by a.id, a.current_status, a.applied_at,
@@ -162,7 +164,7 @@ begin
     extract(day from now() - j.published_at)::integer,
     (select count(*) from public.job_views v where v.job_id = j.id),
     count(a.id),
-    j.salary_min
+    j.salary_min::numeric
   from public.jobs j
   join public.company_profiles c on c.id = j.company_id
   left join public.applications a on a.job_id = j.id

@@ -328,7 +328,7 @@ function CandidateDashboard() {
 
             <button
                 style={{ ...botonEstilo("#0E8F73"), marginTop: 12 }}
-                onClick={() => navigate("/vacantes")}
+                onClick={() => navigate("/empleos")}
             >
                 Ver vacantes disponibles
             </button>

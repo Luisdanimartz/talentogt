@@ -97,7 +97,7 @@ function HowItWorks() {
             </div>
 
             <button
-              onClick={() => navigate("/vacantes")}
+              onClick={() => navigate("/empleos")}
             >
               Buscar empleos
             </button>

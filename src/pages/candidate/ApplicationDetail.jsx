@@ -4,7 +4,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import "../../styles/theme.css";
 import "../../styles/ApplicationDetail.css";
 
-import { getMyApplicationDetail } from "../../services/candidateService";
+import {
+    getMyApplicationDetail,
+    getCurrentCandidateProfile,
+    getOpenJobsForSuggestions,
+    getMyApplications,
+    withdrawApplication,
+} from "../../services/candidateService";
+import { getDepartments } from "../../services/locationService";
+import { computeMatches } from "../../utils/matching";
 import { getJobApplicantStats } from "../../services/jobService";
 import { getMyInterviewsForApplication } from "../../services/interviewService";
 import { formatSalary } from "../../utils/formatSalary";
@@ -57,6 +65,11 @@ function ApplicationDetail() {
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
 
+    const [profile, setProfile] = useState(null);
+    const [departments, setDepartments] = useState([]);
+    const [sugeridas, setSugeridas] = useState([]);
+    const [retirando, setRetirando] = useState(false);
+
     useEffect(() => {
 
         loadData();
@@ -83,6 +96,64 @@ function ApplicationDetail() {
             if (statsData && statsData.length > 0) {
                 setStats(statsData[0]);
             }
+
+        }
+
+        /*
+          Perfil y departamentos: para poder decirle al candidato
+          que cumple y que le falta de ESTA plaza, con el mismo
+          motor que usa la empresa (utils/matching.js).
+        */
+        const [perfilRes, deptosRes] = await Promise.all([
+            getCurrentCandidateProfile(),
+            getDepartments(),
+        ]);
+
+        setProfile(perfilRes.data || null);
+        setDepartments(deptosRes.data || []);
+
+        /*
+          Otras plazas que le encajan. Se calculan aqui y no en el
+          servidor porque el motor de coincidencias vive en el
+          cliente y ya esta probado.
+        */
+        if (perfilRes.data) {
+
+            const [abiertasRes, misRes] = await Promise.all([
+                getOpenJobsForSuggestions(30),
+                getMyApplications(),
+            ]);
+
+            const yaPostuladas = new Set(
+                (misRes.data || [])
+                    .map((app) => app.jobs?.id)
+                    .filter(Boolean)
+            );
+
+            const deptos = deptosRes.data || [];
+
+            const candidatas = (abiertasRes.data || [])
+                .filter((vacante) => !yaPostuladas.has(vacante.id))
+                .map((vacante) => {
+
+                    const nombreDepto = deptos.find(
+                        (d) => d.id === vacante.department_id
+                    )?.name;
+
+                    const match = computeMatches(
+                        perfilRes.data,
+                        vacante,
+                        nombreDepto
+                    );
+
+                    return { ...vacante, match };
+
+                })
+                .filter((vacante) => vacante.match.score > 0)
+                .sort((a, b) => b.match.score - a.match.score)
+                .slice(0, 3);
+
+            setSugeridas(candidatas);
 
         }
 
@@ -154,6 +225,39 @@ function ApplicationDetail() {
             status: application.current_status,
             created_at: application.updated_at,
         });
+    }
+
+    async function handleRetirar() {
+
+        const motivo = window.prompt(
+            "¿Por qué te retiras de este proceso? (opcional)\n\n" +
+            "Por ejemplo: ya conseguí trabajo, el salario no me sirve, " +
+            "queda muy lejos. Nos ayuda a mejorar."
+        );
+
+        /* Cancel en el prompt devuelve null: ahi no se hace nada */
+        if (motivo === null) return;
+
+        const seguro = window.confirm(
+            "¿Seguro que quieres retirar tu candidatura? " +
+            "La empresa dejará de considerarte y no se puede deshacer."
+        );
+
+        if (!seguro) return;
+
+        setRetirando(true);
+
+        const { error } = await withdrawApplication(application.id, motivo);
+
+        setRetirando(false);
+
+        if (error) {
+            alert(error.message);
+            return;
+        }
+
+        loadData();
+
     }
 
     /* Fecha por etapa (la mas reciente de cada una) */
@@ -248,7 +352,7 @@ function ApplicationDetail() {
 
                     <button
                         className="appdetail-verjob"
-                        onClick={() => navigate(`/vacantes/${job?.id}`)}
+                        onClick={() => navigate(`/empleos/${job?.slug || job?.id}`)}
                     >
                         Ver la publicación
                     </button>
@@ -368,6 +472,15 @@ function ApplicationDetail() {
 
                         })}
 
+                        {application.current_status === "withdrawn" && (
+                            <p className="timeline-note">
+                                Te retiraste de este proceso
+                                {application.withdrawn_at &&
+                                    ` el ${new Date(application.withdrawn_at).toLocaleDateString("es-GT", { day: "numeric", month: "long" })}`}
+                                . La empresa ya no te está considerando.
+                            </p>
+                        )}
+
                         {application.current_status === "applied" && (
                             <p className="timeline-note">
                                 {application.cv_viewed_at
@@ -375,6 +488,84 @@ function ApplicationDetail() {
                                     : "La empresa aún no responde. En ChanceGT su reputación de respuesta es pública, así que le conviene hacerlo pronto."}
                             </p>
                         )}
+
+                    </section>
+
+                    {/* ===== Tu perfil contra esta plaza ===== */}
+                    <section className="appdetail-fit">
+
+                        <h2>Tu perfil contra esta plaza</h2>
+
+                        {(() => {
+
+                            if (!profile) {
+                                return (
+                                    <p className="fit-empty">
+                                        Completa tu perfil para ver qué tan
+                                        bien encajas con esta plaza.
+                                    </p>
+                                );
+                            }
+
+                            const nombreDepto = departments.find(
+                                (d) => d.id === job?.department_id
+                            )?.name;
+
+                            const { checks, score, total } = computeMatches(
+                                profile,
+                                job,
+                                nombreDepto
+                            );
+
+                            if (total === 0) {
+                                return (
+                                    <p className="fit-empty">
+                                        Esta vacante no tiene requisitos
+                                        suficientes para compararte.
+                                    </p>
+                                );
+                            }
+
+                            const faltantes = checks.filter((c) => !c.ok);
+
+                            return (
+
+                                <>
+
+                                    <div className="fit-score">
+                                        <strong>{score}</strong> de {total}{" "}
+                                        requisitos cumplidos
+                                    </div>
+
+                                    <ul className="fit-list">
+
+                                        {checks.map((check, i) => (
+                                            <li
+                                                key={i}
+                                                className={
+                                                    check.ok
+                                                        ? "fit-ok"
+                                                        : "fit-falta"
+                                                }
+                                            >
+                                                {check.ok ? "✓" : "•"}{" "}
+                                                {check.text}
+                                            </li>
+                                        ))}
+
+                                    </ul>
+
+                                    <p className="fit-nota">
+                                        {faltantes.length === 0
+                                            ? "Cumples con todo lo que pide la plaza. Ahora depende de la empresa."
+                                            : "Lo que aparece sin marca es lo que puedes mejorar en tu perfil para las próximas plazas."}
+                                    </p>
+
+                                </>
+
+                            );
+
+                        })()}
 
                     </section>
 
@@ -446,6 +637,91 @@ function ApplicationDetail() {
                     </aside>
 
                 </div>
+
+                {/* ===== Otras plazas que encajan contigo ===== */}
+
+                {sugeridas.length > 0 && (
+
+                    <section className="appdetail-sugeridas">
+
+                        <h2>Otras plazas que encajan contigo</h2>
+
+                        <p className="sugeridas-intro">
+                            Mientras esperas respuesta, estas vacantes
+                            abiertas coinciden con tu perfil.
+                        </p>
+
+                        <div className="sugeridas-lista">
+
+                            {sugeridas.map((vacante) => (
+
+                                <button
+                                    key={vacante.id}
+                                    type="button"
+                                    className="sugerida-card"
+                                    onClick={() =>
+                                        navigate(`/empleos/${vacante.slug || vacante.id}`)
+                                    }
+                                >
+
+                                    <strong>{vacante.title}</strong>
+
+                                    <span className="sugerida-empresa">
+                                        {vacante.company_profiles?.company_name}
+                                    </span>
+
+                                    <span className="sugerida-salario">
+                                        {formatSalary(
+                                            vacante.salary_min,
+                                            vacante.salary_max
+                                        )}
+                                    </span>
+
+                                    <span className="sugerida-match">
+                                        Cumples {vacante.match.score} de{" "}
+                                        {vacante.match.total} requisitos
+                                    </span>
+
+                                </button>
+
+                            ))}
+
+                        </div>
+
+                    </section>
+
+                )}
+
+                {/* ===== Retirar candidatura ===== */}
+
+                {application.current_status !== "withdrawn" &&
+                    application.current_status !== "hired" &&
+                    application.current_status !== "rejected" && (
+
+                        <section className="appdetail-retirar">
+
+                            <div>
+                                <strong>¿Ya no te interesa esta plaza?</strong>
+                                <p>
+                                    Puedes retirarte del proceso. La empresa
+                                    dejará de considerarte y tu decisión no
+                                    afecta su reputación en ChanceGT.
+                                </p>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={handleRetirar}
+                                disabled={retirando}
+                            >
+                                {retirando
+                                    ? "Retirando…"
+                                    : "Retirar mi candidatura"}
+                            </button>
+
+                        </section>
+
+                    )}
 
             </div>
 

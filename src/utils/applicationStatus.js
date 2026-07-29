@@ -9,6 +9,7 @@ export const APPLICATION_STATUSES = [
     { value: "interview", label: "Entrevista", tone: "navy" },
     { value: "hired", label: "Contratado", tone: "teal" },
     { value: "rejected", label: "No seleccionado", tone: "red" },
+    { value: "withdrawn", label: "Retirada por el candidato", tone: "slate" },
 ];
 
 export const STATUS_LABELS = Object.fromEntries(

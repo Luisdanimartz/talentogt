@@ -107,6 +107,39 @@ function App() {
           element={<ResetPassword />}
         />
 
+        {/* Rutas publicas de empleo.
+
+            /empleos y /empleos/:slug son las buenas: son las que se
+            indexan y las que se comparten. Las de /vacantes se
+            conservan porque hay enlaces viejos circulando. En el
+            servidor Vercel ya las redirige; esto cubre la navegacion
+            interna de la aplicacion. */}
+
+        <Route
+          path="/empleos"
+          element={<Jobs />}
+        />
+
+        <Route
+          path="/empleos/en/:departamento"
+          element={<Jobs />}
+        />
+
+        <Route
+          path="/empleos/en/:departamento/:municipio"
+          element={<Jobs />}
+        />
+
+        <Route
+          path="/empleos/de/:categoria"
+          element={<Jobs />}
+        />
+
+        <Route
+          path="/empleos/:slug"
+          element={<JobDetail />}
+        />
+
         <Route
           path="/vacantes"
           element={<Jobs />}

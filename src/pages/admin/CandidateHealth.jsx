@@ -92,7 +92,14 @@ function CandidateHealth() {
         setKpis(kpiRes.data?.[0] || null);
         setSinCandidatos(sinRes.data || []);
         setRanking(rankRes.data || []);
-        setDeadlines(deadRes.data || []);
+        /* admin_deadlines_proximos() devuelve tambien vacantes que
+           ya estan resueltas; aqui solo interesan las que de verdad
+           tienen gente esperando. */
+        setDeadlines(
+            (deadRes.data || []).filter(
+                (d) => Number(d.pendientes) > 0
+            )
+        );
 
         setLoading(false);
 
@@ -152,7 +159,7 @@ function CandidateHealth() {
                                 display: "grid",
                                 gridTemplateColumns: {
                                     xs: "1fr 1fr",
-                                    md: "repeat(5, 1fr)",
+                                    md: "repeat(6, 1fr)",
                                 },
                                 gap: 2,
                                 mb: 3,
@@ -192,6 +199,12 @@ function CandidateHealth() {
                                         : "—"
                                 }
                                 nota="Promedio de la plataforma"
+                            />
+
+                            <Kpi
+                                titulo="Retiradas"
+                                valor={kpis?.retiradas || 0}
+                                nota="El candidato se salió"
                             />
 
                             <Kpi

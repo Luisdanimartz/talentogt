@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-import { getJobById, registerJobView } from "../services/jobService";
+import { getJobBySlugOrId, registerJobView } from "../services/jobService";
 import { formatSalary } from "../utils/formatSalary";
 
 import {
@@ -43,7 +43,11 @@ function BloqueLineas({ texto }) {
 
 function JobDetail() {
 
-    const { id } = useParams();
+    /* La ruta nueva es /empleos/:slug y la vieja /vacantes/:id.
+       Tomamos la que venga; el servicio detecta si es slug o UUID. */
+    const params = useParams();
+    const clave = params.slug || params.id;
+
     const navigate = useNavigate();
 
     const { user } = useAuth();
@@ -62,26 +66,31 @@ function JobDetail() {
 
         loadJob();
 
-    }, [id, user]);
+    }, [clave, user]);
 
     async function loadJob() {
 
         setLoading(true);
 
-        const { data, error } = await getJobById(id);
+        const { data, error } = await getJobBySlugOrId(clave);
 
         if (!error) {
             setJob(data);
-            registerJobView(id); // no bloquea la carga, el dedupe lo maneja la BD
+            registerJobView(data.id); // no bloquea la carga, el dedupe lo maneja la BD
         }
+
+        /* El id real de la vacante: lo necesitamos para postularse y
+           para consultar la postulacion existente, porque en la URL
+           nueva lo que viene es el slug, no el UUID. */
+        const jobId = data?.id;
 
         /* Si es candidato, revisamos si ya se postuló
            y traemos su perfil para las coincidencias */
-        if (user && role === "candidato") {
+        if (user && role === "candidato" && jobId) {
 
             const [existingRes, profileRes, departmentsRes] =
                 await Promise.all([
-                    getMyApplicationForJob(id),
+                    getMyApplicationForJob(jobId),
                     getCurrentCandidateProfile(),
                     getDepartments(),
                 ]);
@@ -107,7 +116,7 @@ function JobDetail() {
         setApplying(true);
         setApplyError(null);
 
-        const { data, error } = await applyToJob(id);
+        const { data, error } = await applyToJob(job.id);
 
         setApplying(false);
 
@@ -248,7 +257,7 @@ function JobDetail() {
                     </button>
 
                     <button
-                        onClick={() => navigate("/vacantes")}
+                        onClick={() => navigate("/empleos")}
                         style={{
                             background: "transparent",
                             color: "#0E8F73",

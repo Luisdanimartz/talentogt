@@ -316,6 +316,52 @@ export async function getMyApplications() {
 }
 
 /*
+  El candidato se retira de un proceso.
+
+  Una candidatura retirada no cuenta ni a favor ni en contra de la
+  empresa en su reputacion publica: no es merito suyo, pero tampoco
+  es culpa suya. Ver database/061_retirar_candidatura.sql
+*/
+export async function withdrawApplication(applicationId, motivo) {
+
+  return await supabase.rpc("withdraw_application", {
+    p_application_id: applicationId,
+    p_motivo: motivo || null,
+  });
+
+}
+
+/*
+  Otras vacantes abiertas para recomendarle al candidato, sin las
+  que ya tiene postuladas. La afinidad se calcula en el cliente con
+  utils/matching.js, el mismo motor de siempre.
+*/
+export async function getOpenJobsForSuggestions(limite = 30) {
+
+  return await supabase
+    .from("jobs")
+    .select(`
+      id,
+      title,
+      description,
+      requirements,
+      department_id,
+      salary_min,
+      salary_max,
+      work_mode,
+      is_urgent,
+      published_at,
+      resolution_deadline,
+      company_profiles!inner ( company_name, logo, status )
+    `)
+    .eq("status", "published")
+    .eq("company_profiles.status", "activa")
+    .order("published_at", { ascending: false })
+    .limit(limite);
+
+}
+
+/*
   Detalle de una postulacion del candidato actual: la vacante,
   el estado y su linea de tiempo completa.
 */
@@ -336,9 +382,12 @@ export async function getMyApplicationDetail(applicationId) {
       updated_at,
       auto_resolved,
       cv_viewed_at,
+      withdrawn_at,
       jobs (
         id,
         title,
+        description,
+        requirements,
         department_id,
         salary_min,
         salary_max,

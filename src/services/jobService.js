@@ -45,6 +45,34 @@ export async function getCompanyJobs(companyId) {
     .order("created_at", { ascending: false });
 }
 
+/*
+  Busca una vacante por su slug (URL nueva: /empleos/asistente-de-...)
+  o por su UUID (URL vieja: /vacantes/7c2e9a14-...).
+
+  Detecta cual de los dos le mandaron, asi que sirve para ambos casos
+  sin que la pantalla tenga que preocuparse.
+*/
+export async function getJobBySlugOrId(clave) {
+
+  const esUuid =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      .test(String(clave || ""));
+
+  const consulta = supabase
+    .from("jobs")
+    .select(`
+      *,
+      company_profiles ( company_name, logo, status )
+    `);
+
+  if (esUuid) {
+    return await consulta.eq("id", clave).single();
+  }
+
+  return await consulta.eq("slug", clave).single();
+
+}
+
 export async function getJobById(jobId) {
   return await supabase
     .from("jobs")
@@ -102,6 +130,7 @@ export async function getPublishedJobs() {
     .from("jobs")
     .select(`
       id,
+      slug,
       title,
       work_mode,
       salary_min,
