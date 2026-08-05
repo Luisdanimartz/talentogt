@@ -482,6 +482,37 @@
     background: #E4F5F0;
 }
 
+.status-toast {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: #E4F5F0;
+    border: 1px solid #0E8F73;
+    color: #0B1F3A;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 14.5px;
+    line-height: 1.4;
+    animation: status-toast-in 0.2s ease-out;
+}
+
+.status-toast button {
+    background: none;
+    border: none;
+    color: #0E8F73;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+@keyframes status-toast-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .schedule-form {
     margin-top: 10px;
     padding: 12px;

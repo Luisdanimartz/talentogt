@@ -23,7 +23,7 @@ import {
     updateApplicationStatus,
 } from "../../services/applicationService";
 
-import { APPLICATION_STATUSES } from "../../utils/applicationStatus";
+import { APPLICATION_STATUSES, statusLabel } from "../../utils/applicationStatus";
 import {
     diasParaResolver,
     fechaLarga,
@@ -64,6 +64,7 @@ function Applicants() {
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
     const [savingId, setSavingId] = useState(null);
+    const [toast, setToast] = useState(null);
 
     /* Filtro por vacante publicada */
     const [jobFilter, setJobFilter] = useState("todas");
@@ -138,6 +139,15 @@ function Applicants() {
             return;
         }
 
+        const candidato = applications.find((a) => a.id === applicationId);
+        const nombre = nombreCandidato(candidato?.candidate_profiles);
+
+        setToast(
+            `Estado actualizado a "${statusLabel(status)}". ` +
+            `Se le notificará a ${nombre} por correo automáticamente.`
+        );
+        setTimeout(() => setToast(null), 5000);
+
         setApplications((prev) =>
             prev.map((app) =>
                 app.id === applicationId
@@ -194,6 +204,13 @@ function Applicants() {
             alert(
                 `Se actualizaron algunos, pero ${fallidos.length} no se pudieron marcar. Intenta de nuevo con esos.`
             );
+        } else {
+            const cantidad = resultados.length;
+            setToast(
+                `${cantidad} ${cantidad === 1 ? "candidato marcado" : "candidatos marcados"} como "No seleccionado". ` +
+                `Se les notificará por correo automáticamente.`
+            );
+            setTimeout(() => setToast(null), 5000);
         }
 
     }
@@ -365,6 +382,19 @@ function Applicants() {
             <RecruiterSidebar company={company} role={myRole} />
 
             <main className="dashboard-content">
+
+                {toast && (
+                    <div className="status-toast" role="status">
+                        <span>{toast}</span>
+                        <button
+                            type="button"
+                            aria-label="Cerrar aviso"
+                            onClick={() => setToast(null)}
+                        >
+                            ×
+                        </button>
+                    </div>
+                )}
 
                 <header className="applicants-header">
 
