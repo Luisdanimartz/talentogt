@@ -13,7 +13,10 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 function Login() {
 
@@ -25,6 +28,7 @@ function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const [errors, setErrors] = useState({});
 
@@ -249,13 +253,30 @@ function Login() {
 
               <TextField
                 label="Contraseña"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 fullWidth
                 margin="normal"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 error={!!errors.password || !!errors.general}
                 helperText={errors.password || errors.general}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label={
+                          showPassword
+                            ? "Ocultar contraseña"
+                            : "Mostrar contraseña"
+                        }
+                        onClick={() => setShowPassword((v) => !v)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
 
               <FormControlLabel

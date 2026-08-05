@@ -9,7 +9,10 @@ import {
   TextField,
   Button,
   Alert,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import { updatePassword } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
@@ -24,6 +27,8 @@ function ResetPassword() {
   const [guardando, setGuardando] = useState(false);
   const [listo, setListo] = useState(false);
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   async function handleSubmit() {
 
@@ -187,22 +192,60 @@ function ResetPassword() {
 
                   <TextField
                     label="Contraseña nueva"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     fullWidth
                     margin="normal"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     autoComplete="new-password"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label={
+                              showPassword
+                                ? "Ocultar contraseña"
+                                : "Mostrar contraseña"
+                            }
+                            onClick={() => setShowPassword((v) => !v)}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
 
                   <TextField
                     label="Confirmar contraseña"
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     fullWidth
                     margin="normal"
                     value={confirmar}
                     onChange={(e) => setConfirmar(e.target.value)}
                     autoComplete="new-password"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label={
+                              showConfirmPassword
+                                ? "Ocultar contraseña"
+                                : "Mostrar contraseña"
+                            }
+                            onClick={() => setShowConfirmPassword((v) => !v)}
+                            edge="end"
+                          >
+                            {showConfirmPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
 
                   <Button
