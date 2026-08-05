@@ -89,7 +89,7 @@
     display: grid;
     grid-template-columns: 1.4fr 1fr;
     gap: 20px;
-    align-items: start;
+    align-items: stretch;
 }
 
 /* ----- Linea de tiempo ----- */
